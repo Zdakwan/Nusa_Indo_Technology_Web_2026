@@ -253,7 +253,11 @@ class AdminProyekController extends Controller
                 ->setPaper('a4', 'portrait')
                 ->setOption('isRemoteEnabled', true);
 
-        // 3. Tampilkan PDF di tab baru (Preview / Stream)
-        return $pdf->stream('Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf', ['Attachment' => false]);
+        $tanggalDibuat = $proyek->created_at
+            ? $proyek->created_at->locale('id')->translatedFormat('l-d-F-Y_H-i')
+            : 'tanggal-tidak-tersedia';
+
+        // 3. Unduh PDF melalui browser
+        return $pdf->download('Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '-' . $tanggalDibuat . '.pdf');
     }
 }

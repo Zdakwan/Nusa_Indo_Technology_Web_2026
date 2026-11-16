@@ -30,10 +30,10 @@
 
         /* Progres Box Khusus */
         .progress-box { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; margin-bottom: 30px; text-align: center; }
-        .progress-text { font-size: 14px; font-weight: bold; color: #1e3352; margin-bottom: 10px; }
-        .progress-container { width: 80%; margin: 0 auto; }
-        .progress-bg { background-color: #e2e8f0; width: 100%; height: 8px; border-radius: 4px; }
-        .progress-fill { background-color: #f7bd55; height: 8px; border-radius: 4px; }
+        .progress-text { font-size: 16px; font-weight: bold; color: #1e3352; margin-bottom: 10px; }
+        .progress-container { width: 90%; margin: 0 auto; }
+        .progress-bg { background-color: #e2e8f0; width: 100%; height: 14px; border-radius: 7px; }
+        .progress-fill { background-color: #dc2626; height: 14px; border-radius: 7px; }
 
         /* Riwayat Progress (Timeline) */
         .history-section { margin-bottom: 40px; }
