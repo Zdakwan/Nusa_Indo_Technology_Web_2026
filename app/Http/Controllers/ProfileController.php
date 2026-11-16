@@ -8,7 +8,51 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    // Menampilkan halaman profil client
+    /*
+    |--------------------------------------------------------------------------
+    | KONFIGURASI UPLOAD FOTO PROFIL
+    |--------------------------------------------------------------------------
+    |
+    | Semua pengaturan format dan ukuran foto berada di sini.
+    | Ukuran maksimal dihitung dalam KB.
+    |
+    */
+
+    private const AVATAR_MAX_KB = 2048;
+
+    private const AVATAR_ALLOWED_MIMES = [
+        'jpg',
+        'jpeg',
+        'png',
+    ];
+
+    private const AVATAR_ALLOWED_TYPES = [
+        'image/jpeg',
+        'image/png',
+    ];
+
+    /**
+     * Mengambil konfigurasi upload foto profil.
+     */
+    private function avatarConfig(): array
+    {
+        return [
+            'maxKb' => self::AVATAR_MAX_KB,
+            'maxBytes' => self::AVATAR_MAX_KB * 1024,
+            'maxMb' => self::AVATAR_MAX_KB / 1024,
+            'mimes' => self::AVATAR_ALLOWED_MIMES,
+            'mimeTypes' => self::AVATAR_ALLOWED_TYPES,
+
+            'accept' => implode(',', array_map(
+                fn ($mime) => '.' . $mime,
+                self::AVATAR_ALLOWED_MIMES
+            )),
+        ];
+    }
+
+    /**
+     * Halaman profil client.
+     */
     public function index()
     {
         $client = Auth::guard('client')->user();
@@ -16,46 +60,94 @@ class ProfileController extends Controller
         return view('profile.index', compact('client'));
     }
 
-    // Menampilkan form edit profil
+    /**
+     * Halaman edit profil client.
+     */
     public function edit()
     {
         $client = Auth::guard('client')->user();
 
-        return view('profile.edit', compact('client'));
+        $avatarConfig = $this->avatarConfig();
+
+        return view('profile.edit', compact(
+            'client',
+            'avatarConfig'
+        ));
     }
 
-    // Memvalidasi dan menyimpan perubahan profil
+    /**
+     * Memperbarui profil client.
+     */
     public function update(Request $request)
     {
         $client = Auth::guard('client')->user();
 
-        // Validasi data profil dan foto
+        $avatarConfig = $this->avatarConfig();
+
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
             'email' => [
                 'required',
                 'email',
                 'max:255',
                 'unique:clients,email,' . $client->id,
             ],
-            'phone' => ['required', 'string', 'max:20'],
-            'address' => ['nullable', 'string'],
-            'company' => ['nullable', 'string', 'max:255'],
-            'position' => ['nullable', 'string', 'max:255'],
+
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+            ],
+
+            'address' => [
+                'nullable',
+                'string',
+            ],
+
+            'company' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'position' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            // Validasi foto profil
             'avatar' => [
                 'nullable',
                 'image',
-                'mimes:jpeg,png,jpg',
-                'max:2048',
+                'mimes:' . implode(',', $avatarConfig['mimes']),
+                'max:' . $avatarConfig['maxKb'],
             ],
+
+        ], [
+            'avatar.image' => 'File yang diunggah harus berupa gambar.',
+
+            'avatar.mimes' => 'Format foto harus berupa JPG, JPEG, atau PNG.',
+
+            'avatar.max' => 'Ukuran foto profil maksimal 2 MB.',
         ]);
 
-        // Simpan path foto lama
         $oldAvatar = $client->avatar;
         $newAvatar = null;
 
-        // Simpan foto baru jika ada unggahan
+        /*
+        |--------------------------------------------------------------------------
+        | SIMPAN FOTO BARU
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->hasFile('avatar')) {
+
             $newAvatar = $request->file('avatar')
                 ->store('avatars', 'public');
 
@@ -70,10 +162,23 @@ class ProfileController extends Controller
             $validated['avatar'] = $newAvatar;
         }
 
-        // Perbarui data profil
+        /*
+        |--------------------------------------------------------------------------
+        | PERBARUI DATA CLIENT
+        |--------------------------------------------------------------------------
+        */
+
         $client->update($validated);
 
-        // Hapus foto lama setelah data profil berhasil diperbarui
+        /*
+        |--------------------------------------------------------------------------
+        | HAPUS FOTO LAMA
+        |--------------------------------------------------------------------------
+        |
+        | Foto lama dihapus hanya jika foto baru berhasil disimpan.
+        |
+        */
+
         if (
             $newAvatar &&
             $oldAvatar &&
@@ -88,20 +193,19 @@ class ProfileController extends Controller
             ->with('success', 'Profil berhasil diperbarui!');
     }
 
-    // Menghapus foto profil client
+    /**
+     * Menghapus foto profil client.
+     */
     public function deleteAvatar()
     {
         $client = Auth::guard('client')->user();
 
-        // Simpan path foto lama
         $oldAvatar = $client->avatar;
 
-        // Kosongkan foto profil di database
         $client->update([
             'avatar' => null,
         ]);
 
-        // Hapus file foto dari penyimpanan
         if (
             $oldAvatar &&
             Storage::disk('public')->exists($oldAvatar)

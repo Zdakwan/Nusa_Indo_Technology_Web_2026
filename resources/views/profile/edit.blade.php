@@ -25,11 +25,13 @@
         {{-- Kolom kiri: Foto profil --}}
         <div class="w-full lg:w-1/3">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center">
+
                 <h3 class="w-full text-left font-bold text-gray-900 mb-6">
                     Foto Profil
                 </h3>
 
                 <div class="w-48 h-48 rounded-full overflow-hidden bg-gray-100 border-4 border-gray-50 flex items-center justify-center mb-6 relative group">
+
                     @if($client->avatar)
                         <img
                             id="avatar-preview"
@@ -53,18 +55,21 @@
                             class="fas fa-user text-6xl text-gray-300 mt-4">
                         </i>
                     @endif
+
                 </div>
 
+                {{-- Input foto --}}
                 <input
                     type="file"
                     id="avatar-upload"
                     name="avatar"
                     class="hidden"
-                    accept="image/jpeg,image/png">
+                    accept="{{ $avatarConfig['accept'] }}">
 
                 <label
                     for="avatar-upload"
                     class="bg-[#d1d5db] hover:bg-gray-400 text-gray-800 px-6 py-2.5 rounded-lg font-semibold text-sm cursor-pointer transition w-full text-center flex justify-center items-center">
+
                     <i class="fas fa-edit mr-2"></i>
                     Ganti Foto
                 </label>
@@ -76,13 +81,16 @@
                         form="delete-avatar-form"
                         onclick="return confirm('Yakin ingin menghapus foto profil?')"
                         class="bg-red-100 hover:bg-red-200 text-red-700 px-6 py-2.5 rounded-lg font-semibold text-sm transition w-full text-center mt-3">
+
                         <i class="fas fa-trash-alt mr-2"></i>
                         Hapus Foto
                     </button>
                 @endif
 
+                {{-- Keterangan format dan ukuran diambil dari Controller --}}
                 <p class="text-xs text-gray-500 mt-3 text-center">
-                    Format JPG/PNG, maksimal 2 MB setelah crop.
+                    Format {{ strtoupper(implode('/', $avatarConfig['mimes'])) }},
+                    maksimal {{ $avatarConfig['maxMb'] }} MB.
                 </p>
 
                 @error('avatar')
@@ -90,17 +98,21 @@
                         {{ $message }}
                     </span>
                 @enderror
+
             </div>
         </div>
 
         {{-- Kolom kanan: Informasi pribadi --}}
         <div class="w-full lg:w-2/3">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+
                 <h3 class="text-lg font-bold text-gray-900 mb-6">
                     Informasi Pribadi
                 </h3>
 
                 <div class="space-y-5">
+
+                    {{-- Nama lengkap --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-800 mb-2">
                             Nama Lengkap <span class="text-red-500">*</span>
@@ -114,10 +126,13 @@
                             class="w-full bg-[#f3f4f6] border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3">
 
                         @error('name')
-                            <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
+                    {{-- Email --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-800 mb-2">
                             Email <span class="text-red-500">*</span>
@@ -131,10 +146,13 @@
                             class="w-full bg-[#f3f4f6] border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3">
 
                         @error('email')
-                            <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
+                    {{-- Nomor telepon --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-800 mb-2">
                             No Telepon <span class="text-red-500">*</span>
@@ -148,10 +166,13 @@
                             class="w-full bg-[#f3f4f6] border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3">
 
                         @error('phone')
-                            <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </span>
                         @enderror
                     </div>
 
+                    {{-- Alamat --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-800 mb-2">
                             Alamat
@@ -164,6 +185,7 @@
                             class="w-full bg-[#f3f4f6] border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3">
                     </div>
 
+                    {{-- Perusahaan --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-800 mb-2">
                             Perusahaan
@@ -176,6 +198,7 @@
                             class="w-full bg-[#f3f4f6] border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3">
                     </div>
 
+                    {{-- Jabatan --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-800 mb-2">
                             Jabatan
@@ -187,9 +210,12 @@
                             value="{{ old('position', $client->position) }}"
                             class="w-full bg-[#f3f4f6] border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3">
                     </div>
+
                 </div>
 
+                {{-- Tombol aksi --}}
                 <div class="flex justify-end space-x-3 mt-8">
+
                     <button
                         type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition shadow-sm">
@@ -201,6 +227,7 @@
                         class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-6 py-2.5 rounded-lg font-bold text-sm transition">
                         Batal
                     </a>
+
                 </div>
             </div>
         </div>
@@ -212,7 +239,10 @@
         class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
 
         <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
+
+            {{-- Header modal --}}
             <div class="flex items-center justify-between p-4 border-b">
+
                 <h3 class="text-lg font-bold text-gray-900">
                     Sesuaikan Foto Profil
                 </h3>
@@ -224,9 +254,12 @@
                     aria-label="Tutup">
                     &times;
                 </button>
+
             </div>
 
+            {{-- Area crop --}}
             <div class="p-4">
+
                 <div class="w-full h-72 sm:h-96 bg-gray-100 overflow-hidden">
                     <img
                         id="crop-image"
@@ -235,7 +268,9 @@
                         class="block max-w-full">
                 </div>
 
+                {{-- Kontrol crop --}}
                 <div class="flex justify-center gap-3 mt-4">
+
                     <button
                         type="button"
                         id="zoom-out"
@@ -258,10 +293,13 @@
                         class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100">
                         Reset
                     </button>
+
                 </div>
             </div>
 
+            {{-- Footer modal --}}
             <div class="flex justify-end gap-3 p-4 border-t">
+
                 <button
                     type="button"
                     id="crop-cancel"
@@ -275,12 +313,15 @@
                     class="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">
                     Gunakan Foto
                 </button>
+
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
+
+{{-- CropperJS --}}
 <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -299,6 +340,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 
 <script>
+    /*
+    |--------------------------------------------------------------------------
+    | KONFIGURASI DARI CONTROLLER
+    |--------------------------------------------------------------------------
+    */
+
+    const AVATAR_CONFIG = {
+        maxBytes: @json($avatarConfig['maxBytes']),
+        maxMb: @json($avatarConfig['maxMb']),
+        mimeTypes: @json($avatarConfig['mimeTypes'])
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | VARIABEL CROP
+    |--------------------------------------------------------------------------
+    */
+
     let cropper = null;
     let temporaryImageUrl = null;
     let previewImageUrl = null;
@@ -309,28 +368,49 @@
     const cropApplyButton = document.getElementById('crop-apply');
     const profileForm = document.getElementById('profile-form');
 
-    // Buka modal ketika pengguna memilih foto
+    /*
+    |--------------------------------------------------------------------------
+    | MEMBUKA MODAL CROP
+    |--------------------------------------------------------------------------
+    */
+
     avatarInput.addEventListener('change', function () {
+
         const file = this.files[0];
 
         if (!file) {
             return;
         }
 
-        if (!['image/jpeg', 'image/png'].includes(file.type)) {
-            alert('Pilih foto berformat JPG atau PNG.');
+        // Validasi format file berdasarkan Controller
+        if (!AVATAR_CONFIG.mimeTypes.includes(file.type)) {
+
+            alert(
+                'Format foto tidak diizinkan. Silakan pilih JPG, JPEG, atau PNG.'
+            );
+
             this.value = '';
             return;
         }
 
-        if (file.size > 10 * 1024 * 1024) {
-            alert('Ukuran foto maksimal 10 MB sebelum crop.');
+        // Validasi ukuran foto asli sebelum modal crop dibuka
+        if (file.size > AVATAR_CONFIG.maxBytes) {
+
+            alert(
+                `Ukuran foto maksimal ${AVATAR_CONFIG.maxMb} MB. Silakan pilih foto lain.`
+            );
+
             this.value = '';
             return;
         }
 
+        // Pastikan CropperJS berhasil dimuat
         if (typeof Cropper === 'undefined') {
-            alert('Fitur crop belum berhasil dimuat. Periksa koneksi internet.');
+
+            alert(
+                'Fitur crop belum berhasil dimuat. Periksa koneksi internet.'
+            );
+
             this.value = '';
             return;
         }
@@ -343,6 +423,7 @@
         cropModal.classList.add('flex');
 
         cropImage.onload = function () {
+
             cropper = new Cropper(cropImage, {
                 aspectRatio: 1,
                 viewMode: 1,
@@ -356,136 +437,311 @@
                 cropBoxResizable: false,
                 toggleDragModeOnDblclick: false
             });
+
         };
 
         cropImage.onerror = function () {
-            alert('Foto tidak dapat dibuka. Silakan pilih foto lain.');
+
+            alert(
+                'Foto tidak dapat dibuka. Silakan pilih foto lain.'
+            );
+
             avatarInput.value = '';
+
             closeCropModal();
+
         };
 
         cropImage.src = temporaryImageUrl;
+
     });
 
-    // Tutup modal dan bersihkan objek crop
+    /*
+    |--------------------------------------------------------------------------
+    | MENUTUP MODAL DAN MEMBERSIHKAN CROP
+    |--------------------------------------------------------------------------
+    */
+
     function closeCropModal() {
+
         if (cropper) {
+
             cropper.destroy();
             cropper = null;
+
         }
 
         cropImage.onload = null;
         cropImage.onerror = null;
+
         cropImage.removeAttribute('src');
 
         if (temporaryImageUrl) {
+
             URL.revokeObjectURL(temporaryImageUrl);
             temporaryImageUrl = null;
+
         }
 
         cropModal.classList.add('hidden');
         cropModal.classList.remove('flex');
+
     }
 
-    // Batalkan pemilihan foto
+    /*
+    |--------------------------------------------------------------------------
+    | MEMBATALKAN CROP
+    |--------------------------------------------------------------------------
+    */
+
     function cancelCrop() {
+
         closeCropModal();
+
         avatarInput.value = '';
+
     }
 
-    document.getElementById('crop-close').addEventListener('click', cancelCrop);
-    document.getElementById('crop-cancel').addEventListener('click', cancelCrop);
+    document
+        .getElementById('crop-close')
+        .addEventListener('click', cancelCrop);
+
+    document
+        .getElementById('crop-cancel')
+        .addEventListener('click', cancelCrop);
 
     cropModal.addEventListener('click', function (event) {
+
         if (event.target === cropModal) {
+
             cancelCrop();
+
         }
+
     });
 
-    // Perbesar atau perkecil foto
-    document.getElementById('zoom-in').addEventListener('click', function () {
-        if (cropper) {
-            cropper.zoom(0.1);
-        }
-    });
+    /*
+    |--------------------------------------------------------------------------
+    | ZOOM FOTO
+    |--------------------------------------------------------------------------
+    */
 
-    document.getElementById('zoom-out').addEventListener('click', function () {
-        if (cropper) {
-            cropper.zoom(-0.1);
-        }
-    });
+    document
+        .getElementById('zoom-in')
+        .addEventListener('click', function () {
 
-    // Kembalikan posisi crop ke kondisi awal
-    document.getElementById('crop-reset').addEventListener('click', function () {
-        if (cropper) {
-            cropper.reset();
-        }
-    });
+            if (cropper) {
 
-    // Terapkan hasil crop pada foto profil
+                cropper.zoom(0.1);
+
+            }
+
+        });
+
+    document
+        .getElementById('zoom-out')
+        .addEventListener('click', function () {
+
+            if (cropper) {
+
+                cropper.zoom(-0.1);
+
+            }
+
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESET CROP
+    |--------------------------------------------------------------------------
+    */
+
+    document
+        .getElementById('crop-reset')
+        .addEventListener('click', function () {
+
+            if (cropper) {
+
+                cropper.reset();
+
+            }
+
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENERAPKAN HASIL CROP
+    |--------------------------------------------------------------------------
+    */
+
     cropApplyButton.addEventListener('click', function () {
+
         if (!cropper) {
             return;
         }
 
         const canvas = cropper.getCroppedCanvas({
+
             width: 512,
             height: 512,
+
             imageSmoothingEnabled: true,
             imageSmoothingQuality: 'high'
+
         });
 
         if (!canvas) {
-            alert('Foto gagal diproses. Silakan coba kembali.');
+
+            alert(
+                'Foto gagal diproses. Silakan coba kembali.'
+            );
+
             return;
         }
 
         canvas.toBlob(function (blob) {
+
             if (!blob) {
-                alert('Foto gagal diproses. Silakan coba kembali.');
+
+                alert(
+                    'Foto gagal diproses. Silakan coba kembali.'
+                );
+
                 return;
             }
 
-            if (blob.size > 2 * 1024 * 1024) {
-                alert('Ukuran foto setelah crop melebihi 2 MB. Perkecil atau pilih foto lain.');
+            // Validasi ukuran hasil crop berdasarkan Controller
+            if (blob.size > AVATAR_CONFIG.maxBytes) {
+
+                alert(
+                    `Ukuran hasil crop melebihi ${AVATAR_CONFIG.maxMb} MB. Silakan sesuaikan kembali foto.`
+                );
+
                 return;
             }
 
+            // Hasil crop disimpan sebagai JPEG
             const croppedFile = new File(
                 [blob],
                 'avatar.jpg',
-                { type: 'image/jpeg' }
+                {
+                    type: 'image/jpeg'
+                }
             );
 
+            // Masukkan hasil crop ke input file
             const transfer = new DataTransfer();
+
             transfer.items.add(croppedFile);
+
             avatarInput.files = transfer.files;
 
+            // Tampilkan hasil crop pada preview
             const preview = document.getElementById('avatar-preview');
             const icon = document.getElementById('avatar-icon');
 
             if (previewImageUrl) {
+
                 URL.revokeObjectURL(previewImageUrl);
+
             }
 
             previewImageUrl = URL.createObjectURL(blob);
+
             preview.src = previewImageUrl;
+
             preview.classList.remove('hidden');
 
             if (icon) {
+
                 icon.classList.add('hidden');
+
             }
 
             closeCropModal();
+
         }, 'image/jpeg', 0.9);
+
     });
 
-    // Cegah formulir disimpan saat modal crop masih terbuka
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI SEBELUM FORM DIKIRIM
+    |--------------------------------------------------------------------------
+    */
+
     profileForm.addEventListener('submit', function (event) {
+
+        // Pastikan modal crop sudah ditutup
         if (!cropModal.classList.contains('hidden')) {
+
             event.preventDefault();
-            alert('Terapkan atau batalkan crop foto terlebih dahulu.');
+
+            alert(
+                'Terapkan atau batalkan crop foto terlebih dahulu.'
+            );
+
+            return;
         }
+
+        const file = avatarInput.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        // Validasi ulang format file
+        if (!AVATAR_CONFIG.mimeTypes.includes(file.type)) {
+
+            event.preventDefault();
+
+            alert(
+                'Format foto tidak diizinkan.'
+            );
+
+            avatarInput.value = '';
+
+            return;
+        }
+
+        // Validasi ulang ukuran file
+        if (file.size > AVATAR_CONFIG.maxBytes) {
+
+            event.preventDefault();
+
+            alert(
+                `Ukuran foto maksimal ${AVATAR_CONFIG.maxMb} MB.`
+            );
+
+            avatarInput.value = '';
+
+            return;
+        }
+
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MEMBERSIHKAN URL PREVIEW
+    |--------------------------------------------------------------------------
+    */
+
+    window.addEventListener('beforeunload', function () {
+
+        if (previewImageUrl) {
+
+            URL.revokeObjectURL(previewImageUrl);
+
+        }
+
+        if (temporaryImageUrl) {
+
+            URL.revokeObjectURL(temporaryImageUrl);
+
+        }
+
+    });
+
 </script>
+
 @endpush
