@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Notifications\ClientResetPasswordNotification;
 
 class Client extends Authenticatable
 {
@@ -37,5 +38,10 @@ class Client extends Authenticatable
     public function proyek(): HasMany
     {
     return $this->hasMany(Proyek::class, 'client_id');
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ClientResetPasswordNotification($token));
     }
 }
