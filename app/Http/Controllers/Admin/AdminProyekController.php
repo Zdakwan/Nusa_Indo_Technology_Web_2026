@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminProyekController extends Controller
 {
@@ -239,5 +240,20 @@ class AdminProyekController extends Controller
         return redirect()
             ->route('admin.proyek.index')
             ->with('success', 'Proyek berhasil dihapus.');
+
+    }
+
+    public function exportSinglePdf($id)
+    {
+        // 1. Ambil data 1 proyek beserta relasi client-nya
+        $proyek = \App\Models\Proyek::with('client')->findOrFail($id);
+
+        // 2. Load file single_pdf.blade.php
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.proyek.single_pdf', compact('proyek'))
+                ->setPaper('a4', 'portrait')
+                ->setOption('isRemoteEnabled', true);
+
+        // 3. Tampilkan PDF di tab baru (Preview / Stream)
+        return $pdf->stream('Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf', ['Attachment' => false]);
     }
 }

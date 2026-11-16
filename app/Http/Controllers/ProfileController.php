@@ -56,7 +56,6 @@ class ProfileController extends Controller
     public function index()
     {
         $client = Auth::guard('client')->user();
-
         return view('profile.index', compact('client'));
     }
 
@@ -152,13 +151,8 @@ class ProfileController extends Controller
                 ->store('avatars', 'public');
 
             if (!$newAvatar) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'avatar' => 'Foto gagal disimpan. Silakan coba kembali.',
-                    ]);
+                return back()->withInput()->withErrors(['avatar' => 'Foto gagal disimpan. Silakan coba kembali.']);
             }
-
             $validated['avatar'] = $newAvatar;
         }
 
@@ -188,9 +182,7 @@ class ProfileController extends Controller
             Storage::disk('public')->delete($oldAvatar);
         }
 
-        return redirect()
-            ->route('profile.index')
-            ->with('success', 'Profil berhasil diperbarui!');
+        return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui!');
     }
 
     /**
@@ -213,8 +205,6 @@ class ProfileController extends Controller
             Storage::disk('public')->delete($oldAvatar);
         }
 
-        return redirect()
-            ->route('profile.edit')
-            ->with('success', 'Foto profil berhasil dihapus!');
+        return redirect()->route('profile.edit')->with('success', 'Foto profil berhasil dihapus!');
     }
 }

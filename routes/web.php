@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Admin\TentangKamiController;
+use App\Http\Controllers\Admin\LoginLogController;
 use App\Http\Controllers\Admin\AdminProyekController;
 
 /*
@@ -71,14 +72,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
             // Rute Tambah, Edit, dan Hapus Aktivitas Dashboard
-            Route::post('/dashboard/aktivitas', [AdminDashboardController::class, 'storeAktivitas'])
-                ->name('dashboard.aktivitas.store');
-
-            Route::put('/dashboard/aktivitas/{id}', [AdminDashboardController::class, 'updateAktivitas'])
-                ->name('dashboard.aktivitas.update');
-
-            Route::delete('/dashboard/aktivitas/{id}', [AdminDashboardController::class, 'destroyAktivitas'])
-                ->name('dashboard.aktivitas.destroy');
+            Route::post('/dashboard/aktivitas', [AdminDashboardController::class, 'storeAktivitas'])->name('dashboard.aktivitas.store');
+            Route::put('/dashboard/aktivitas/{id}', [AdminDashboardController::class, 'updateAktivitas'])->name('dashboard.aktivitas.update');
+            Route::delete('/dashboard/aktivitas/{id}', [AdminDashboardController::class, 'destroyAktivitas'])->name('dashboard.aktivitas.destroy');
 
             // Rute Pengaturan dikembalikan ke sini agar bisa diakses semua admin
             Route::get('/pengaturan', [AdminPengaturanController::class, 'index'])->name('pengaturan.index');
@@ -95,14 +91,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('client', ClientController::class);
 
             // Rute riwayat-login digabung di sini agar tidak duplikat
-            Route::get('/riwayat-login', [\App\Http\Controllers\Admin\LoginLogController::class, 'index'])->name('riwayat-login.index');
+            Route::get('/riwayat-login', [LoginLogController::class, 'index'])->name('riwayat-login.index');
 
-            // Manajemen Proyek
-            Route::post('/proyek/{id}/progress', [AdminProyekController::class, 'updateProgress'])
-                ->name('proyek.updateProgress');
+            // === Manajemen Proyek ===
+            // Rute statis (PDF Single & Progress)
+            Route::get('/proyek/{id}/pdf', [AdminProyekController::class, 'exportSinglePdf'])->name('proyek.single.pdf');
+            Route::post('/proyek/{id}/progress', [AdminProyekController::class, 'updateProgress'])->name('proyek.updateProgress');
 
-            Route::resource('proyek', AdminProyekController::class)
-                ->except(['update']);
+            // Rute resource WAJIB DI BAWAH rute statis
+            Route::resource('proyek', AdminProyekController::class)->except(['update']);
         });
 
         // ---- AKSES SUPER ADMIN & ADMIN KONTEN ----
@@ -110,17 +107,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('ensiklopedia', EnsiklopediaController::class);
             Route::resource('portofolio', PortofolioController::class);
             Route::resource('pelatihan', PelatihanController::class);
-        });
 
-        // ---- AKSES KHUSUS SUPER ADMIN ----
-        Route::middleware('admin.role:super_admin')->group(function () {
-            Route::resource('pengguna', PenggunaController::class);
-
+            // Rute Tentang Kami dipindahkan ke sini agar Admin Konten bisa mengaksesnya
             Route::get('/tentang-kami', [TentangKamiController::class, 'index'])->name('tentang-kami.index');
             Route::put('/tentang-kami/profil', [TentangKamiController::class, 'updateProfil'])->name('tentang-kami.profil.update');
             Route::post('/tentang-kami/tim', [TentangKamiController::class, 'storeTim'])->name('tentang-kami.tim.store');
             Route::put('/tentang-kami/tim/{id}', [TentangKamiController::class, 'updateTim'])->name('tentang-kami.tim.update');
             Route::delete('/tentang-kami/tim/{id}', [TentangKamiController::class, 'destroyTim'])->name('tentang-kami.tim.destroy');
+        });
+
+        // ---- AKSES KHUSUS SUPER ADMIN ----
+        Route::middleware('admin.role:super_admin')->group(function () {
+            Route::resource('pengguna', PenggunaController::class);
         });
     });
 });
@@ -187,12 +185,11 @@ Route::middleware('auth:client')->group(function () {
     Route::post('/pengaturan/call-center', [CallCenterController::class, 'store'])->name('call-center.store');
 
     // Proyek Saya
-    Route::get('/proyek', [ProyekClientController::class, 'index'])
-        ->name('proyek.index');
+    Route::get('/proyek', [ProyekClientController::class, 'index'])->name('proyek.index');
+    // Rute export PDF Client (Statis di atas Resource)
+    Route::get('/proyek/{id}/pdf', [ProyekClientController::class, 'exportPdf'])->name('client.proyek.pdf');
+    Route::get('/proyek/{id}', [ProyekClientController::class, 'show'])->name('proyek.show');
 
-    Route::get('/proyek/{id}', [ProyekClientController::class, 'show'])
-        ->name('proyek.show');
-
-    //Logout
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Logout
+    Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 });

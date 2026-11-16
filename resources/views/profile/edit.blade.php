@@ -7,6 +7,21 @@
         <h2 class="text-2xl font-bold text-gray-900">Edit Profil</h2>
     </div>
 
+    <!-- Jika Ada Error (General) -->
+    @if ($errors->any())
+        <div class="mb-6 px-4 py-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded shadow-sm" role="alert">
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-exclamation-circle"></i>
+                <span class="font-bold">Gagal menyimpan data!</span>
+            </div>
+            <ul class="list-disc list-inside text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Form penghapusan foto dibuat terpisah dari form utama --}}
     <form id="delete-avatar-form"
           action="{{ route('profile.avatar.delete') }}"
@@ -64,7 +79,7 @@
                     id="avatar-upload"
                     name="avatar"
                     class="hidden"
-                    accept="{{ $avatarConfig['accept'] }}">
+                    accept="image/jpeg,image/png,image/gif,image/bmp">
 
                 <label
                     for="avatar-upload"
@@ -87,14 +102,15 @@
                     </button>
                 @endif
 
-                {{-- Keterangan format dan ukuran diambil dari Controller --}}
-                <p class="text-xs text-gray-500 mt-3 text-center">
-                    Format {{ strtoupper(implode('/', $avatarConfig['mimes'])) }},
-                    maksimal {{ $avatarConfig['maxMb'] }} MB.
+                <p class="mt-3 text-xs text-red-500 font-medium text-center">
+                    *Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.
                 </p>
+                 @error('gambar')
+                    <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+                @enderror
 
                 @error('avatar')
-                    <span class="text-red-500 text-xs mt-2">
+                    <span class="text-red-500 text-xs mt-2 text-center block font-bold">
                         {{ $message }}
                     </span>
                 @enderror
@@ -382,24 +398,14 @@
             return;
         }
 
-        // Validasi format file berdasarkan Controller
-        if (!AVATAR_CONFIG.mimeTypes.includes(file.type)) {
-
-            alert(
-                'Format foto tidak diizinkan. Silakan pilih JPG, JPEG, atau PNG.'
-            );
-
+        if (!['image/jpeg', 'image/png', 'image/gif', 'image/bmp'].includes(file.type)) {
+            alert('Pilih foto berformat JPG, PNG, GIF, atau BMP.');
             this.value = '';
             return;
         }
 
-        // Validasi ukuran foto asli sebelum modal crop dibuka
-        if (file.size > AVATAR_CONFIG.maxBytes) {
-
-            alert(
-                `Ukuran foto maksimal ${AVATAR_CONFIG.maxMb} MB. Silakan pilih foto lain.`
-            );
-
+        if (file.size > 15 * 1024 * 1024) {
+            alert('Ukuran foto maksimal 15 MB sebelum crop.');
             this.value = '';
             return;
         }
@@ -610,13 +616,8 @@
                 return;
             }
 
-            // Validasi ukuran hasil crop berdasarkan Controller
-            if (blob.size > AVATAR_CONFIG.maxBytes) {
-
-                alert(
-                    `Ukuran hasil crop melebihi ${AVATAR_CONFIG.maxMb} MB. Silakan sesuaikan kembali foto.`
-                );
-
+            if (blob.size > 8 * 1024 * 1024) {
+                alert('Ukuran foto setelah crop melebihi 8 MB. Perkecil atau pilih foto lain.');
                 return;
             }
 
