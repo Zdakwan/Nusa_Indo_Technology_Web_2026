@@ -116,7 +116,7 @@
                     <input type="checkbox" class="w-4 h-4 accent-[#f7bd55] cursor-pointer">
                     <span class="ml-2 text-sm text-gray-300 font-semibold">Ingat saya</span>
                 </label>
-                <a href="#" class="text-sm font-bold text-[#f7bd55] hover:underline">Lupa password?</a>
+                <a href="{{ route('password.request') }}" class="text-sm font-bold text-[#f7bd55] hover:underline">Lupa password?</a>
             </div>
 
             <button type="submit" id="btn-submit-login" class="w-full btn-yellow hover:bg-yellow-500 font-extrabold py-4 rounded-full transition duration-300 text-sm shadow-lg">

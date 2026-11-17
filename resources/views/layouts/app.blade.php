@@ -227,18 +227,6 @@
                     <i class="fas fa-bars text-xl"></i>
                 </button>
 
-                <div class="relative hidden sm:block w-96">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-gray-400"></i>
-                    </div>
-
-                    <input
-                        type="text"
-                        class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-[#f7bd55] focus:border-[#f7bd55] block pl-10 p-2"
-                        placeholder="Penelusuran"
-                    >
-                </div>
-
             </div>
 
             {{-- INFORMASI CLIENT --}}

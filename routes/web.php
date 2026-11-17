@@ -16,6 +16,7 @@ use App\Http\Controllers\PanduanController;
 use App\Http\Controllers\CallCenterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProyekClientController;
+use App\Http\Controllers\PasswordResetController;
 
 // --- Controller Admin ---
 use App\Http\Controllers\AdminAuthController;
@@ -157,6 +158,13 @@ Route::middleware('guest:client')->group(function () {
         ->middleware('throttle:client-auth')
         ->name('register.process');
 });
+
+Route::get('/lupa-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+Route::post('/lupa-password', [PasswordResetController::class, 'sendResetLink'])
+    ->middleware('throttle:6,1')
+    ->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 
 Route::middleware('auth:client')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
