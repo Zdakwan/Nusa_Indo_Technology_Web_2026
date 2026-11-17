@@ -8,19 +8,28 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('client_password_reset_tokens')) {
-            return;
-        }
+        Schema::create('clients', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('username')->nullable();
+            $table->string('email')->unique();
+            $table->string('phone')->nullable();
+            $table->string('password');
 
-        Schema::create('client_password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+            // Kolom profil yang digabungkan
+            $table->string('avatar')->nullable();
+            $table->text('address')->nullable();
+            $table->string('company')->nullable();
+            $table->string('position')->nullable();
+
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('client_password_reset_tokens');
+        Schema::dropIfExists('clients');
     }
 };
+
