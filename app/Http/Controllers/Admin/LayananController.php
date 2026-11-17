@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Layanan;
+use App\Services\MobileApi;
 use Illuminate\Http\Request;
 
 class LayananController extends Controller
@@ -24,7 +25,10 @@ class LayananController extends Controller
             'deskripsi'    => 'required|string',
         ]);
 
-        Layanan::create($data);
+        $layanan = Layanan::create($data);
+
+        // Teruskan ke aplikasi mobile (gagal kirim tidak membatalkan simpan).
+        app(MobileApi::class)->pushLayanan($layanan);
 
         return redirect()->route('admin.layanan.index')->with('success', 'Layanan berhasil ditambahkan.');
     }
@@ -43,6 +47,8 @@ class LayananController extends Controller
 
         $layanan->update($data);
 
+        app(MobileApi::class)->pushLayanan($layanan);
+
         return redirect()->route('admin.layanan.index')->with('success', 'Layanan berhasil diperbarui.');
     }
 
@@ -50,7 +56,10 @@ class LayananController extends Controller
     {
         $layanan = Layanan::findOrFail($id);
 
+        $idWeb = $layanan->id;
         $layanan->delete();
+
+        app(MobileApi::class)->deleteLayanan($idWeb);
 
         return redirect()->route('admin.layanan.index')->with('success', 'Layanan berhasil dihapus.');
     }

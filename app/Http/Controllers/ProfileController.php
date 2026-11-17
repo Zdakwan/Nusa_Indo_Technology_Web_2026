@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Services\MobileApi;
 
 class ProfileController extends Controller
 {
@@ -51,6 +52,9 @@ class ProfileController extends Controller
         }
 
         $client->update($validated);
+
+        // Samakan perubahan profil ke aplikasi mobile.
+        app(MobileApi::class)->pushClient($client);
 
         if ($newAvatar && $oldAvatar && $oldAvatar !== $newAvatar && Storage::disk('public')->exists($oldAvatar)) {
             Storage::disk('public')->delete($oldAvatar);

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use App\Models\Client;
 use App\Models\LoginLog;
+use App\Services\MobileApi;
 
 class AuthController extends Controller
 {
@@ -153,13 +154,18 @@ class AuthController extends Controller
             'password.regex' => 'Password harus mengandung kombinasi huruf besar, huruf kecil, angka, dan karakter spesial (@$!%*#?&).'
         ]);
 
-        Client::create([
+        // Kolom di tabel clients bernama `phone` (bukan `no_telp`); field form tetap no_telp.
+        $client = Client::create([
             'name' => $validated['name'],
             'username' => $validated['username'],
             'email' => $validated['email'],
-            'no_telp' => $validated['no_telp'],
+            'phone' => $validated['no_telp'],
             'password' => Hash::make($validated['password']),
         ]);
+
+        // Teruskan klien baru ke aplikasi mobile. Gagal kirim tidak membatalkan pendaftaran
+        // (bisa diulang dengan: php artisan mobile:sync-klien).
+        app(MobileApi::class)->pushClient($client);
 
         return redirect()
             ->route('login')

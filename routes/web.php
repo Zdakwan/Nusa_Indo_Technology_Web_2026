@@ -98,7 +98,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/proyek/{id}/pdf', [AdminProyekController::class, 'exportSinglePdf'])->name('proyek.single.pdf');
             Route::post('/proyek/{id}/progress', [AdminProyekController::class, 'updateProgress'])->name('proyek.updateProgress');
 
-            // Rute resource WAJIB DI BAWAH rute statis
+            // Rute resource  
             Route::resource('proyek', AdminProyekController::class)->except(['update']);
         });
 
