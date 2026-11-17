@@ -9,13 +9,21 @@
         <p class="text-sm text-gray-500 mt-1">Manajemen data Pelatihan IT (LMS) Nusa Indo Tech.</p>
     </div>
 
-    <!-- Tombol Tambah -->
-    <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#254261] hover:bg-[#1a2f45] text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-        <i class="fas fa-plus"></i> Tambah Pelatihan
-    </button>
+    <div class="flex items-center gap-2">
+        <button type="button" id="btnToggleBulk" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg shadow-sm transition-all">
+            <i class="fa-solid fa-list-check"></i> Pilih Hapus
+        </button>
+
+        <button type="submit" form="bulkDeleteForm" id="btnBulkDelete" disabled class="hidden inline-flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all" onclick="return confirm('Apakah Anda yakin ingin menghapus pelatihan beserta gambarnya yang dipilih?')">
+            <i class="fa-solid fa-trash-alt"></i> Hapus Terpilih
+        </button>
+
+        <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#254261] hover:bg-[#1a2f45] text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+            <i class="fas fa-plus"></i> Tambah Pelatihan
+        </button>
+    </div>
 </div>
 
-<!-- Notifikasi Alert -->
 @if(session('success'))
     <div class="mb-6 px-4 py-3 bg-green-50 border-l-4 border-green-500 text-green-700 rounded shadow-sm flex items-center justify-between" role="alert">
         <div class="flex items-center gap-2">
@@ -28,82 +36,90 @@
     </div>
 @endif
 
-<!-- Tabel Data -->
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-50 border-b border-gray-100">
-                    <th class="px-6 py-4 text-sm font-semibold text-gray-600 w-16 text-center">No</th>
-                    <th class="px-6 py-4 text-sm font-semibold text-gray-600 w-24 text-center">Gambar</th>
-                    <th class="px-6 py-4 text-sm font-semibold text-gray-600">Judul</th>
-                    <th class="px-6 py-4 text-sm font-semibold text-gray-600">Kategori</th>
-                    <th class="px-6 py-4 text-sm font-semibold text-gray-600">Harga</th>
-                    <th class="px-6 py-4 text-sm font-semibold text-gray-600 w-32 text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
+<form id="bulkDeleteForm" action="{{ route('admin.pelatihan.bulkDelete') }}" method="POST">
+    @csrf
+    @method('DELETE')
 
-                @forelse($pelatihan as $key => $item)
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 text-sm text-gray-600 text-center">{{ $pelatihan->firstItem() + $key }}</td>
-                    <td class="px-6 py-4 text-center">
-                        @if($item->gambar)
-                            <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar" class="w-12 h-12 object-cover rounded shadow-sm mx-auto">
-                        @else
-                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center mx-auto text-gray-400">
-                                <i class="fas fa-image"></i>
-                            </div>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-800 font-medium">{{ $item->judul }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">
-                        <span class="px-2 py-1 bg-gray-100 rounded text-xs">{{ $item->kategori }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-800 font-semibold">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
-                        <!-- Tombol Edit -->
-                        <button type="button"
-                            onclick="openEditModal(this)"
-                            data-id="{{ $item->id }}"
-                            data-judul="{{ $item->judul }}"
-                            data-kategori="{{ $item->kategori }}"
-                            data-harga="{{ $item->harga }}"
-                            data-deskripsi="{{ $item->deskripsi }}"
-                            class="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
-                            <i class="fas fa-edit text-lg"></i>
-                        </button>
-                        <!-- Tombol Hapus -->
-                        <form action="{{ route('admin.pelatihan.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus pelatihan ini?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 transition-colors" title="Hapus">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="bulk-action-cell hidden px-6 py-4 text-sm font-semibold text-gray-600 w-12 text-center">
+                            <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-[#254261] focus:ring-[#254261] cursor-pointer">
+                        </th>
+                        <th class="px-6 py-4 text-sm font-semibold text-gray-600 w-16 text-center">No</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-gray-600 w-24 text-center">Gambar</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-gray-600">Judul</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-gray-600">Kategori</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-gray-600">Harga</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-gray-600 w-32 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+
+                    @forelse($pelatihan as $key => $item)
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="bulk-action-cell hidden px-6 py-4 text-center">
+                            <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="rowCheckbox rounded border-gray-300 text-[#254261] focus:ring-[#254261] cursor-pointer">
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600 text-center">{{ $pelatihan->firstItem() + $key }}</td>
+                        <td class="px-6 py-4 text-center">
+                            @if($item->gambar)
+                                <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar" class="w-12 h-12 object-cover rounded shadow-sm mx-auto">
+                            @else
+                                <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center mx-auto text-gray-400">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-800 font-medium">{{ $item->judul }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <span class="px-2 py-1 bg-gray-100 rounded text-xs">{{ $item->kategori }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-800 font-semibold">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
+                            <button type="button"
+                                onclick="openEditModal(this)"
+                                data-id="{{ $item->id }}"
+                                data-judul="{{ $item->judul }}"
+                                data-kategori="{{ $item->kategori }}"
+                                data-harga="{{ $item->harga }}"
+                                data-deskripsi="{{ $item->deskripsi }}"
+                                class="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
+                                <i class="fas fa-edit text-lg"></i>
+                            </button>
+                            <button type="button" onclick="deleteSingle('{{ $item->id }}')" class="text-red-500 hover:text-red-700 transition-colors" title="Hapus">
                                 <i class="fas fa-trash-alt text-lg"></i>
                             </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <!-- State Kosong -->
-                <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
-                        <div class="flex flex-col items-center justify-center">
-                            <i class="fas fa-graduation-cap text-5xl text-gray-300 mb-4"></i>
-                            <p class="text-base font-medium text-gray-600">Belum ada data pelatihan.</p>
-                            <p class="text-sm text-gray-400 mt-1">Silakan klik tombol "Tambah Pelatihan" untuk memasukkan data baru.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center justify-center">
+                                <i class="fas fa-graduation-cap text-5xl text-gray-300 mb-4"></i>
+                                <p class="text-base font-medium text-gray-600">Belum ada data pelatihan.</p>
+                                <p class="text-sm text-gray-400 mt-1">Silakan klik tombol "Tambah Pelatihan" untuk memasukkan data baru.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
 
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
 
-    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
-        <p class="text-sm text-gray-500">Menampilkan data pelatihan.</p>
-        {{ $pelatihan->links() }}
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <p class="text-sm text-gray-500">Menampilkan data pelatihan.</p>
+            {{ $pelatihan->links() }}
+        </div>
     </div>
-</div>
+</form>
+
+<form id="singleDeleteForm" method="POST" class="hidden">
+    @csrf @method('DELETE')
+</form>
 
 <!-- Modal Tambah Pelatihan -->
 <div id="tambahModal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm overflow-y-auto w-full h-full flex items-center justify-center transition-opacity duration-300">
@@ -203,7 +219,6 @@
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
                     </div>
-                    </div>
                 </div>
                 <div class="flex items-center justify-end gap-3 mt-6 border-t pt-4">
                     <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
@@ -237,6 +252,69 @@
         document.getElementById('editForm').action = '/admin/pelatihan/' + btn.getAttribute('data-id');
         openModal('editModal');
     }
+
+    function deleteSingle(id) {
+        if(confirm('Hapus pelatihan ini?')) {
+            let form = document.getElementById('singleDeleteForm');
+            form.action = '/admin/pelatihan/' + id;
+            form.submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnToggleBulk = document.getElementById('btnToggleBulk');
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.rowCheckbox');
+        const btnBulkDelete = document.getElementById('btnBulkDelete');
+        const bulkCells = document.querySelectorAll('.bulk-action-cell');
+
+        let isBulkMode = false;
+
+        if (btnToggleBulk) {
+            btnToggleBulk.addEventListener('click', function() {
+                isBulkMode = !isBulkMode;
+
+                if (isBulkMode) {
+                    bulkCells.forEach(cell => cell.classList.remove('hidden'));
+                    btnBulkDelete.classList.remove('hidden');
+
+                    this.innerHTML = '<i class="fa-solid fa-times"></i> Batal Pilih';
+                    this.classList.replace('bg-gray-500', 'bg-gray-400');
+                    this.classList.replace('hover:bg-gray-600', 'hover:bg-gray-500');
+                } else {
+                    bulkCells.forEach(cell => cell.classList.add('hidden'));
+                    btnBulkDelete.classList.add('hidden');
+
+                    if(selectAll) selectAll.checked = false;
+                    checkboxes.forEach(cb => cb.checked = false);
+                    toggleBulkDeleteBtn();
+
+                    this.innerHTML = '<i class="fa-solid fa-list-check"></i> Pilih Hapus';
+                    this.classList.replace('bg-gray-400', 'bg-gray-500');
+                    this.classList.replace('hover:bg-gray-500', 'hover:bg-gray-600');
+                }
+            });
+        }
+
+        const toggleBulkDeleteBtn = () => {
+            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
+            btnBulkDelete.disabled = checkedCount === 0;
+        };
+
+        if(selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                toggleBulkDeleteBtn();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (!this.checked) selectAll.checked = false;
+                toggleBulkDeleteBtn();
+            });
+        });
+    });
 
     window.onclick = function(event) {
         if (event.target == document.getElementById('tambahModal')) closeModal('tambahModal');

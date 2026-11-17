@@ -8,9 +8,21 @@
         <h1 class="text-2xl font-bold text-gray-800">Portofolio Proyek</h1>
         <p class="text-sm text-gray-500 mt-1">Kelola data riwayat proyek IT Nusa Indo Tech.</p>
     </div>
-    <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#254261] hover:bg-[#1a2f45] text-white text-sm font-medium rounded-lg shadow-sm">
-        <i class="fas fa-plus"></i> Tambah Portofolio
-    </button>
+    <div class="flex items-center gap-2">
+        <!-- Tombol Toggle Mode Pilih Hapus -->
+        <button type="button" id="btnToggleBulk" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg shadow-sm transition-all">
+            <i class="fa-solid fa-list-check"></i> Pilih Hapus
+        </button>
+
+        <!-- Tombol Hapus Terpilih (Sembunyi secara default) -->
+        <button type="submit" form="bulkDeleteForm" id="btnBulkDelete" disabled class="hidden inline-flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all" onclick="return confirm('Apakah Anda yakin ingin menghapus portofolio beserta gambarnya yang dipilih?')">
+            <i class="fa-solid fa-trash-alt"></i> Hapus Terpilih
+        </button>
+
+        <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#254261] hover:bg-[#1a2f45] text-white text-sm font-medium rounded-lg shadow-sm">
+            <i class="fas fa-plus"></i> Tambah Portofolio
+        </button>
+    </div>
 </div>
 
 @if(session('success'))
@@ -35,69 +47,85 @@
     </div>
 @endif
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <table class="w-full text-left border-collapse">
-        <thead>
-            <tr class="bg-gray-50 border-b border-gray-100">
-                <th class="px-6 py-4 text-sm text-gray-600 w-24 text-center">Gambar</th>
-                <th class="px-6 py-4 text-sm text-gray-600">Judul Proyek</th>
-                <th class="px-6 py-4 text-sm text-gray-600">Klien</th>
-                <th class="px-6 py-4 text-sm text-gray-600 text-center">Rating</th>
-                <th class="px-6 py-4 text-sm text-gray-600 text-center">Aksi</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-            @forelse($portofolio as $item)
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 text-center">
-                    @if($item->gambar)
-                        <img src="{{ asset('storage/' . $item->gambar) }}" class="w-16 h-12 object-cover rounded shadow-sm mx-auto">
-                    @else
-                        <div class="w-16 h-12 bg-gray-100 rounded flex items-center justify-center mx-auto text-gray-400"><i class="fas fa-image"></i></div>
-                    @endif
-                </td>
-                <td class="px-6 py-4">
-                    <p class="text-sm text-gray-800 font-medium">{{ $item->judul }}</p>
-                    <p class="text-xs text-gray-500">{{ $item->tahun }} - {{ $item->kategori }}</p>
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-600">{{ $item->nama_klien ?? '-' }}</td>
-                <td class="px-6 py-4 text-center text-sm font-bold text-[#f5b73e]">
-                    <i class="fas fa-star text-xs"></i> {{ number_format($item->rating ?? 0, 1) }}
-                </td>
-                <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
-                    <!-- Tombol Edit menggunakan data attributes -->
-                    <button type="button"
-                        onclick="openEditModal(this)"
-                        data-id="{{ $item->id }}"
-                        data-judul="{{ $item->judul }}"
-                        data-klien="{{ $item->nama_klien }}"
-                        data-tahun="{{ $item->tahun }}"
-                        data-kategori="{{ $item->kategori }}"
-                        data-link="{{ $item->link_project }}"
-                        data-deskripsi="{{ $item->deskripsi }}"
-                        data-layanan="{{ $item->layanan_id }}"
-                        data-rating="{{ $item->rating }}"
-                        data-fitur="{{ $item->fitur_utama }}"
-                        data-teknologi="{{ $item->teknologi }}"
-                        class="text-blue-500 hover:text-blue-700" title="Edit">
-                        <i class="fas fa-edit text-lg"></i>
-                    </button>
-                    <!-- Tombol Hapus -->
-                    <form action="{{ route('admin.portofolio.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus portofolio ini?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt text-lg"></i></button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="5" class="px-6 py-12 text-center text-gray-500">Belum ada portofolio.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-    <div class="px-6 py-4 bg-gray-50/50 border-t">{{ $portofolio->links() }}</div>
-</div>
+<!-- Form untuk Bulk Delete -->
+<form id="bulkDeleteForm" action="{{ route('admin.portofolio.bulkDelete') }}" method="POST">
+    @csrf
+    @method('DELETE')
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <!-- Header Checkbox -->
+                    <th class="bulk-action-cell hidden px-6 py-4 text-sm font-semibold text-gray-600 w-12 text-center">
+                        <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-[#254261] focus:ring-[#254261] cursor-pointer">
+                    </th>
+                    <th class="px-6 py-4 text-sm text-gray-600 w-24 text-center">Gambar</th>
+                    <th class="px-6 py-4 text-sm text-gray-600">Judul Proyek</th>
+                    <th class="px-6 py-4 text-sm text-gray-600">Klien</th>
+                    <th class="px-6 py-4 text-sm text-gray-600 text-center">Rating</th>
+                    <th class="px-6 py-4 text-sm text-gray-600 text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($portofolio as $item)
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <!-- Baris Checkbox -->
+                    <td class="bulk-action-cell hidden px-6 py-4 text-center">
+                        <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="rowCheckbox rounded border-gray-300 text-[#254261] focus:ring-[#254261] cursor-pointer">
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        @if($item->gambar)
+                            <img src="{{ asset('storage/' . $item->gambar) }}" class="w-16 h-12 object-cover rounded shadow-sm mx-auto">
+                        @else
+                            <div class="w-16 h-12 bg-gray-100 rounded flex items-center justify-center mx-auto text-gray-400"><i class="fas fa-image"></i></div>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm text-gray-800 font-medium">{{ $item->judul }}</p>
+                        <p class="text-xs text-gray-500">{{ $item->tahun }} - {{ $item->kategori }}</p>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ $item->nama_klien ?? '-' }}</td>
+                    <td class="px-6 py-4 text-center text-sm font-bold text-[#f5b73e]">
+                        <i class="fas fa-star text-xs"></i> {{ number_format($item->rating ?? 0, 1) }}
+                    </td>
+                    <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
+                        <button type="button"
+                            onclick="openEditModal(this)"
+                            data-id="{{ $item->id }}"
+                            data-judul="{{ $item->judul }}"
+                            data-klien="{{ $item->nama_klien }}"
+                            data-tahun="{{ $item->tahun }}"
+                            data-kategori="{{ $item->kategori }}"
+                            data-link="{{ $item->link_project }}"
+                            data-deskripsi="{{ $item->deskripsi }}"
+                            data-layanan="{{ $item->layanan_id }}"
+                            data-rating="{{ $item->rating }}"
+                            data-fitur="{{ $item->fitur_utama }}"
+                            data-teknologi="{{ $item->teknologi }}"
+                            class="text-blue-500 hover:text-blue-700" title="Edit">
+                            <i class="fas fa-edit text-lg"></i>
+                        </button>
+                        <button type="button" onclick="deleteSingle('{{ $item->id }}')" class="text-red-500 hover:text-red-700 transition-colors" title="Hapus">
+                            <i class="fa-solid fa-trash-alt text-lg"></i>
+                        </button>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">Belum ada portofolio.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+        <div class="px-6 py-4 bg-gray-50/50 border-t">{{ $portofolio->links() }}</div>
+    </div>
+</form>
+
+<!-- Form Hapus Satuan (Hidden) -->
+<form id="singleDeleteForm" method="POST" class="hidden">
+    @csrf @method('DELETE')
+</form>
 
 <!-- Modal Tambah Portofolio -->
 <div id="tambahModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -211,16 +239,10 @@
 </div>
 
 <script>
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-    }
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     function openEditModal(btn) {
-        // Ambil data dari atribut tombol dan masukkan ke input form
         document.getElementById('edit_judul').value = btn.getAttribute('data-judul') || '';
         document.getElementById('edit_nama_klien').value = btn.getAttribute('data-klien') || '';
         document.getElementById('edit_tahun').value = btn.getAttribute('data-tahun') || '';
@@ -229,19 +251,78 @@
         document.getElementById('edit_deskripsi').value = btn.getAttribute('data-deskripsi') || '';
         document.getElementById('edit_layanan_id').value = btn.getAttribute('data-layanan') || '';
         document.getElementById('edit_rating').value = btn.getAttribute('data-rating') || '';
-
-        // Form fitur & teknologi
         document.getElementById('edit_fitur_utama').value = btn.getAttribute('data-fitur') || '';
         document.getElementById('edit_teknologi').value = btn.getAttribute('data-teknologi') || '';
 
-        // Set action URL form update
         document.getElementById('editForm').action = '/admin/portofolio/' + btn.getAttribute('data-id');
-
-        // Tampilkan modal
         openModal('editModal');
     }
 
-    // Buka kembali form tambah jika ada error
+    function deleteSingle(id) {
+        if(confirm('Hapus portofolio ini?')) {
+            let form = document.getElementById('singleDeleteForm');
+            form.action = '/admin/portofolio/' + id;
+            form.submit();
+        }
+    }
+
+    // Script Mode Pilih Hapus & Checkbox
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnToggleBulk = document.getElementById('btnToggleBulk');
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.rowCheckbox');
+        const btnBulkDelete = document.getElementById('btnBulkDelete');
+        const bulkCells = document.querySelectorAll('.bulk-action-cell');
+
+        let isBulkMode = false;
+
+        // Toggle Mode
+        if (btnToggleBulk) {
+            btnToggleBulk.addEventListener('click', function() {
+                isBulkMode = !isBulkMode;
+
+                if (isBulkMode) {
+                    bulkCells.forEach(cell => cell.classList.remove('hidden'));
+                    btnBulkDelete.classList.remove('hidden');
+
+                    this.innerHTML = '<i class="fa-solid fa-times"></i> Batal Pilih';
+                    this.classList.replace('bg-gray-500', 'bg-gray-400');
+                    this.classList.replace('hover:bg-gray-600', 'hover:bg-gray-500');
+                } else {
+                    bulkCells.forEach(cell => cell.classList.add('hidden'));
+                    btnBulkDelete.classList.add('hidden');
+
+                    if(selectAll) selectAll.checked = false;
+                    checkboxes.forEach(cb => cb.checked = false);
+                    toggleBulkDeleteBtn();
+
+                    this.innerHTML = '<i class="fa-solid fa-list-check"></i> Pilih Hapus';
+                    this.classList.replace('bg-gray-400', 'bg-gray-500');
+                    this.classList.replace('hover:bg-gray-500', 'hover:bg-gray-600');
+                }
+            });
+        }
+
+        const toggleBulkDeleteBtn = () => {
+            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
+            btnBulkDelete.disabled = checkedCount === 0;
+        };
+
+        if(selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                toggleBulkDeleteBtn();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (!this.checked) selectAll.checked = false;
+                toggleBulkDeleteBtn();
+            });
+        });
+    });
+
     @if ($errors->any() && !old('_method'))
         openModal('tambahModal');
     @endif

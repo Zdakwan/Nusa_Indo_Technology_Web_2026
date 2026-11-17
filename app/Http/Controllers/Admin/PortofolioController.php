@@ -95,4 +95,26 @@ class PortofolioController extends Controller
 
         return redirect()->route('admin.portofolio.index')->with('success', 'Portofolio berhasil dihapus.');
     }
+
+    /**
+     * Menghapus beberapa portofolio sekaligus beserta file gambarnya (Bulk Delete).
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:portofolios,id',
+        ]);
+
+        $portofolios = Portofolio::whereIn('id', $request->ids)->get();
+
+        foreach ($portofolios as $portofolio) {
+            if ($portofolio->gambar && Storage::disk('public')->exists($portofolio->gambar)) {
+                Storage::disk('public')->delete($portofolio->gambar);
+            }
+            $portofolio->delete();
+        }
+
+        return redirect()->back()->with('success', count($request->ids) . ' portofolio berhasil dihapus beserta file gambarnya.');
+    }
 }
