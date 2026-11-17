@@ -76,6 +76,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/dashboard/aktivitas', [AdminDashboardController::class, 'storeAktivitas'])->name('dashboard.aktivitas.store');
             Route::put('/dashboard/aktivitas/{id}', [AdminDashboardController::class, 'updateAktivitas'])->name('dashboard.aktivitas.update');
             Route::delete('/dashboard/aktivitas/{id}', [AdminDashboardController::class, 'destroyAktivitas'])->name('dashboard.aktivitas.destroy');
+            Route::delete('/dashboard/aktivitas', [AdminDashboardController::class, 'bulkDestroyAktivitas'])->name('dashboard.aktivitas.bulkDestroy');
 
             // Rute Pengaturan
             Route::get('/pengaturan', [AdminPengaturanController::class, 'index'])->name('pengaturan.index');
@@ -90,9 +91,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             // Route Hapus Massal Layanan
             Route::delete('/layanan/bulk-delete', [LayananController::class, 'bulkDelete'])->name('layanan.bulkDelete');
-            Route::resource('layanan', LayananController::class);
+            Route::resource('layanan', LayananController::class)->only(['index', 'store', 'update', 'destroy']);
 
-            Route::resource('client', ClientController::class);
+            Route::resource('client', ClientController::class)->only(['index', 'destroy']);
 
             // Rute riwayat-login
             Route::get('/riwayat-login', [LoginLogController::class, 'index'])->name('riwayat-login.index');
@@ -100,7 +101,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // === Manajemen Proyek ===
             Route::get('/proyek/{id}/pdf', [AdminProyekController::class, 'exportSinglePdf'])->name('proyek.single.pdf');
             Route::post('/proyek/{id}/progress', [AdminProyekController::class, 'updateProgress'])->name('proyek.updateProgress');
-            Route::resource('proyek', AdminProyekController::class)->except(['update']);
+            Route::delete('/proyek/bulk-delete', [AdminProyekController::class, 'bulkDelete'])->name('proyek.bulkDelete');
+            Route::resource('proyek', AdminProyekController::class)->except([]);
         });
 
         // ---- AKSES SUPER ADMIN & ADMIN KONTEN ----
@@ -110,11 +112,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             // Route Hapus Massal Ensiklopedia
             Route::delete('/ensiklopedia/bulk-delete', [EnsiklopediaController::class, 'bulkDelete'])->name('ensiklopedia.bulkDelete');
-            Route::resource('ensiklopedia', EnsiklopediaController::class);
-            Route::resource('portofolio', PortofolioController::class);
+            Route::resource('ensiklopedia', EnsiklopediaController::class)->only(['index', 'store', 'update', 'destroy']);
+            Route::resource('portofolio', PortofolioController::class)->only(['index', 'store', 'update', 'destroy']);
             // Route Hapus Massal Pelatihan
             Route::delete('/pelatihan/bulk-delete', [PelatihanController::class, 'bulkDelete'])->name('pelatihan.bulkDelete');
-            Route::resource('pelatihan', PelatihanController::class);
+            Route::resource('pelatihan', PelatihanController::class)->only(['index', 'store', 'update', 'destroy']);
 
             // Rute Tentang Kami
             Route::get('/tentang-kami', [TentangKamiController::class, 'index'])->name('tentang-kami.index');
@@ -126,7 +128,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // ---- AKSES KHUSUS SUPER ADMIN ----
         Route::middleware('admin.role:super_admin')->group(function () {
-            Route::resource('pengguna', PenggunaController::class);
+            Route::resource('pengguna', PenggunaController::class)->only(['index', 'store', 'destroy']);
         });
     });
 });

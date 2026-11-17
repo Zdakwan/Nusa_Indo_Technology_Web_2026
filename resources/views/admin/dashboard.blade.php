@@ -73,7 +73,20 @@
 </div>
 
 {{-- Tombol Tambah Aktivitas (Memanggil JS openModalTambah) --}}
-<div class="flex justify-end mb-4">
+<div class="flex justify-end mb-4 gap-2">
+
+    <!-- Tombol Toggle Mode Pilih Hapus -->
+    <button type="button" id="btnToggleBulk" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold rounded-lg shadow-sm transition-all">
+        <i class="fa-solid fa-list-check"></i> Pilih Hapus
+    </button>
+
+    <!-- Tombol Hapus Terpilih (Sembunyi secara default) -->
+    <button type="submit" form="bulkDeleteForm" id="btnBulkDelete" disabled
+        class="hidden inline-flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        onclick="return confirm('Apakah Anda yakin ingin menghapus aktivitas yang dipilih?')">
+        <i class="fa-solid fa-trash-alt"></i> Hapus Terpilih
+    </button>
+
     <button type="button" onclick="openModalTambah()" class="bg-[#1b314c] hover:bg-[#122236] text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm transition inline-flex items-center gap-2">
         <span>Tambah Aktivitas</span>
         <i class="fas fa-plus"></i>
@@ -81,6 +94,9 @@
 </div>
 
 {{-- Tabel Daftar Aktivitas Klien --}}
+<form id="bulkDeleteForm" action="{{ route('admin.dashboard.aktivitas.bulkDestroy') }}" method="POST">
+    @csrf
+    @method('DELETE')
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
     <h2 class="text-base font-extrabold text-gray-900 mb-4">Daftar Aktivitas Klien Terbaru & Permintaan Konsultasi</h2>
 
@@ -88,7 +104,10 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-[#fdf2f0] text-gray-900 text-xs font-bold">
-                    <th class="py-3 pl-4 rounded-l-lg w-10"></th>
+                    <th class="py-3 pl-4 rounded-l-lg w-10 bulk-action-cell hidden">
+                        <input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-gray-300 cursor-pointer">
+                    </th>
+                    <th class="py-3 pl-4 rounded-l-lg w-10 bulk-spacer-cell"></th>
                     <th class="py-3 px-4">Nama Klien/Perusahaan</th>
                     <th class="py-3 px-4">Permintaan/Proyek</th>
                     <th class="py-3 px-4">Tanggal Pengajuan</th>
@@ -114,9 +133,10 @@
                         };
                     @endphp
                     <tr class="hover:bg-gray-50 transition">
-                        <td class="py-3.5 pl-4">
-                            <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+                        <td class="py-3.5 pl-4 bulk-action-cell hidden">
+                            <input type="checkbox" name="ids[]" value="{{ $k->id }}" class="rowCheckbox w-4 h-4 rounded border-gray-300 cursor-pointer">
                         </td>
+                        <td class="py-3.5 pl-4 bulk-spacer-cell"></td>
                         <td class="py-3.5 px-4 font-medium">{{ $namaKlien }}</td>
                         <td class="py-3.5 px-4">{{ \Illuminate\Support\Str::limit($proyek, 40) }}</td>
                         <td class="py-3.5 px-4">{{ $tglFormat }}</td>
@@ -142,25 +162,27 @@
                                 </button>
 
                                 {{-- Tombol Hapus (Tempat Sampah) --}}
-                                <form action="{{ route('admin.dashboard.aktivitas.destroy', $k->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus aktivitas ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Hapus" class="text-red-600 hover:text-red-800 cursor-pointer">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="deleteSingleAktivitas({{ $k->id }})" title="Hapus" class="text-red-600 hover:text-red-800 cursor-pointer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="py-8 text-center text-gray-400">Belum ada aktivitas klien.</td>
+                        <td colspan="7" class="py-8 text-center text-gray-400">Belum ada aktivitas klien.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
+</form>
+
+<!-- Form Hapus Satuan (Hidden) -->
+<form id="singleDeleteAktivitasForm" method="POST" class="hidden">
+    @csrf @method('DELETE')
+</form>
 
 {{-- MODAL TAMBAH AKTIVITAS (Disembunyikan default dengan class 'hidden') --}}
 <div id="modalTambah" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
@@ -296,5 +318,69 @@
         // Menyembunyikan modal
         document.getElementById(modalId).classList.add('hidden');
     }
+
+    // === BULK DELETE & SINGLE DELETE ===
+    function deleteSingleAktivitas(id) {
+        if (confirm('Yakin ingin menghapus aktivitas ini?')) {
+            let form = document.getElementById('singleDeleteAktivitasForm');
+            form.action = '/admin/dashboard/aktivitas/' + id;
+            form.submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnToggleBulk = document.getElementById('btnToggleBulk');
+        const selectAll     = document.getElementById('selectAll');
+        const checkboxes    = document.querySelectorAll('.rowCheckbox');
+        const btnBulkDelete = document.getElementById('btnBulkDelete');
+        const bulkCells     = document.querySelectorAll('.bulk-action-cell');
+        const spacerCells   = document.querySelectorAll('.bulk-spacer-cell');
+
+        let isBulkMode = false;
+
+        const toggleBulkDeleteBtn = () => {
+            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
+            btnBulkDelete.disabled = checkedCount === 0;
+        };
+
+        if (btnToggleBulk) {
+            btnToggleBulk.addEventListener('click', function () {
+                isBulkMode = !isBulkMode;
+
+                if (isBulkMode) {
+                    bulkCells.forEach(cell => cell.classList.remove('hidden'));
+                    spacerCells.forEach(cell => cell.classList.add('hidden'));
+                    btnBulkDelete.classList.remove('hidden');
+                    this.innerHTML = '<i class="fa-solid fa-times"></i> Batal Pilih';
+                    this.classList.replace('bg-gray-500', 'bg-gray-400');
+                    this.classList.replace('hover:bg-gray-600', 'hover:bg-gray-500');
+                } else {
+                    bulkCells.forEach(cell => cell.classList.add('hidden'));
+                    spacerCells.forEach(cell => cell.classList.remove('hidden'));
+                    btnBulkDelete.classList.add('hidden');
+                    if (selectAll) selectAll.checked = false;
+                    checkboxes.forEach(cb => cb.checked = false);
+                    toggleBulkDeleteBtn();
+                    this.innerHTML = '<i class="fa-solid fa-list-check"></i> Pilih Hapus';
+                    this.classList.replace('bg-gray-400', 'bg-gray-500');
+                    this.classList.replace('hover:bg-gray-500', 'hover:bg-gray-600');
+                }
+            });
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                toggleBulkDeleteBtn();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (!this.checked && selectAll) selectAll.checked = false;
+                toggleBulkDeleteBtn();
+            });
+        });
+    });
 </script>
 @endsection

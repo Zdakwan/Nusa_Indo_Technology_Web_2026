@@ -24,19 +24,36 @@
     <section class="py-16 bg-gray-50">
         <div class="container mx-auto px-6 max-w-7xl">
 
-            <!-- Filter Kategori (Visual) -->
-            <div class="flex flex-wrap justify-center gap-2 text-sm font-semibold mb-12">
-                <button class="px-6 py-2.5 rounded-full bg-nusaNavy text-white shadow-md">Semua Proyek</button>
-                <button class="px-6 py-2.5 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors">Web App</button>
-                <button class="px-6 py-2.5 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors">Mobile App</button>
-                <button class="px-6 py-2.5 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors">Infrastruktur</button>
+            <!-- Filter Kategori (Dropdown) -->
+            <div class="flex justify-center mb-12">
+                <div class="relative w-full max-w-sm md:max-w-md">
+                    <!-- Elemen Select -->
+                    <select id="filter-dropdown" class="w-full appearance-none bg-white border border-gray-200 text-gray-700 py-3.5 pl-6 pr-12 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-nusaNavy focus:border-nusaNavy font-bold cursor-pointer transition-shadow hover:shadow-md text-sm md:text-base">
+                        <option value="all">Semua Proyek</option>
+                        <option value="it portfolio management">IT Portfolio Management</option>
+                        <option value="training it">Training IT</option>
+                        <option value="enterprise architecture">Enterprise Architecture</option>
+                        <option value="software & hardware development">Software & Hardware Development</option>
+                        <option value="it governance">IT Governance</option>
+                        <option value="multimedia">Multimedia</option>
+                    </select>
+                    <!-- Ikon Panah Kustom (agar terlihat modern) -->
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gray-500">
+                        <i class="fas fa-chevron-down text-sm"></i>
+                    </div>
+                </div>
             </div>
 
             <!-- GRID PORTOFOLIO -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="portfolio-grid">
                 @forelse($portofolio ?? [] as $item)
-                    <!-- Card Portofolio -->
-                    <div class="bg-white rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden flex flex-col group">
+                    @php
+                        // Ambil nama layanan dari relasi database jika ada, jika tidak fallback ke input teks kategori
+                        $kategoriLabel = $item->layanan->nama_layanan ?? $item->kategori ?? 'Layanan IT';
+                    @endphp
+
+                    <!-- Card Portofolio (data-category disesuaikan dengan Layanan) -->
+                    <div class="portfolio-item bg-white rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden flex flex-col group" data-category="{{ strtolower($kategoriLabel) }}">
 
                         <!-- Header Gambar -->
                         <div class="relative h-64 bg-nusaNavy overflow-hidden">
@@ -48,10 +65,10 @@
                                 </div>
                             @endif
 
-                            <!-- Overlay Gradient & Kategori -->
+                            <!-- Overlay Gradient & Badge Kategori -->
                             <div class="absolute inset-0 bg-gradient-to-t from-nusaNavyDark/90 via-transparent to-transparent"></div>
                             <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-nusaNavyDark text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                                {{ $item->kategori ?? 'Layanan IT' }}
+                                {{ $kategoriLabel }}
                             </span>
                         </div>
 
@@ -86,7 +103,55 @@
                 @endforelse
             </div>
 
+            <!-- Pesan jika filter tidak menemukan hasil -->
+            <div id="no-results" class="hidden justify-center py-10">
+                 <div class="bg-white border border-gray-200 rounded-2xl p-8 text-center max-w-md w-full shadow-sm">
+                     <p class="text-gray-500 font-medium">Belum ada portofolio di kategori ini.</p>
+                 </div>
+            </div>
+
         </div>
     </section>
 
+   <!-- Script Filter Interaktif untuk Dropdown -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterDropdown = document.getElementById('filter-dropdown');
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            const noResultsMsg = document.getElementById('no-results');
+
+            if (filterDropdown) {
+                filterDropdown.addEventListener('change', function(e) {
+                    const filterValue = this.value;
+                    let visibleCount = 0;
+
+                    // Logika penyaringan
+                    portfolioItems.forEach(item => {
+                        const itemCategory = item.getAttribute('data-category');
+
+                        // Tampilkan jika pilih "Semua Proyek" atau kategori cocok
+                        if(filterValue === 'all' || itemCategory === filterValue) {
+                            item.style.display = 'flex';
+                            visibleCount++;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Tampilkan pesan kosong jika tidak ada data yang cocok
+                    if (visibleCount === 0 && portfolioItems.length > 0) {
+                        if(noResultsMsg) {
+                            noResultsMsg.classList.remove('hidden');
+                            noResultsMsg.classList.add('flex');
+                        }
+                    } else {
+                        if(noResultsMsg) {
+                            noResultsMsg.classList.remove('flex');
+                            noResultsMsg.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 @endsection

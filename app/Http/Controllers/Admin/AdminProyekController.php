@@ -243,6 +243,23 @@ class AdminProyekController extends Controller
 
     }
 
+    /**
+     * Menghapus beberapa proyek sekaligus (Bulk Delete).
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:proyeks,id',
+        ]);
+
+        $count = Proyek::whereIn('id', $request->ids)->count();
+        Proyek::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('admin.proyek.index')
+            ->with('success', $count . ' proyek berhasil dihapus.');
+    }
+
     public function exportSinglePdf($id)
     {
         // 1. Ambil data 1 proyek beserta relasi client-nya

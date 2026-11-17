@@ -18,9 +18,19 @@
 
         <div class="flex items-center gap-2">
 
+            <!-- Tombol Toggle Mode Pilih Hapus -->
+            <button type="button" id="btnToggleBulk" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg shadow-sm transition-all">
+                <i class="fa-solid fa-list-check"></i> Pilih Hapus
+            </button>
+
+            <!-- Tombol Hapus Terpilih (Sembunyi secara default) -->
+            <button type="submit" form="bulkDeleteForm" id="btnBulkDelete" disabled class="hidden inline-flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all" onclick="return confirm('Apakah Anda yakin ingin menghapus proyek yang dipilih?')">
+                <i class="fa-solid fa-trash-alt"></i> Hapus Terpilih
+            </button>
+
             <!-- Tombol Tambah Proyek -->
             <a href="{{ route('admin.proyek.create') }}"
-               class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#1e3352] text-white text-sm font-semibold hover:bg-[#2a4165] transition shadow-sm">
+               class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-[#1e3352] text-white text-sm font-semibold hover:bg-[#2a4165] transition shadow-sm">
                 <i class="fas fa-plus"></i>
                 Tambah Proyek
             </a>
@@ -50,6 +60,10 @@
     @endif
 
     {{-- TABEL PROYEK --}}
+    <form id="bulkDeleteForm" action="{{ route('admin.proyek.bulkDelete') }}" method="POST">
+        @csrf
+        @method('DELETE')
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 
         <div class="p-5 border-b border-gray-200">
@@ -66,6 +80,10 @@
                 <table class="w-full text-sm text-left">
                     <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                         <tr>
+                            <!-- Header Checkbox (Sembunyi secara default) -->
+                            <th class="bulk-action-cell hidden px-6 py-4 w-12 text-center">
+                                <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-[#254261] focus:ring-[#254261] cursor-pointer">
+                            </th>
                             <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Nama Proyek</th>
                             <th class="px-6 py-4">Client</th>
@@ -78,6 +96,11 @@
                     <tbody class="divide-y divide-gray-100">
                         @foreach($proyek as $index => $item)
                             <tr class="hover:bg-gray-50 transition">
+
+                                <!-- Baris Checkbox (Sembunyi secara default) -->
+                                <td class="bulk-action-cell hidden px-6 py-4 text-center">
+                                    <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="rowCheckbox rounded border-gray-300 text-[#254261] focus:ring-[#254261] cursor-pointer">
+                                </td>
 
                                 <td class="px-6 py-4 text-gray-500">
                                     {{ $proyek->firstItem() + $index }}
@@ -143,18 +166,12 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <form action="{{ route('admin.proyek.destroy', $item->id) }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Yakin ingin menghapus proyek ini? Seluruh riwayat progresnya juga akan terhapus.')">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                    title="Hapus Proyek"
-                                                    class="w-9 h-9 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                                onclick="deleteSingleProyek('{{ $item->id }}')"
+                                                title="Hapus Proyek"
+                                                class="w-9 h-9 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
 
                                     </div>
                                 </td>
@@ -192,5 +209,73 @@
         @endif
 
     </div>
+    </form>
+
+    <!-- Form Hapus Satuan (Hidden) -->
+    <form id="singleDeleteProyekForm" method="POST" class="hidden">
+        @csrf @method('DELETE')
+    </form>
 </div>
+
+<script>
+    function deleteSingleProyek(id) {
+        if (confirm('Yakin ingin menghapus proyek ini? Seluruh riwayat progresnya juga akan terhapus.')) {
+            let form = document.getElementById('singleDeleteProyekForm');
+            form.action = '/admin/proyek/' + id;
+            form.submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnToggleBulk = document.getElementById('btnToggleBulk');
+        const selectAll     = document.getElementById('selectAll');
+        const checkboxes    = document.querySelectorAll('.rowCheckbox');
+        const btnBulkDelete = document.getElementById('btnBulkDelete');
+        const bulkCells     = document.querySelectorAll('.bulk-action-cell');
+
+        let isBulkMode = false;
+
+        const toggleBulkDeleteBtn = () => {
+            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
+            btnBulkDelete.disabled = checkedCount === 0;
+        };
+
+        if (btnToggleBulk) {
+            btnToggleBulk.addEventListener('click', function () {
+                isBulkMode = !isBulkMode;
+
+                if (isBulkMode) {
+                    bulkCells.forEach(cell => cell.classList.remove('hidden'));
+                    btnBulkDelete.classList.remove('hidden');
+                    this.innerHTML = '<i class="fa-solid fa-times"></i> Batal Pilih';
+                    this.classList.replace('bg-gray-500', 'bg-gray-400');
+                    this.classList.replace('hover:bg-gray-600', 'hover:bg-gray-500');
+                } else {
+                    bulkCells.forEach(cell => cell.classList.add('hidden'));
+                    btnBulkDelete.classList.add('hidden');
+                    if (selectAll) selectAll.checked = false;
+                    checkboxes.forEach(cb => cb.checked = false);
+                    toggleBulkDeleteBtn();
+                    this.innerHTML = '<i class="fa-solid fa-list-check"></i> Pilih Hapus';
+                    this.classList.replace('bg-gray-400', 'bg-gray-500');
+                    this.classList.replace('hover:bg-gray-500', 'hover:bg-gray-600');
+                }
+            });
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                toggleBulkDeleteBtn();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (!this.checked && selectAll) selectAll.checked = false;
+                toggleBulkDeleteBtn();
+            });
+        });
+    });
+</script>
 @endsection
