@@ -7,7 +7,7 @@
      Menampilkan formulir pendaftaran konsultasi client
      ========================================================= --}}
 
-<div class="min-h-screen bg-[#f1f5f9] px-10 py-8">
+<div class="min-h-screen bg-[#f1f5f9] px-6 py-5">
 
   {{-- HEADER HALAMAN --}}
     <div class="mb-6">
@@ -44,9 +44,9 @@
             {{-- =================================================
                  DATA PERUSAHAAN
                  ================================================= --}}
-            <div class="bg-white border border-gray-300 rounded-xl px-10 py-7">
+            <div class="bg-white border border-gray-300 rounded-xl px-6 py-5">
 
-                <h2 class="text-3xl font-semibold text-black mb-5">
+                <h2 class="text-base font-semibold text-black mb-5">
                     Data Perusahaan
                 </h2>
 
@@ -174,9 +174,9 @@
             {{-- =================================================
                  DATA KONSULTASI
                  ================================================= --}}
-            <div class="bg-white border border-gray-300 rounded-xl px-10 py-7">
+            <div class="bg-white border border-gray-300 rounded-xl px-6 py-5">
 
-                <h2 class="text-3xl font-semibold text-black mb-5">
+                <h2 class="text-base font-semibold text-black mb-5">
                     Data Konsultasi
                 </h2>
 

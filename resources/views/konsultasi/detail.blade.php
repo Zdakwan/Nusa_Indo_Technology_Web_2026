@@ -2,21 +2,21 @@
 
 @section('content')
 
-<div class="min-h-screen bg-[#f1f5f9] px-10 py-8">
+<div class="min-h-screen bg-[#f1f5f9] px-6 py-5">
 
     {{-- TOMBOL KEMBALI --}}
     <div class="mb-2">
-        <a href="{{ route('konsultasi.index') }}" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 transition text-lg">
+        <a href="{{ route('konsultasi.index') }}" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 transition text-sm">
             <i class="fas fa-sign-in-alt rotate-180"></i> Kembali
         </a>
     </div>
 
     {{-- HEADER HALAMAN --}}
     <div class="mb-4">
-        <h1 class="text-4xl font-bold text-black">
+        <h1 class="text-2xl font-bold text-black">
             Detail Pendaftaran Konsultasi
         </h1>
-        <p class="text-gray-500 text-lg mt-1">
+        <p class="text-gray-500 text-sm mt-1">
             Informasi lengkap mengenai pengajuan konsultasi Anda.
         </p>
     </div>
@@ -31,11 +31,11 @@
             <div class="bg-white border border-gray-300 rounded-xl px-4 py-3">
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-full bg-[#2874d0] flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-chalkboard-teacher text-white text-3xl"></i>
+                        <div class="w-10 h-10 rounded-full bg-[#2874d0] flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-chalkboard-teacher text-white text-lg"></i>
                         </div>
                         <div>
-                            <h2 class="text-3xl font-bold text-black">
+                            <h2 class="text-base font-bold text-black">
                                 {{ $konsultasi['judul'] }}
                             </h2>
                             <p class="text-gray-400 text-base mt-0.5">
@@ -71,7 +71,7 @@
 
             {{-- STATUS PENDAFTARAN --}}
             <div class="bg-white border border-gray-300 rounded-xl px-4 py-4">
-                <h2 class="text-lg font-semibold text-black mb-6">
+                <h2 class="text-sm font-semibold text-black mb-3">
                     Status Pendaftaran Terbaru
                 </h2>
 

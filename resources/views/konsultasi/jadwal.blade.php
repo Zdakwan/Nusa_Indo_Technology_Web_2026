@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="min-h-screen bg-[#f1f5f9] px-10 py-8">
+<div class="min-h-screen bg-[#f1f5f9] px-6 py-5">
 
     {{-- =====================================================
          TOMBOL KEMBALI
@@ -10,7 +10,7 @@
     <div class="mb-2">
         <a
             href="{{ route('konsultasi.index') }}"
-            class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 transition text-lg"
+            class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 transition text-sm"
         >
             <i class="fas fa-sign-in-alt rotate-180"></i>
             Kembali
@@ -21,7 +21,7 @@
          HEADER HALAMAN
          ===================================================== --}}
     <div class="mb-4">
-        <h1 class="text-4xl font-bold text-black">
+        <h1 class="text-2xl font-bold text-black">
             Detail Jadwal Konsultasi
         </h1>
     </div>
@@ -32,15 +32,15 @@
     <div class="bg-white border border-gray-300 rounded-xl overflow-hidden">
 
         {{-- HEADER JADWAL --}}
-        <div class="px-10 py-7 flex items-center justify-between gap-4">
+        <div class="px-6 py-4 flex items-center justify-between gap-4">
 
             <div class="flex items-center gap-5">
 
-                <div class="w-16 h-16 rounded-full bg-[#2874d0] flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-chalkboard-teacher text-white text-3xl"></i>
+                <div class="w-10 h-10 rounded-full bg-[#2874d0] flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-chalkboard-teacher text-white text-lg"></i>
                 </div>
 
-                <h2 class="text-4xl font-bold text-black">
+                <h2 class="text-lg font-bold text-black">
                     {{ $jadwal['judul'] }}
                 </h2>
 
@@ -67,27 +67,27 @@
         {{-- =================================================
              INFORMASI JADWAL
              ================================================= --}}
-        <div class="px-10 py-6">
+        <div class="px-6 py-4">
 
-            <h2 class="text-xl font-bold text-black mb-7">
+            <h2 class="text-sm font-bold text-black mb-7">
                 Informasi Jadwal
             </h2>
 
-            <div class="space-y-6">
+            <div class="space-y-4">
 
                 {{-- Tanggal --}}
                 <div class="flex items-center">
                     <div class="w-10">
-                        <i class="far fa-calendar-alt text-[#19375c] text-2xl"></i>
+                        <i class="far fa-calendar-alt text-[#19375c] text-base"></i>
                     </div>
 
-                    <div class="w-44 text-lg font-semibold text-[#19375c]">
+                    <div class="w-44 text-sm font-semibold text-[#19375c]">
                         Tanggal
                     </div>
 
-                    <div class="w-5 text-lg">:</div>
+                    <div class="w-5 text-sm">:</div>
 
-                    <div class="text-lg text-[#19375c]">
+                    <div class="text-sm text-[#19375c]">
                         {{ $jadwal['tanggal'] }}
                     </div>
                 </div>
@@ -95,16 +95,16 @@
                 {{-- Waktu --}}
                 <div class="flex items-center">
                     <div class="w-10">
-                        <i class="far fa-clock text-[#19375c] text-2xl"></i>
+                        <i class="far fa-clock text-[#19375c] text-base"></i>
                     </div>
 
-                    <div class="w-44 text-lg font-semibold text-[#19375c]">
+                    <div class="w-44 text-sm font-semibold text-[#19375c]">
                         Waktu
                     </div>
 
-                    <div class="w-5 text-lg">:</div>
+                    <div class="w-5 text-sm">:</div>
 
-                    <div class="text-lg text-[#19375c]">
+                    <div class="text-sm text-[#19375c]">
                         {{ $jadwal['waktu'] }}
                     </div>
                 </div>
@@ -112,16 +112,16 @@
                 {{-- Konsultan --}}
                 <div class="flex items-center">
                     <div class="w-10">
-                        <i class="fas fa-user text-[#19375c] text-2xl"></i>
+                        <i class="fas fa-user text-[#19375c] text-base"></i>
                     </div>
 
-                    <div class="w-44 text-lg font-semibold text-[#19375c]">
+                    <div class="w-44 text-sm font-semibold text-[#19375c]">
                         Konsultan
                     </div>
 
-                    <div class="w-5 text-lg">:</div>
+                    <div class="w-5 text-sm">:</div>
 
-                    <div class="text-lg text-[#19375c]">
+                    <div class="text-sm text-[#19375c]">
                         {{ $jadwal['konsultan'] }}
                     </div>
                 </div>
@@ -129,16 +129,16 @@
                 {{-- Metode --}}
                 <div class="flex items-center">
                     <div class="w-10">
-                        <i class="fas fa-link text-[#19375c] text-2xl"></i>
+                        <i class="fas fa-link text-[#19375c] text-base"></i>
                     </div>
 
-                    <div class="w-44 text-lg font-semibold text-[#19375c]">
+                    <div class="w-44 text-sm font-semibold text-[#19375c]">
                         Metode
                     </div>
 
-                    <div class="w-5 text-lg">:</div>
+                    <div class="w-5 text-sm">:</div>
 
-                    <div class="text-lg text-[#19375c]">
+                    <div class="text-sm text-[#19375c]">
                         {{ $jadwal['metode'] }}
                     </div>
                 </div>
@@ -146,14 +146,14 @@
                 {{-- Link Meeting --}}
                 <div class="flex items-start">
                     <div class="w-10 pt-1">
-                        <i class="fas fa-link text-[#19375c] text-2xl"></i>
+                        <i class="fas fa-link text-[#19375c] text-base"></i>
                     </div>
 
-                    <div class="w-44 text-lg font-semibold text-[#19375c]">
+                    <div class="w-44 text-sm font-semibold text-[#19375c]">
                         Link Meeting
                     </div>
 
-                    <div class="w-5 text-lg">:</div>
+                    <div class="w-5 text-sm">:</div>
 
                     <div class="flex flex-wrap items-center gap-4 min-w-0">
 
@@ -165,7 +165,7 @@
                                 href="{{ $jadwal['link_meeting'] }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="text-[#4389ef] text-lg hover:underline break-all"
+                                class="text-[#4389ef] text-sm hover:underline break-all"
                             >
                                 {{ $jadwal['link_meeting'] }}
                             </a>
@@ -174,13 +174,13 @@
                                 href="{{ $jadwal['link_meeting'] }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="h-12 px-5 bg-[#2874d0] hover:bg-[#2167bd] text-white font-semibold rounded-xl flex items-center gap-3 transition"
+                                class="h-9 px-4 bg-[#2874d0] hover:bg-[#2167bd] text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition"
                             >
-                                <i class="fas fa-paper-plane text-lg"></i>
+                                <i class="fas fa-paper-plane text-sm"></i>
                                 Gabung Sekarang
                             </a>
                         @else
-                            <span class="text-lg text-gray-500">
+                            <span class="text-sm text-gray-500">
                                 Belum tersedia
                             </span>
                         @endif
@@ -204,15 +204,15 @@
             <div class="flex items-start gap-4">
 
                 <div class="w-12 h-12 rounded-full bg-[#2874d0] flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-exclamation text-white text-2xl"></i>
+                    <i class="fas fa-exclamation text-white text-base"></i>
                 </div>
 
                 <div>
-                    <h2 class="text-xl font-bold text-[#2874d0] mb-3">
+                    <h2 class="text-sm font-bold text-[#2874d0] mb-3">
                         Informasi Jadwal
                     </h2>
 
-                    <p class="text-xl font-semibold text-[#19375c]">
+                    <p class="text-sm font-semibold text-[#19375c]">
                         {{ $jadwal['catatan_admin'] }}
                     </p>
                 </div>

@@ -30,8 +30,8 @@
         </div>
 
         <div class="ml-8">
-            <h1 class="text-3xl font-bold text-gray-900">{{ $client->name }}</h1>
-            <p class="text-gray-500 font-medium text-lg mt-1">Klien</p>
+            <h1 class="text-xl font-bold text-gray-900">{{ $client->name }}</h1>
+            <p class="text-sm text-gray-500 mt-1">Klien</p>
         </div>
     </div>
 

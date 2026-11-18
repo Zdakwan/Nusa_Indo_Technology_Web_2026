@@ -6,11 +6,11 @@
      HEADER HALAMAN PENGATURAN
      ========================================================= --}}
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">
+    <h1 class="text-2xl font-bold text-gray-900">
         Pengaturan
     </h1>
 
-    <p class="mt-1 text-lg text-gray-500">
+    <p class="mt-1 text-sm text-gray-500">
         Atur preferensi platform sesuai kebutuhan anda
     </p>
 </div>
@@ -24,7 +24,7 @@
     {{-- Update Konsultasi --}}
     <div class="bg-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-sm font-semibold text-gray-900">
                 Update Konsultasi
             </h2>
             <p class="text-gray-500">
@@ -48,7 +48,7 @@
     {{-- Perubahan Jadwal Konsultasi --}}
     <div class="bg-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-sm font-semibold text-gray-900">
                 Perubahan Jadwal Konsultasi
             </h2>
             <p class="text-gray-500">
@@ -72,7 +72,7 @@
     {{-- Updated Proyek --}}
     <div class="bg-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-sm font-semibold text-gray-900">
                 Updated Proyek
             </h2>
             <p class="text-gray-500">
@@ -96,9 +96,7 @@
     {{-- Artikel Ensiklopedia Baru --}}
     <div class="bg-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <h2 class="text-xl font-semibold text-gray-900">
-                Artikel Ensiklopedia Baru
-            </h2>
+            <h2 class="text-sm font-semibold text-gray-900">Artikel Ensiklopedia Baru</h2>
             <p class="text-gray-500">
                 Notifikasi konten terbaru di ensiklopedia IT
             </p>
@@ -142,13 +140,13 @@
         </div>
 
         <div class="ml-4">
-            <h2 class="text-xl font-semibold text-gray-900">FAQ</h2>
+            <h2 class="text-sm font-semibold text-gray-900">FAQ</h2>
             <p class="text-gray-500">
                 Temukan jawaban untuk pertanyaan yang sering diajukan
             </p>
         </div>
 
-        <i class="fas fa-arrow-right ml-auto text-2xl text-gray-900"></i>
+        <i class="fas fa-arrow-right ml-auto text-base text-gray-900"></i>
     </a>
 
     {{-- Panduan Penggunaan Platform --}}
@@ -161,7 +159,7 @@
         </div>
 
         <div class="ml-4">
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-sm font-semibold text-gray-900">
                 Panduan Penggunaan Platform
             </h2>
             <p class="text-gray-500">
@@ -169,7 +167,7 @@
             </p>
         </div>
 
-        <i class="fas fa-arrow-right ml-auto text-2xl text-gray-900"></i>
+        <i class="fas fa-arrow-right ml-auto text-base text-gray-900"></i>
     </a>
 
     {{-- Call Center --}}
@@ -182,7 +180,7 @@
         </div>
 
         <div class="ml-4">
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-sm font-semibold text-gray-900">
                 Hubungi Call Center
             </h2>
             <p class="text-gray-500">
@@ -190,7 +188,7 @@
             </p>
         </div>
 
-        <i class="fas fa-arrow-right ml-auto text-2xl text-gray-900"></i>
+        <i class="fas fa-arrow-right ml-auto text-base text-gray-900"></i>
     </a>
 
 </div>
