@@ -9,13 +9,13 @@
 
 <div class="min-h-screen bg-[#f1f5f9] px-10 py-8">
 
-    {{-- HEADER HALAMAN --}}
-    <div class="mb-5">
-        <h1 class="text-4xl font-bold text-black">
+  {{-- HEADER HALAMAN --}}
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">
             Pendaftaran Konsultasi
         </h1>
 
-        <p class="text-gray-500 text-lg mt-1">
+        <p class="text-gray-500 text-sm mt-1.5">
             Isi formulir berikut untuk mendaftar konsultasi
         </p>
     </div>
@@ -63,7 +63,7 @@
                         type="text"
                         id="nama_perusahaan"
                         name="nama_perusahaan"
-                        value="{{ old('nama_perusahaan') }}"
+                        value="{{ old('nama_perusahaan', auth()->user()->company) }}"
                         placeholder="Nama Perusahaan"
                         required
                         class="w-full h-14 px-4 rounded-xl bg-[#f1f4f8] text-gray-700 placeholder-gray-500 shadow-[0_5px_5px_rgba(0,0,0,0.18)] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -87,7 +87,7 @@
                         type="text"
                         id="nama_pic"
                         name="nama_pic"
-                        value="{{ old('nama_pic') }}"
+                        value="{{ old('nama_pic', auth()->user()->name) }}"
                         placeholder="Nama PIC"
                         required
                         class="w-full h-14 px-4 rounded-xl bg-[#f1f4f8] text-gray-700 placeholder-gray-500 shadow-[0_5px_5px_rgba(0,0,0,0.18)] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -111,7 +111,7 @@
                         type="text"
                         id="jabatan_pic"
                         name="jabatan_pic"
-                        value="{{ old('jabatan_pic') }}"
+                        value="{{ old('jabatan_pic', auth()->user()->position) }}"
                         placeholder="Contoh: Project Manager"
                         class="w-full h-14 px-4 rounded-xl bg-[#f1f4f8] text-gray-700 placeholder-gray-500 shadow-[0_5px_5px_rgba(0,0,0,0.18)] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
@@ -134,7 +134,7 @@
                         type="email"
                         id="email_pic"
                         name="email_pic"
-                        value="{{ old('email_pic') }}"
+                        value="{{ old('email_pic', auth()->user()->email) }}"
                         placeholder="Email perusahaan"
                         required
                         class="w-full h-14 px-4 rounded-xl bg-[#f1f4f8] text-gray-700 placeholder-gray-500 shadow-[0_5px_5px_rgba(0,0,0,0.18)] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -158,7 +158,7 @@
                         type="tel"
                         id="telepon_pic"
                         name="telepon_pic"
-                        value="{{ old('telepon_pic') }}"
+                        value="{{ old('telepon_pic', auth()->user()->phone) }}"
                         placeholder="+62"
                         required
                         class="w-full h-14 px-4 rounded-xl bg-[#f1f4f8] text-gray-700 placeholder-gray-500 shadow-[0_5px_5px_rgba(0,0,0,0.18)] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -265,12 +265,16 @@ class AdminProyekController extends Controller
         // 1. Ambil data 1 proyek beserta relasi client-nya
         $proyek = \App\Models\Proyek::with('client')->findOrFail($id);
 
-        // 2. Load file single_pdf.blade.php
+        // 2. Generate PDF
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.proyek.single_pdf', compact('proyek'))
                 ->setPaper('a4', 'portrait')
                 ->setOption('isRemoteEnabled', true);
 
-        // 3. Tampilkan PDF di tab baru (Preview / Stream)
-        return $pdf->stream('Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf', ['Attachment' => false]);
+        // 3. Encode ke base64 lalu tampilkan dalam HTML viewer
+        //    agar browser menampilkan preview (bukan langsung download via IDM)
+        $pdfBase64 = base64_encode($pdf->output());
+        $filename  = 'Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf';
+
+        return view('admin.proyek.pdf_viewer', compact('pdfBase64', 'filename', 'proyek'));
     }
 }

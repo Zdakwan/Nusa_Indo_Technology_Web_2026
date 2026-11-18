@@ -26,8 +26,10 @@ class Konsultasi extends Model
         'waktu_konsultasi',
         'catatan_klien',
         'status',
-        'pesan_admin', // Fitur Anda
+        'pesan_admin',
         'link_meeting',
+        'konsultan',
+        'metode',
     ];
 
     // Relasi ke tabel clients (Milik Anda)

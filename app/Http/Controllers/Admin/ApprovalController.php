@@ -75,8 +75,8 @@ class ApprovalController extends Controller
                 ['client_id' => $konsultasi->client_id],
                 [
                     'update_konsultasi' => true,
-                    'perubahan_jadwal' => true,
-                    'updated_proyek' => true,
+                    'perubahan_jadwal'  => true,
+                    'updated_proyek'    => true,
                     'artikel_ensiklopedia' => true,
                 ]
             );
@@ -97,9 +97,60 @@ class ApprovalController extends Controller
 
                 Notifikasi::create([
                     'client_id' => $konsultasi->client_id,
-                    'judul' => 'Perubahan Jadwal Konsultasi',
-                    'pesan' => $pesan,
-                    'is_read' => false,
+                    'judul'     => 'Perubahan Jadwal Konsultasi',
+                    'pesan'     => $pesan,
+                    'is_read'   => false,
+                ]);
+            }
+        }
+
+        // Kirim notifikasi saat status berubah (approved / rejected / completed)
+        $statusBerubah = $validated['status'] !== $konsultasi->status;
+        if ($statusBerubah && $konsultasi->client_id) {
+            $preferensi = PreferensiNotifikasi::firstOrCreate(
+                ['client_id' => $konsultasi->client_id],
+                [
+                    'update_konsultasi'    => true,
+                    'perubahan_jadwal'     => true,
+                    'updated_proyek'       => true,
+                    'artikel_ensiklopedia' => true,
+                ]
+            );
+
+            if ($preferensi->update_konsultasi) {
+                $labelStatus = match ($validated['status']) {
+                    'approved'  => 'Disetujui',
+                    'rejected'  => 'Ditolak',
+                    'completed' => 'Selesai',
+                    default     => 'Menunggu',
+                };
+
+                $judul = match ($validated['status']) {
+                    'approved'  => 'Konsultasi Disetujui',
+                    'rejected'  => 'Konsultasi Ditolak',
+                    'completed' => 'Konsultasi Selesai',
+                    default     => 'Update Status Konsultasi',
+                };
+
+                $pesan = 'Status konsultasi ' . ($konsultasi->jenis_konsultasi ?? 'Umum') .
+                         ' Anda telah diperbarui menjadi: ' . $labelStatus . '.';
+
+                if (!empty(trim($validated['pesan_admin'] ?? ''))) {
+                    $pesan .= ' Pesan dari admin: ' . trim($validated['pesan_admin']);
+                }
+
+                if ($validated['status'] === 'approved' && !empty($validated['tanggal_konsultasi'])) {
+                    $tanggalTampil = Carbon::parse($validated['tanggal_konsultasi'])
+                        ->locale('id')->translatedFormat('d F Y');
+                    $waktuTampil = substr($validated['waktu_konsultasi'] ?? '09:00', 0, 5) . ' WIB';
+                    $pesan .= ' Jadwal: ' . $tanggalTampil . ', pukul ' . $waktuTampil . '.';
+                }
+
+                Notifikasi::create([
+                    'client_id' => $konsultasi->client_id,
+                    'judul'     => $judul,
+                    'pesan'     => $pesan,
+                    'is_read'   => false,
                 ]);
             }
         }

@@ -67,7 +67,7 @@
             }
         @endphp
         @if($logoData)
-            <img src="{{ $logoData }}" width="240" alt="Logo Nusa Indo Tech"larag
+            <img src="{{ $logoData }}" width="240" alt="Logo Nusa Indo Tech">
         @endif
         <div class="tagline">IT Management Consultant & System Development</div>
         <div class="address">Jl. Rungkut Asri Timur XV H No.2, Surabaya, Jawa Timur 60293</div>

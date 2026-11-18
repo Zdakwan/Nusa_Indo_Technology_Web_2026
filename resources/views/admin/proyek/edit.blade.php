@@ -40,7 +40,7 @@
         </div>
     @endif
 
-    {{-- INFORMASI PROYEK (READ ONLY) --}}
+    {{-- INFORMASI PROYEK (EDITABLE) --}}
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div class="flex items-center gap-3 mb-5">
             <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -48,51 +48,52 @@
             </div>
             <div>
                 <h2 class="text-lg font-bold text-gray-800">Informasi Proyek</h2>
-                <p class="text-sm text-gray-500">Informasi ini hanya dapat dilihat.</p>
+                <p class="text-sm text-gray-500">Edit nama dan deskripsi proyek.</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <form action="{{ route('admin.proyek.update', $proyek->id) }}" method="POST">
+            @csrf
+            @method('PUT')
 
-            <div>
-                <p class="text-sm text-gray-500 mb-1">Nama Proyek</p>
-                <p class="font-semibold text-gray-800">
-                    {{ $proyek->nama_proyek }}
-                </p>
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Proyek</label>
+                    <input type="text" name="nama_proyek" value="{{ old('nama_proyek', $proyek->nama_proyek) }}"
+                           required maxlength="255"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#1e3352] focus:border-[#1e3352] outline-none">
+                </div>
 
-            <div>
-                <p class="text-sm text-gray-500 mb-1">Client</p>
-                <p class="font-semibold text-gray-800">
-                    {{ $proyek->client->name ?? '-' }}
-                </p>
-            </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Client</label>
+                    <p class="px-4 py-2.5 bg-gray-50 rounded-lg text-sm text-gray-600 border border-gray-200">
+                        {{ $proyek->client->name ?? '-' }}
+                    </p>
+                </div>
 
-            <div>
-                <p class="text-sm text-gray-500 mb-1">Status Proyek</p>
-                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
-                    {{ $proyek->status === 'selesai'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-blue-100 text-blue-700' }}">
-                    {{ ucfirst($proyek->status) }}
-                </span>
-            </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Status Proyek</label>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                        {{ $proyek->status === 'selesai' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' }}">
+                        {{ ucfirst($proyek->status) }}
+                    </span>
+                </div>
 
-            <div>
-                <p class="text-sm text-gray-500 mb-1">Progres Saat Ini</p>
-                <p class="font-semibold text-gray-800">
-                    {{ $proyek->progres }}%
-                </p>
-            </div>
-
-            <div class="md:col-span-2">
-                <p class="text-sm text-gray-500 mb-1">Deskripsi Proyek</p>
-                <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-line">
-                    {{ $proyek->deskripsi ?: 'Tidak ada deskripsi proyek.' }}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Proyek</label>
+                    <textarea name="deskripsi" rows="4" maxlength="5000"
+                              placeholder="Deskripsi proyek..."
+                              class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-[#1e3352] focus:border-[#1e3352] outline-none">{{ old('deskripsi', $proyek->deskripsi) }}</textarea>
                 </div>
             </div>
 
-        </div>
+            <div class="flex justify-end">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1e3352] text-white rounded-lg hover:bg-[#172943] transition font-semibold text-sm">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </form>
     </div>
 
     {{-- INFORMASI KONSULTASI ASAL (READ ONLY) --}}

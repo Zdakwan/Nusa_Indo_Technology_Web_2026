@@ -15,7 +15,8 @@
 <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900/50 z-20 hidden md:hidden transition-opacity"></div>
 
 <!-- Sidebar Container (Responsif dengan Translasi) -->
-<aside id="sidebar" class="admin-sidebar fixed inset-y-0 left-0 z-30 w-64 bg-[#254261] text-white transition-transform duration-300 ease-in-out transform -translate-x-full md:relative md:translate-x-0 overflow-y-auto flex flex-col h-screen">
+<!-- PERBAIKAN: Menambahkan class 'hide-scrollbar' -->
+<aside id="sidebar" class="admin-sidebar hide-scrollbar fixed inset-y-0 left-0 z-30 w-64 bg-[#254261] text-white transition-transform duration-300 ease-in-out transform -translate-x-full md:relative md:translate-x-0 overflow-y-auto flex flex-col h-screen">
 
     <!-- Logo & Tombol Close (Mobile) -->
     <div class="bg-white h-16 flex items-center justify-between px-4 shrink-0 shadow-sm border-b border-gray-100">
@@ -28,7 +29,8 @@
     </div>
 
     <!-- Navigasi -->
-    <nav class="px-3 py-4 font-medium space-y-1 text-[13px] flex-1 overflow-y-auto">
+    <!-- PERBAIKAN: Menambahkan class 'hide-scrollbar' pada div navigasi jika meluap -->
+    <nav class="px-3 py-4 font-medium space-y-1 text-[13px] flex-1 overflow-y-auto hide-scrollbar">
 
         <!-- Dashboard -->
         <a href="{{ route('admin.dashboard') }}"
