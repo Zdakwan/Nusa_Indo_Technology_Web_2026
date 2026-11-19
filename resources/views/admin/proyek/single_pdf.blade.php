@@ -52,6 +52,11 @@
         .badge-selesai { background-color: #dcfce7; color: #166534; border-color: #bbf7d0;}
         .badge-berjalan { background-color: #dbeafe; color: #1e40af; border-color: #bfdbfe;}
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/LogoNIT.png') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/LogoNIT.png') }}?v=2">
+    <link rel="apple-touch-icon" href="{{ asset('images/LogoNIT.png') }}?v=2">
 </head>
 <body>
     <div class="top-bar"></div>
@@ -155,5 +160,6 @@
             $pdf->page_text($x, $y, $text, $font, $size, array(0.4, 0.4, 0.4));
         }
     </script>
+    <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
 </body>
 </html>

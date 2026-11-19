@@ -1,0 +1,175 @@
+/* =========================================================
+   Global Mobile Responsiveness & Touch UX - Nusa Indo Tech
+   ========================================================= */
+
+html,
+body {
+    /* Pakai clip agar position: sticky pada navbar tetap berjalan */
+    overflow-x: clip;
+    max-width: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Cegah URL/email/judul panjang merusak lebar layar HP */
+p, h1, h2, h3, h4, h5, h6, td, th, li, a {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+img, svg, video, canvas {
+    max-width: 100%;
+}
+
+/* Wrapper tabel horizontal scroll */
+.responsive-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0.75rem;
+}
+
+.responsive-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Wrapper responsif iframe (Google Maps, YouTube, PDF) */
+.responsive-embed-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0.75rem;
+}
+
+.responsive-embed-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+}
+
+/* Indikator geser tabel khusus mobile */
+.table-scroll-hint {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    /* Cegah auto-zoom browser HP saat mengetik di input form */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    .container,
+    main,
+    section,
+    article {
+        max-width: 100%;
+    }
+
+    /* Jaga sel tabel tetap rapi dan tidak patah per huruf */
+    .responsive-table-wrap th,
+    .responsive-table-wrap td {
+        white-space: nowrap;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .table-scroll-hint.is-overflowing {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+
+    /* Pastikan modal/popup selalu muat di viewport HP */
+    [role="dialog"],
+    .modal-content {
+        max-width: calc(100vw - 1.5rem) !important;
+        max-height: calc(100dvh - 2rem);
+        overflow-y: auto;
+    }
+
+    /* Pagination Laravel rapi dan tidak meluber di layar kecil */
+    nav[role="navigation"] {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Backdrop otomatis untuk sidebar drawer di HP */
+    .nusa-mobile-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 35;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+
+    .nusa-mobile-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    aside.nusa-auto-drawer {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 40 !important;
+        display: flex !important;
+        width: min(18rem, 82vw) !important;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 20px 35px rgba(15, 23, 42, 0.35);
+    }
+
+    aside.nusa-auto-drawer.is-open {
+        transform: translateX(0);
+    }
+}
+
+/* Tombol Scroll-to-Top dinamis */
+#nusaScrollTopBtn {
+    position: fixed;
+    right: 1rem;
+    bottom: 1.25rem;
+    z-index: 45;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    background-color: #23364f;
+    color: #f5b73e;
+    border: 1px solid rgba(245, 183, 62, 0.35);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#nusaScrollTopBtn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+#nusaScrollTopBtn:active {
+    transform: scale(0.94);
+}

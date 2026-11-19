@@ -64,6 +64,11 @@
         .signature-space { height: 75px; }
         .signature-name { font-weight: bold; text-decoration: underline; color: #0f172a; font-size: 12px; }
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/LogoNIT.png') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/LogoNIT.png') }}?v=2">
+    <link rel="apple-touch-icon" href="{{ asset('images/LogoNIT.png') }}?v=2">
 </head>
 <body>
 
@@ -169,5 +174,6 @@
             $pdf->page_text($x, $y, $text, $font, $size, array(0.4, 0.4, 0.4));
         }
     </script>
+    <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
 </body>
 </html>
