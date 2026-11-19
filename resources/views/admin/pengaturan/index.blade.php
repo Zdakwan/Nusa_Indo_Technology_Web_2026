@@ -34,7 +34,8 @@
     </div>
 @endif
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-3xl">
+<!-- FORM PENGATURAN AKUN -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-3xl mb-6">
     <div class="p-6 md:p-8">
         <form action="{{ route('admin.pengaturan.update') }}" method="POST">
             @csrf
@@ -90,6 +91,42 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- KARTU INTEGRASI APLIKASI MOBILE (QR CODE) -->
+{{-- Container utama berupa Card putih dengan bayangan (shadow) --}}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-3xl mb-10">
+
+    {{-- flex-col untuk HP (atas-bawah), md:flex-row untuk PC (kiri-kanan) --}}
+    <div class="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+
+        {{-- shrink-0: Mencegah area QR Code mengecil terhimpit teks --}}
+        <div class="shrink-0 p-4 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col items-center justify-center">
+
+            {{--
+               1. {!! !!} (Unescaped): Wajib agar dirender jadi visual kotak QR, bukan teks HTML mentah.
+               2. DNS2D & 'QRCODE': Class khusus untuk generate QR 2 Dimensi.
+               3. 5, 5: Ukuran pixel agar polanya presisi bujur sangkar.
+            --}}
+            {!! \DNS2D::getBarcodeHTML('https://drive.google.com/file/d/1zzqftXPkR4ZUDi1gm_oZ_GAbN-YA8Nle/view?usp=sharing', 'QRCODE', 5, 5) !!}
+
+            <span class="text-xs font-bold text-gray-500 mt-3 tracking-widest uppercase">Scan Me</span>
+        </div>
+
+        {{-- Area Teks & Tombol --}}
+        <div class="text-center md:text-left">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Aplikasi Mobile Nusa Indo Tech</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Pindai QR Code di samping menggunakan kamera <i>smartphone</i> atau aplikasi scanner Anda untuk mengunduh dan menginstal aplikasi Android (.apk) Nusa Indo Tech secara langsung.
+            </p>
+
+            {{-- target="_blank": Membuka link Google Drive di tab baru --}}
+            <a href="https://drive.google.com/file/d/1zzqftXPkR4ZUDi1gm_oZ_GAbN-YA8Nle/view?usp=sharing" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#254261] bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                <i class="fas fa-external-link-alt mr-2"></i> Kunjungi Tautan Unduhan
+            </a>
+        </div>
+
     </div>
 </div>
 @endsection

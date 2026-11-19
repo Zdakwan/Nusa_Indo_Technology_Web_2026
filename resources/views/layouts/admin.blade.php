@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
 
+    <!-- PERBAIKAN: CSS tambahan untuk menyembunyikan scrollbar -->
+    <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
     @stack('styles')
 </head>
 <body class="flex h-screen overflow-hidden text-gray-900">
@@ -28,6 +39,6 @@
     @stack('scripts')
 
     <!-- Script Notifikasi tetap di sini (Paling Bawah) -->
-    
+
 </body>
 </html>

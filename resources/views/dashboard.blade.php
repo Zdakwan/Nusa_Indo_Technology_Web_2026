@@ -3,10 +3,10 @@
 @section('title', 'Dashboard - Nusa Indo Tech')
 
 @section('content')
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-4">Dashboard</h1>
 
     <!-- Tiga Kartu Atas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
         <!-- Card 1: Permintaan Konsultasi -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative h-36 flex flex-col justify-between">
@@ -76,15 +76,15 @@
     </div>
 
     <!-- Bagian Tengah (Dua Kolom) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
 
         <!-- Jadwal Konsultasi Terdekat -->
         @if ($jadwalTerdekat)
             <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
 
-                <div class="flex items-center mb-6">
+                <div class="flex items-center mb-3">
                     <i class="fas fa-calendar-alt text-[#1e3352] text-xl mr-3"></i>
-                    <h3 class="font-bold text-gray-900 text-lg">Jadwal Konsultasi Terdekat</h3>
+                    <h3 class="font-bold text-gray-900 text-sm">Jadwal Konsultasi Terdekat</h3>
                 </div>
 
                 <div class="flex items-center justify-between mb-4">
@@ -93,7 +93,7 @@
                             <i class="fas fa-desktop"></i>
                         </div>
 
-                        <h4 class="font-bold text-gray-900 text-lg">
+                        <h4 class="font-bold text-gray-900 text-sm">
                             Konsultasi #{{ $jadwalTerdekat->id }}
                         </h4>
                     </div>
@@ -144,15 +144,15 @@
             </div>
         @else
             <!-- Tampilan ketika belum ada jadwal konsultasi -->
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 min-h-[280px] flex flex-col">
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 min-h-[180px] flex flex-col">
 
-                <div class="flex items-center mb-6 self-start">
+                <div class="flex items-center mb-3 self-start">
                     <i class="fas fa-calendar-alt text-[#1e3352] text-xl mr-3"></i>
-                    <h3 class="font-bold text-gray-900 text-lg">Jadwal Konsultasi Terdekat</h3>
+                    <h3 class="font-bold text-gray-900 text-sm">Jadwal Konsultasi Terdekat</h3>
                 </div>
 
                 <div class="flex-grow flex flex-col items-center justify-center text-center">
-                    <i class="fas fa-calendar-alt text-gray-400 text-3xl mb-4"></i>
+                    <i class="fas fa-calendar-alt text-gray-400 text-2xl mb-4"></i>
 
                     <p class="font-bold text-gray-700">
                         Belum Ada Jadwal Konsultasi
@@ -171,15 +171,15 @@
         @endif
 
         <!-- Status Pendaftaran Terbaru -->
-        <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col">
-            <div class="flex items-center mb-6">
+        <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col">
+            <div class="flex items-center mb-3">
                 <i class="fas fa-file-alt text-[#1e3352] text-xl mr-3"></i>
-                <h3 class="font-bold text-gray-900 text-lg">Status Pendaftaran Terbaru</h3>
+                <h3 class="font-bold text-gray-900 text-sm">Status Pendaftaran Terbaru</h3>
             </div>
 
             @if ($pendaftaranTerbaru)
                 <div class="flex-grow">
-                    <h4 class="font-bold text-gray-900 text-lg">
+                    <h4 class="font-bold text-gray-900 text-sm">
                         Konsultasi #{{ $pendaftaranTerbaru->id }}
                     </h4>
 
@@ -272,8 +272,8 @@
                 </div>
             @else
                 <!-- Tampilan ketika belum ada pendaftaran -->
-                <div class="flex-grow min-h-[220px] flex flex-col items-center justify-center text-center">
-                    <i class="fas fa-file-alt text-gray-400 text-3xl mb-3"></i>
+                <div class="flex-grow min-h-[180px] flex flex-col items-center justify-center text-center">
+                    <i class="fas fa-file-alt text-gray-400 text-2xl mb-3"></i>
 
                     <p class="font-bold text-gray-700">
                         Belum Ada Pendaftaran
@@ -297,7 +297,7 @@
         <div class="flex justify-between items-center p-5 border-b border-gray-100">
             <div class="flex items-center">
                 <i class="fas fa-bell text-[#1e3352] text-xl mr-3"></i>
-                <h3 class="font-bold text-gray-900 text-lg">Notifikasi Terbaru</h3>
+                <h3 class="font-bold text-gray-900 text-sm">Notifikasi Terbaru</h3>
             </div>
 
             <a href="{{ route('notifikasi.index') }}"
@@ -377,8 +377,8 @@
 
             @empty
                 <!-- Tampilan ketika belum ada notifikasi -->
-                <div class="min-h-[180px] p-6 flex flex-col items-center justify-center text-center">
-                    <i class="fas fa-bell-slash text-gray-400 text-3xl mb-3"></i>
+                <div class="min-h-[120px] p-4 flex flex-col items-center justify-center text-center">
+                    <i class="fas fa-bell-slash text-gray-400 text-2xl mb-3"></i>
 
                     <p class="font-bold text-gray-700">
                         Belum Ada Notifikasi

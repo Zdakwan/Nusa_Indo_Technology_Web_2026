@@ -38,7 +38,7 @@
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
 
             <div>
-                <h2 class="text-xl font-bold text-gray-800">
+                <h2 class="text-base font-bold text-gray-800">
                     {{ $proyek->nama_proyek }}
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">
@@ -107,7 +107,7 @@
                     Perkembangan Proyek
                 </h3>
 
-                <span class="text-xl font-bold text-[#1e3352]">
+                <span class="text-sm font-bold text-[#1e3352]">
                     {{ $proyek->progres }}%
                 </span>
             </div>

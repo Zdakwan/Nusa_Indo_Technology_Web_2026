@@ -96,4 +96,26 @@ class EnsiklopediaController extends Controller
         $artikel->delete();
         return back()->with('success', 'Artikel berhasil dihapus.');
     }
+
+    /**
+     * Menghapus beberapa artikel sekaligus beserta file gambarnya (Bulk Delete).
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:ensiklopedias,id', // pastikan nama tabel benar
+        ]);
+
+        $artikels = Ensiklopedia::whereIn('id', $request->ids)->get();
+
+        foreach ($artikels as $artikel) {
+            if ($artikel->gambar && Storage::disk('public')->exists($artikel->gambar)) {
+                Storage::disk('public')->delete($artikel->gambar);
+            }
+            $artikel->delete();
+        }
+
+        return redirect()->back()->with('success', count($request->ids) . ' artikel berhasil dihapus beserta file gambarnya.');
+    }
 }

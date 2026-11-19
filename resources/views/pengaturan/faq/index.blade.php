@@ -17,7 +17,7 @@
         Kembali
     </a>
 
-    <h1 class="text-3xl font-bold text-gray-900 mt-4">
+    <h1 class="text-2xl font-bold text-gray-900 mt-4">
         Frequently Ask Question
     </h1>
 

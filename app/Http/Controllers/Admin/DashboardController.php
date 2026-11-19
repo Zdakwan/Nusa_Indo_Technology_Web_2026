@@ -184,4 +184,18 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')
             ->with('success', 'Aktivitas berhasil dihapus!');
     }
+
+    public function bulkDestroyAktivitas(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:konsultasi,id',
+        ]);
+
+        $count = count($request->ids);
+        DB::table('konsultasi')->whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', $count . ' aktivitas berhasil dihapus!');
+    }
 }

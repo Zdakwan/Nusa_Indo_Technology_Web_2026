@@ -2,25 +2,23 @@
 
 @section('content')
 
-<div class="min-h-screen bg-[#f1f5f9] px-10 py-8">
+<div class="min-h-screen bg-[#f1f5f9] px-6 py-5">
 
     {{-- HEADER HALAMAN --}}
-    <div class="mb-8">
-
-        <h1 class="text-4xl font-bold text-black">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">
             Konsultasi Saya
         </h1>
 
-        <p class="text-gray-500 text-lg mt-1">
+        <p class="text-gray-500 text-sm mt-1.5">
             Kelola semua konsultasi yang pernah anda ajukan ke tim Nusa Indo Technology
         </p>
-
     </div>
 
     {{-- CARD DAFTAR KONSULTASI --}}
     <div class="bg-white border border-gray-300 rounded-xl px-6 py-6">
 
-        <h2 class="text-3xl font-semibold text-black mb-4">
+        <h2 class="text-sm font-bold text-gray-900 mb-5">
             Daftar Konsultasi
         </h2>
 
@@ -33,27 +31,27 @@
                 <thead>
                     <tr class="bg-[#fff4f4]">
 
-                        <th class="text-left px-6 py-3 text-base font-semibold text-black rounded-l-lg whitespace-nowrap">
+                        <th class="text-left px-6 py-3 text-sm font-semibold text-black rounded-l-lg whitespace-nowrap">
                             Judul Konsultasi
                         </th>
 
-                        <th class="text-left px-6 py-3 text-base font-semibold text-black whitespace-nowrap">
+                        <th class="text-left px-6 py-3 text-sm font-semibold text-black whitespace-nowrap">
                             Kategori
                         </th>
 
-                        <th class="text-left px-6 py-3 text-base font-semibold text-black whitespace-nowrap">
+                        <th class="text-left px-6 py-3 text-sm font-semibold text-black whitespace-nowrap">
                             Tanggal Pengajuan
                         </th>
 
-                        <th class="text-left px-6 py-3 text-base font-semibold text-black whitespace-nowrap">
+                        <th class="text-left px-6 py-3 text-sm font-semibold text-black whitespace-nowrap">
                             Jadwal
                         </th>
 
-                        <th class="text-left px-6 py-3 text-base font-semibold text-black whitespace-nowrap">
+                        <th class="text-left px-6 py-3 text-sm font-semibold text-black whitespace-nowrap">
                             Status
                         </th>
 
-                        <th class="text-left px-6 py-3 text-base font-semibold text-black rounded-r-lg whitespace-nowrap">
+                        <th class="text-left px-6 py-3 text-sm font-semibold text-black rounded-r-lg whitespace-nowrap">
                             Aksi
                         </th>
 
@@ -133,7 +131,7 @@
 
                         {{-- KONDISI KOSONG --}}
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-6 text-center text-gray-500">
                                 Belum ada konsultasi yang diajukan.
                             </td>
                         </tr>

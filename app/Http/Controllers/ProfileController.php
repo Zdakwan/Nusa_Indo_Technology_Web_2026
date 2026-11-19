@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Services\MobileApi;
 
 class ProfileController extends Controller
 {
@@ -130,9 +131,7 @@ class ProfileController extends Controller
 
         ], [
             'avatar.image' => 'File yang diunggah harus berupa gambar.',
-
             'avatar.mimes' => 'Format foto harus berupa JPG, JPEG, atau PNG.',
-
             'avatar.max' => 'Ukuran foto profil maksimal 2 MB.',
         ]);
 
@@ -146,13 +145,12 @@ class ProfileController extends Controller
         */
 
         if ($request->hasFile('avatar')) {
-
-            $newAvatar = $request->file('avatar')
-                ->store('avatars', 'public');
+            $newAvatar = $request->file('avatar')->store('avatars', 'public');
 
             if (!$newAvatar) {
                 return back()->withInput()->withErrors(['avatar' => 'Foto gagal disimpan. Silakan coba kembali.']);
             }
+
             $validated['avatar'] = $newAvatar;
         }
 
@@ -163,6 +161,9 @@ class ProfileController extends Controller
         */
 
         $client->update($validated);
+
+        // Sinkronisasi perubahan profil ke aplikasi mobile (Android Native via Retrofit)
+        app(MobileApi::class)->pushClient($client);
 
         /*
         |--------------------------------------------------------------------------

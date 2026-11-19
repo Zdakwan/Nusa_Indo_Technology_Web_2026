@@ -4,21 +4,25 @@
 @endphp
 
 <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 z-10 relative">
-    
-    <!-- Bagian Kiri -->
-    <div class="flex items-center">
-        <!-- Kosongkan atau isi dengan fitur pencarian -->
+
+    <!-- Bagian Kiri (Hamburger Menu Mobile & Search Kosong) -->
+    <div class="flex items-center gap-3">
+        <!-- Tombol Toggle Sidebar Mobile -->
+        <button type="button" id="mobileMenuBtn" class="md:hidden p-2 -ml-2 text-[#1a2f45] hover:bg-gray-100 rounded-lg focus:outline-none transition">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+        <!-- Tempat kosong untuk search -->
     </div>
 
     <!-- Bagian Kanan (Lonceng & Profil) -->
     <div class="flex items-center gap-4">
-        
+
         <!-- Wrapper Notifikasi -->
         <div class="relative inline-block text-left">
-            <!-- Tombol Lonceng (Diberi ID 'bellButton' agar dikenali JS) -->
+            <!-- Tombol Lonceng -->
             <button type="button" id="bellButton" onclick="toggleNotifDropdown()" class="relative p-2 text-[#1a2f45] hover:text-blue-700 transition focus:outline-none cursor-pointer">
                 <i class="fas fa-bell text-xl"></i>
-                
+
                 @if($pendingCount > 0)
                 <span class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full border-2 border-white">
                     {{ $pendingCount }}
@@ -32,7 +36,7 @@
                     <h3 class="text-sm font-extrabold text-gray-800">Notifikasi</h3>
                     <button type="button" class="text-[11px] text-blue-600 hover:underline font-semibold cursor-pointer">Tandai dibaca</button>
                 </div>
-                
+
                 <div class="max-h-[300px] overflow-y-auto">
                     @if($pendingCount > 0)
                         <a href="#" class="block px-4 py-3 bg-blue-50/50 hover:bg-gray-50 border-b border-gray-50 transition">
@@ -67,22 +71,16 @@
     </div>
 </header>
 
-<!-- JAVASCRIPT UNTUK MEMUNCULKAN POP-UP -->
 <script>
     function toggleNotifDropdown() {
         const dropdown = document.getElementById('dropdownNotifikasi');
-        if(dropdown.classList.contains('hidden')) {
-            dropdown.classList.remove('hidden');
-        } else {
-            dropdown.classList.add('hidden');
-        }
+        dropdown.classList.toggle('hidden');
     }
 
-    // Menutup pop-up secara otomatis saat klik di luar lonceng/kotak
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('dropdownNotifikasi');
         const bellBtn = document.getElementById('bellButton');
-        
+
         if (dropdown && bellBtn) {
             if (!dropdown.contains(event.target) && !bellBtn.contains(event.target)) {
                 dropdown.classList.add('hidden');

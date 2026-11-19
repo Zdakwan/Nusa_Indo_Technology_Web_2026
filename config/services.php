@@ -28,6 +28,12 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    // Jembatan ke API aplikasi mobile (nusa-api). Kunci harus sama dengan api/web_key.php.
+    'mobile_api' => [
+        'url' => env('MOBILE_API_URL'),
+        'key' => env('MOBILE_API_KEY'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

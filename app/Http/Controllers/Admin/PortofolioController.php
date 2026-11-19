@@ -20,7 +20,7 @@ class PortofolioController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul'        => 'required|string|max:255',
             'deskripsi'    => 'required|string',
             'nama_klien'   => 'nullable|string|max:255',
@@ -33,19 +33,20 @@ class PortofolioController extends Controller
             'teknologi'    => 'nullable|string|max:255',
             'gambar'       => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
         ], [
-            'gambar.min' => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
-            'gambar.max' => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
+            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
+            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
             'gambar.mimes' => 'Format gambar harus berupa: png, jpg, jpeg, gif, atau bmp.',
-            'gambar.image' => 'File yang diunggah harus berupa gambar.'
+            'gambar.image' => 'File yang diunggah harus berupa gambar.',
         ]);
-
-        $data = $request->all();
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('portofolio', 'public');
+        } else {
+            unset($data['gambar']);
         }
 
         Portofolio::create($data);
+
         return redirect()->route('admin.portofolio.index')->with('success', 'Portofolio berhasil ditambahkan.');
     }
 
@@ -53,7 +54,7 @@ class PortofolioController extends Controller
     {
         $portofolio = Portofolio::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'judul'        => 'required|string|max:255',
             'deskripsi'    => 'required|string',
             'nama_klien'   => 'nullable|string|max:255',
@@ -66,33 +67,58 @@ class PortofolioController extends Controller
             'teknologi'    => 'nullable|string|max:255',
             'gambar'       => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
         ], [
-            'gambar.min' => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
-            'gambar.max' => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
+            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
+            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
             'gambar.mimes' => 'Format gambar harus berupa: png, jpg, jpeg, gif, atau bmp.',
-            'gambar.image' => 'File yang diunggah harus berupa gambar.'
+            'gambar.image' => 'File yang diunggah harus berupa gambar.',
         ]);
-
-        $data = $request->all();
 
         if ($request->hasFile('gambar')) {
             if ($portofolio->gambar && Storage::disk('public')->exists($portofolio->gambar)) {
                 Storage::disk('public')->delete($portofolio->gambar);
             }
             $data['gambar'] = $request->file('gambar')->store('portofolio', 'public');
+        } else {
+            unset($data['gambar']);
         }
 
         $portofolio->update($data);
+
         return redirect()->route('admin.portofolio.index')->with('success', 'Portofolio berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         $portofolio = Portofolio::findOrFail($id);
+
         if ($portofolio->gambar && Storage::disk('public')->exists($portofolio->gambar)) {
             Storage::disk('public')->delete($portofolio->gambar);
         }
+
         $portofolio->delete();
 
         return redirect()->route('admin.portofolio.index')->with('success', 'Portofolio berhasil dihapus.');
+    }
+
+    /**
+     * Menghapus beberapa portofolio sekaligus beserta file gambarnya (Bulk Delete).
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:portofolios,id',
+        ]);
+
+        $portofolios = Portofolio::whereIn('id', $request->ids)->get();
+
+        foreach ($portofolios as $portofolio) {
+            if ($portofolio->gambar && Storage::disk('public')->exists($portofolio->gambar)) {
+                Storage::disk('public')->delete($portofolio->gambar);
+            }
+            $portofolio->delete();
+        }
+
+        return redirect()->back()->with('success', count($request->ids) . ' portofolio berhasil dihapus beserta file gambarnya.');
     }
 }
