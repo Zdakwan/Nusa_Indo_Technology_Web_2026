@@ -16,6 +16,10 @@
             "dest": "/public/build/$1"
         },
         {
+            "src": "/storage/(.*)",
+            "dest": "/public/storage/$1"
+        },
+        {
             "src": "/(css|js|images|img|assets|favicon\\.ico|robots\\.txt)(.*)",
             "dest": "/public/$1$2"
         },
@@ -26,7 +30,7 @@
     ],
     "env": {
         "APP_ENV": "production",
-        "APP_DEBUG": "true",
+        "APP_DEBUG": "false",
         "APP_STORAGE": "/tmp/storage",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
