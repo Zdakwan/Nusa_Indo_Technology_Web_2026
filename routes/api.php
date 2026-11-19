@@ -11,4 +11,9 @@ Route::prefix('internal')
             ->whereNumber('id');
         Route::match(['patch', 'put'], '/proyek/{id}/progress', [MobileProyekSyncController::class, 'updateProgress'])
             ->whereNumber('id');
+        Route::match(['patch', 'put'], '/proyek/{id}/progress', [MobileProyekSyncController::class, 'updateProgress'])
+            ->whereNumber('id');
+        // Keputusan supervisor (disetujui / ditolak / menunggu) atas proyek client
+        Route::match(['patch', 'put'], '/proyek/{id}/keputusan', [MobileProyekSyncController::class, 'keputusan'])
+            ->whereNumber('id');
     });

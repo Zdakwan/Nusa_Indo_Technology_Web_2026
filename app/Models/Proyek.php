@@ -18,12 +18,15 @@ class Proyek extends Model
         'deskripsi',
         'progres',
         'status',
+        'catatan_supervisor',
+        'keputusan_at',
     ];
 
     protected function casts(): array
     {
         return [
             'progres' => 'integer',
+            'keputusan_at' => 'datetime',
         ];
     }
 
