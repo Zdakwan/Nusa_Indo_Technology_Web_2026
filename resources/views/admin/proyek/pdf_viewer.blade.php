@@ -77,9 +77,9 @@
         }
     </style>
     <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/LogoNIT.png') }}?v=2">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('images/LogoNIT.png') }}?v=2">
-    <link rel="apple-touch-icon" href="{{ asset('images/LogoNIT.png') }}?v=2">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
 </head>
 <body>
 
