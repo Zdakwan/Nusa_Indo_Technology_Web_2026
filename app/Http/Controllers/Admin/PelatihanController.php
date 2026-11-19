@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Layanan;
 use App\Models\Pelatihan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,30 +13,30 @@ class PelatihanController extends Controller
     public function index()
     {
         $pelatihan = Pelatihan::latest()->paginate(10);
-        $layanan = \App\Models\Layanan::all();
+        $layanan = Layanan::all();
 
         return view('admin.pelatihan.index', compact('pelatihan', 'layanan'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required',
-            'harga' => 'required|numeric',
-            'kategori' => 'nullable|string|max:100',
-            'gambar' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+        $data = $request->validate([
+            'judul'     => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'harga'     => 'required|numeric',
+            'kategori'  => 'nullable|string|max:100',
+            'gambar'    => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
         ], [
-            'gambar.min' => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
-            'gambar.max' => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
+            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
+            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
             'gambar.mimes' => 'Format gambar harus berupa: png, jpg, jpeg, gif, atau bmp.',
-            'gambar.image' => 'File yang diunggah harus berupa gambar.'
+            'gambar.image' => 'File yang diunggah harus berupa gambar.',
         ]);
-
-        $data = $request->all();
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('pelatihan', 'public');
+        } else {
+            unset($data['gambar']);
         }
 
         Pelatihan::create($data);
@@ -47,26 +48,26 @@ class PelatihanController extends Controller
     {
         $pelatihan = Pelatihan::findOrFail($id);
 
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required',
-            'harga' => 'required|numeric',
-            'kategori' => 'nullable|string|max:100',
-            'gambar' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+        $data = $request->validate([
+            'judul'     => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'harga'     => 'required|numeric',
+            'kategori'  => 'nullable|string|max:100',
+            'gambar'    => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
         ], [
-            'gambar.min' => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
-            'gambar.max' => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
+            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
+            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
             'gambar.mimes' => 'Format gambar harus berupa: png, jpg, jpeg, gif, atau bmp.',
-            'gambar.image' => 'File yang diunggah harus berupa gambar.'
+            'gambar.image' => 'File yang diunggah harus berupa gambar.',
         ]);
-
-        $data = $request->all();
 
         if ($request->hasFile('gambar')) {
             if ($pelatihan->gambar && Storage::disk('public')->exists($pelatihan->gambar)) {
                 Storage::disk('public')->delete($pelatihan->gambar);
             }
             $data['gambar'] = $request->file('gambar')->store('pelatihan', 'public');
+        } else {
+            unset($data['gambar']);
         }
 
         $pelatihan->update($data);
@@ -94,7 +95,7 @@ class PelatihanController extends Controller
     {
         $request->validate([
             'ids'   => 'required|array',
-            'ids.*' => 'exists:pelatihans,id', // pastikan nama tabel Anda benar
+            'ids.*' => 'exists:pelatihans,id',
         ]);
 
         $pelatihans = Pelatihan::whereIn('id', $request->ids)->get();

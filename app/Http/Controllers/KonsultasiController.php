@@ -163,26 +163,21 @@ class KonsultasiController extends Controller
         return view('konsultasi.index', compact('konsultasis'));
     }
 
-    /**
-     * Menampilkan detail konsultasi milik client yang sedang login.
-     */
     public function detail($id)
     {
-        // Memastikan konsultasi ditemukan dan dimiliki client yang login.
         $data = Konsultasi::where('id', $id)
             ->where('client_id', Auth::guard('client')->id())
             ->firstOrFail();
 
         $daftarStatus = [
-            'pending' => 'Menunggu Persetujuan',
-            'approved' => 'Disetujui Admin',
-            'rejected' => 'Ditolak',
+            'pending'   => 'Menunggu Persetujuan',
+            'approved'  => 'Disetujui Admin',
+            'rejected'  => 'Ditolak',
             'completed' => 'Selesai',
         ];
 
         $statusLabel = $daftarStatus[$data->status] ?? $data->status;
 
-        // Memformat tanggal pengajuan berdasarkan zona waktu WIB.
         $tanggalPengajuan = $data->created_at
             ? $data->created_at
                 ->timezone('Asia/Jakarta')
@@ -190,74 +185,67 @@ class KonsultasiController extends Controller
                 ->translatedFormat('d M Y, H:i')
             : '-';
 
-        // Menampilkan riwayat yang dapat diketahui dari data saat ini.
         $riwayat = [];
 
         if ($data->created_at) {
             $riwayat[] = [
-                'judul' => 'Pengajuan Dibuat',
+                'judul'   => 'Pengajuan Dibuat',
                 'tanggal' => $tanggalPengajuan,
-                'warna' => 'gray',
+                'warna'   => 'gray',
             ];
         }
 
-        // Menampilkan status terakhir tanpa mengarang waktu persetujuan.
         if ($data->status !== 'pending') {
             $riwayat[] = [
-                'judul' => $statusLabel,
+                'judul'   => $statusLabel,
                 'tanggal' => $data->updated_at
                     ? $data->updated_at
                         ->timezone('Asia/Jakarta')
                         ->locale('id')
                         ->translatedFormat('d M Y, H:i')
                     : '-',
-                'warna' => $data->status === 'rejected' ? 'gray' : 'green',
+                'warna'   => $data->status === 'rejected' ? 'gray' : 'green',
             ];
         }
 
         $catatanStatus = [
-            'pending' => 'Pendaftaran Anda telah diterima dan sedang menunggu pemeriksaan Admin.',
-            'approved' => 'Pendaftaran Anda telah disetujui Admin. Silakan periksa informasi jadwal yang tersedia.',
-            'rejected' => 'Pendaftaran konsultasi Anda ditolak. Silakan hubungi Admin untuk informasi lebih lanjut.',
+            'pending'   => 'Pendaftaran Anda telah diterima dan sedang menunggu pemeriksaan Admin.',
+            'approved'  => 'Pendaftaran Anda telah disetujui Admin. Silakan periksa informasi jadwal yang tersedia.',
+            'rejected'  => 'Pendaftaran konsultasi Anda ditolak. Silakan hubungi Admin untuk informasi lebih lanjut.',
             'completed' => 'Konsultasi Anda telah selesai.',
         ];
 
-        $konsultasi = [
-            'id' => $data->id,
-            'judul' => 'Konsultasi ' . $data->jenis_konsultasi,
+        // Prioritaskan pesan asli dari Admin; pakai teks default hanya jika kosong
+        $pesanAdmin = trim((string) ($data->pesan_admin ?? ''));
 
-            'kode_pengajuan' => 'KNS-' .
+        $konsultasi = [
+            'id'                  => $data->id,
+            'judul'               => 'Konsultasi ' . $data->jenis_konsultasi,
+            'kode_pengajuan'      => 'KNS-' .
                 ($data->created_at
                     ? $data->created_at->timezone('Asia/Jakarta')->format('Ymd')
                     : now('Asia/Jakarta')->format('Ymd')) .
                 '-' . str_pad((string) $data->id, 3, '0', STR_PAD_LEFT),
-
-            'status' => $statusLabel,
-            'status_database' => $data->status,
-            'jenis_konsultasi' => $data->jenis_konsultasi ?? '-',
+            'status'              => $statusLabel,
+            'status_database'     => $data->status,
+            'jenis_konsultasi'    => $data->jenis_konsultasi ?? '-',
             'deskripsi_kebutuhan' => $data->catatan_klien ?? '-',
-            'tanggal_pengajuan' => $tanggalPengajuan,
-            'status_konsultasi' => $statusLabel,
-
-            'nama_perusahaan' => $data->nama_perusahaan ?? '-',
-            'nama_pic' => $data->nama_pic ?? '-',
-            'email_pic' => $data->email_pic ?? '-',
-            'no_telp' => $data->telepon_pic ?? '-',
-            'jabatan' => $data->jabatan_pic ?? '-',
-
-            'catatan_admin' => $catatanStatus[$data->status]
-                ?? 'Silakan hubungi Admin untuk informasi lebih lanjut.',
-
-            'riwayat' => $riwayat,
+            'tanggal_pengajuan'   => $tanggalPengajuan,
+            'status_konsultasi'   => $statusLabel,
+            'nama_perusahaan'     => $data->nama_perusahaan ?? '-',
+            'nama_pic'            => $data->nama_pic ?? '-',
+            'email_pic'           => $data->email_pic ?? '-',
+            'no_telp'             => $data->telepon_pic ?? '-',
+            'jabatan'             => $data->jabatan_pic ?? '-',
+            'catatan_admin'       => $pesanAdmin !== ''
+                ? $pesanAdmin
+                : ($catatanStatus[$data->status] ?? 'Silakan hubungi Admin untuk informasi lebih lanjut.'),
+            'riwayat'             => $riwayat,
         ];
 
         return view('konsultasi.detail', compact('konsultasi'));
     }
 
-    /**
-     * Menampilkan detail jadwal konsultasi dari database.
-     * Client hanya dapat mengakses jadwal miliknya sendiri.
-     */
     public function jadwal($id)
     {
         $data = Konsultasi::where('id', $id)
@@ -265,49 +253,48 @@ class KonsultasiController extends Controller
             ->firstOrFail();
 
         $daftarStatus = [
-            'pending' => 'Menunggu Persetujuan',
-            'approved' => 'Disetujui Admin',
-            'rejected' => 'Ditolak',
+            'pending'   => 'Menunggu Persetujuan',
+            'approved'  => 'Disetujui Admin',
+            'rejected'  => 'Ditolak',
             'completed' => 'Selesai',
         ];
 
         $status = $daftarStatus[$data->status] ?? $data->status;
 
-        // Format tanggal konsultasi dalam bahasa Indonesia.
         $tanggal = $data->tanggal_konsultasi
             ? Carbon::parse($data->tanggal_konsultasi)
                 ->locale('id')
                 ->translatedFormat('l, d F Y')
             : 'Belum ditentukan';
 
-        // Format waktu konsultasi.
         $waktu = $data->waktu_konsultasi
             ? substr($data->waktu_konsultasi, 0, 5) . ' WIB'
             : 'Belum ditentukan';
 
         $linkMeeting = $data->link_meeting;
+        $pesanAdmin  = trim((string) ($data->pesan_admin ?? ''));
 
-        $catatanAdmin = match ($data->status) {
-            'pending' => 'Pendaftaran konsultasi Anda masih menunggu persetujuan Admin.',
-            'approved' => $linkMeeting
+        $catatanDefault = match ($data->status) {
+            'pending'   => 'Pendaftaran konsultasi Anda masih menunggu persetujuan Admin.',
+            'approved'  => $linkMeeting
                 ? 'Jadwal konsultasi telah disetujui. Silakan hadir sesuai tanggal dan waktu yang tertera.'
                 : 'Jadwal konsultasi telah disetujui, tetapi tautan meeting belum tersedia.',
-            'rejected' => 'Pendaftaran konsultasi Anda ditolak. Silakan hubungi Admin untuk informasi lebih lanjut.',
+            'rejected'  => 'Pendaftaran konsultasi Anda ditolak. Silakan hubungi Admin untuk informasi lebih lanjut.',
             'completed' => 'Konsultasi Anda telah selesai.',
-            default => 'Silakan hubungi Admin untuk informasi lebih lanjut.',
+            default     => 'Silakan hubungi Admin untuk informasi lebih lanjut.',
         };
 
         $jadwal = [
-            'id' => $data->id,
-            'judul' => 'Konsultasi ' . ($data->jenis_konsultasi ?? 'Umum'),
-            'status' => $status,
+            'id'              => $data->id,
+            'judul'           => 'Konsultasi ' . ($data->jenis_konsultasi ?? 'Umum'),
+            'status'          => $status,
             'status_database' => $data->status,
-            'tanggal' => $tanggal,
-            'waktu' => $waktu,
-            'konsultan' => 'Belum ditentukan',
-            'metode' => $linkMeeting ? 'Online' : 'Belum ditentukan',
-            'link_meeting' => $linkMeeting,
-            'catatan_admin' => $catatanAdmin,
+            'tanggal'         => $tanggal,
+            'waktu'           => $waktu,
+            'konsultan'       => filled($data->konsultan) ? $data->konsultan : 'Belum ditentukan',
+            'metode'          => filled($data->metode) ? $data->metode : ($linkMeeting ? 'Online' : 'Belum ditentukan'),
+            'link_meeting'    => $linkMeeting,
+            'catatan_admin'   => $pesanAdmin !== '' ? $pesanAdmin : $catatanDefault,
         ];
 
         return view('konsultasi.jadwal', compact('jadwal'));
