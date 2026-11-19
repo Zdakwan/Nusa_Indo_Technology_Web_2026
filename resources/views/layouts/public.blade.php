@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN untuk Fleksibilitas Responsif Modern -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -32,11 +32,15 @@
         }
     </script>
 
-    <!-- CSS Utama Kustom Anda -->
+    <!-- CSS Utama Kustom -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        /* Menghilangkan kotak biru bawaan saat tap di browser HP */
+        a, button { -webkit-tap-highlight-color: transparent; }
+    </style>
     @yield('styles')
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased flex flex-col min-h-screen font-sans">
+<body class="bg-gray-50 text-gray-800 antialiased flex flex-col min-h-[100dvh] overflow-x-hidden font-sans">
 
     <!-- NAVBAR PUBLIK -->
     @include('partials.navbar')
