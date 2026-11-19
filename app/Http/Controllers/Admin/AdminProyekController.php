@@ -8,6 +8,7 @@ use App\Models\RiwayatProyek;
 use App\Models\Konsultasi;
 use App\Models\Notifikasi;
 use App\Models\PreferensiNotifikasi;
+use App\Services\MobileApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -72,7 +73,7 @@ class AdminProyekController extends Controller
             'deskripsi' => 'nullable|string|max:5000',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $proyek = DB::transaction(function () use ($validated) {
 
             // Ambil konsultasi dan kunci selama proses penyimpanan.
             $konsultasi = Konsultasi::where('id', $validated['konsultasi_id'])
@@ -103,7 +104,8 @@ class AdminProyekController extends Controller
                 'nama_proyek' => $validated['nama_proyek'],
                 'deskripsi' => $validated['deskripsi'] ?? null,
                 'progres' => 0,
-                'status' => 'berjalan',
+                // Menunggu keputusan supervisor di aplikasi mobile.
+                'status' => 'menunggu_supervisor',
             ]);
 
             // Simpan riwayat awal proyek.
@@ -111,14 +113,22 @@ class AdminProyekController extends Controller
                 'proyek_id' => $proyek->id,
                 'admin_id' => $adminId,
                 'progres' => 0,
-                'catatan' => 'Proyek berhasil dibuat berdasarkan konsultasi yang disetujui.',
+                'catatan' => 'Proyek berhasil dibuat berdasarkan konsultasi yang disetujui. Menunggu keputusan supervisor.',
             ]);
+
+            return $proyek;
         });
+
+        // Kirim ke aplikasi mobile (kegagalan tidak membatalkan proyek).
+        $terkirim = app(MobileApi::class)->pushProyek($proyek);
 
         return redirect()
             ->route('admin.proyek.index')
-            ->with('success', 'Proyek berhasil dibuat berdasarkan konsultasi.');
+            ->with('success', $terkirim
+                ? 'Proyek berhasil dibuat dan dikirim ke supervisor untuk diputuskan.'
+                : 'Proyek berhasil dibuat, tetapi belum terkirim ke aplikasi mobile. Jalankan: php artisan mobile:sync-proyek');
     }
+    
 
     /**
      * Menampilkan detail proyek.
@@ -177,6 +187,9 @@ class AdminProyekController extends Controller
 
         $adminId = Auth::guard('admin')->id();
         $proyek = Proyek::findOrFail($id);
+        if (in_array($proyek->status, ['menunggu_supervisor', 'ditolak'], true)) {
+            return redirect()->back()->with('error', 'Proyek belum disetujui supervisor, progres belum bisa diubah.');
+        }
 
         DB::transaction(function () use (
             $proyek,
@@ -250,7 +263,7 @@ class AdminProyekController extends Controller
     {
         $request->validate([
             'ids'   => 'required|array',
-            'ids.*' => 'exists:proyeks,id',
+            'ids.*' => 'exists:proyek,id',
         ]);
 
         $count = Proyek::whereIn('id', $request->ids)->count();

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Client;
 use App\Models\Layanan;
+use App\Models\Proyek; 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -72,6 +73,36 @@ class MobileApi
             'id_web'    => (string) $layanan->id,
             'nama'      => mb_substr((string) $layanan->nama_layanan, 0, 150),
             'deskripsi' => (string) $layanan->deskripsi,
+        ]);
+    }
+
+    /**
+     * Kirim (atau perbarui) satu proyek beserta data kliennya ke aplikasi mobile
+     * agar supervisor bisa memutuskan. Aman dipanggil berulang: mobile memakai id_web
+     * sebagai kunci unik dan tidak menimpa keputusan supervisor.
+     */
+    public function pushProyek(Proyek $proyek): bool
+    {
+        $proyek->loadMissing('client');
+        $c = $proyek->client;
+
+        if (! $c) {
+            return false;
+        }
+
+        return $this->kirim('proyek_masuk.php', [
+            'id_web'      => (string) $proyek->id,
+            'nama_proyek' => mb_substr((string) $proyek->nama_proyek, 0, 255),
+            'deskripsi'   => (string) $proyek->deskripsi,
+            'status_web'  => (string) $proyek->status,
+            'progres'     => (int) $proyek->progres,
+            'client'      => [
+                'id_web' => (string) $c->id,
+                'nama'   => mb_substr((string) $c->name, 0, 100),
+                'kontak' => mb_substr((string) $c->phone, 0, 30),
+                'email'  => mb_substr((string) $c->email, 0, 100),
+                'alamat' => (string) ($c->address ?? ''),
+            ],
         ]);
     }
 
