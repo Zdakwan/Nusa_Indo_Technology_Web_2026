@@ -48,6 +48,8 @@
         document.querySelectorAll('iframe').forEach((iframe) => {
             if (iframe.dataset.mobileEnhanced === 'true') return;
             if (iframe.closest('.responsive-embed-wrap, .aspect-video')) return;
+            const src = (iframe.getAttribute('src') || '').toLowerCase();
+            if (src.includes('google.com/maps') || src.includes('maps.google') || iframe.classList.contains('h-full')) return;
 
             iframe.dataset.mobileEnhanced = 'true';
             const wrapper = document.createElement('div');

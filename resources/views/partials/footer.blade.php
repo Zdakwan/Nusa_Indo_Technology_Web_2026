@@ -4,11 +4,7 @@
 
             <!-- KOLOM 1: INFO PERUSAHAAN -->
             <div class="md:col-span-5">
-                <img
-                    src="{{ asset('images/LogoNusa.png') }}"
-                    alt="Nusa Indo Technology"
-                    class="h-8 sm:h-10 w-auto object-contain mb-5"
-                >
+                <div class="inline-block bg-white px-3.5 py-2 rounded-xl shadow-sm mb-5"><img src="{{ asset('images/LogoNusa.png') }}" alt="Nusa Indo Technology" class="h-7 sm:h-8 w-auto object-contain"></div>
                 <p class="text-sm leading-relaxed mb-5">
                     Solusi IT terintegrasi untuk masa depan bisnis Anda. Menyediakan layanan konsultasi, arsitektur sistem, tata kelola, dan pengembangan teknologi profesional.
                 </p>
