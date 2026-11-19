@@ -5,4 +5,4 @@
 !*.jpeg
 !*.gif
 !*.bmp
-!*/
+!*#/public/storage

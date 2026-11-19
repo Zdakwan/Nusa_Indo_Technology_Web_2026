@@ -118,7 +118,7 @@
         <div class="text-center md:text-left">
             <h3 class="text-lg font-semibold text-gray-900 mb-2">Aplikasi Mobile Nusa Indo Tech</h3>
             <p class="text-sm text-gray-600 mb-4">
-                Pindai QR Code di samping menggunakan kamera <i>smartphone</i> atau aplikasi *scanner* Anda untuk mengunduh dan menginstal aplikasi Android (.apk) Nusa Indo Tech secara langsung.
+                Pindai QR Code di samping menggunakan kamera <i>smartphone</i> atau aplikasi scanner Anda untuk mengunduh dan menginstal aplikasi Android (.apk) Nusa Indo Tech secara langsung.
             </p>
 
             {{-- target="_blank": Membuka link Google Drive di tab baru --}}
