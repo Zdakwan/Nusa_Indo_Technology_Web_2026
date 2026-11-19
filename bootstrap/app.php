@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminRole;
+use App\Http\Middleware\EnsureSingleDeviceSession;
 use App\Http\Middleware\VerifyMobileApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.role'     => AdminRole::class,
             'mobile.api.key' => VerifyMobileApiKey::class,
+            'single.device'  => EnsureSingleDeviceSession::class,
         ]);
 
         $middleware->redirectGuestsTo(fn (Request $request) =>
@@ -35,7 +37,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(fn (Request $request, \Throwable $e) =>
             $request->is('api/*') || $request->expectsJson()
         );
-    })->create();
+    })
+    ->create();
 
 $app->useStoragePath($_ENV['APP_STORAGE'] ?? base_path('storage'));
 
