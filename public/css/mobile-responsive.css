@@ -448,3 +448,53 @@ aside nav button i,
         text-align: center !important;
     }
 }
+
+/* === Sejajarkan Ikon & Teks Menu Sidebar (Client & Admin) === */
+aside nav a,
+aside nav button,
+.sidebar nav a,
+.sidebar nav button {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1.25 !important;
+}
+
+aside nav a > div,
+aside nav button > div,
+aside nav a > span,
+aside nav button > span,
+.sidebar nav a > div,
+.sidebar nav button > div,
+.sidebar nav a > span,
+.sidebar nav button > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1.25 !important;
+}
+
+aside nav a svg,
+aside nav a i,
+aside nav button svg,
+aside nav button i,
+.sidebar nav a svg,
+.sidebar nav a i,
+.sidebar nav button svg,
+.sidebar nav button i {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    line-height: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+}
+
+/* Pastikan logo header sidebar tetap proporsional di tengah */
+aside img,
+.sidebar img {
+    display: block;
+    object-fit: contain;
+}
