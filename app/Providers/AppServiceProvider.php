@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\View\Composers\AdminDashboardChartComposer;
+use Illuminate\Support\Facades\View;
+
 use App\Listeners\HandleSingleDeviceLogin;
 use App\Listeners\HandleSingleDeviceLogout;
 use Illuminate\Auth\Events\Login;
@@ -25,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::composer(['admin.dashboard', 'admin.dashboard.*'], AdminDashboardChartComposer::class);
         Event::listen(Login::class, HandleSingleDeviceLogin::class);
         Event::listen(Logout::class, HandleSingleDeviceLogout::class);
         //

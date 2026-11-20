@@ -97,6 +97,8 @@
 <form id="bulkDeleteForm" action="{{ route('admin.dashboard.aktivitas.bulkDestroy') }}" method="POST">
     @csrf
     @method('DELETE')
+
+    @include('admin.partials.dashboard-charts')
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
     <h2 class="text-base font-extrabold text-gray-900 mb-4">Daftar Aktivitas Klien Terbaru & Permintaan Konsultasi</h2>
 
