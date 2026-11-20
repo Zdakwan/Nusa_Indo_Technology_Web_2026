@@ -258,50 +258,6 @@ img, svg, video, canvas {
     }
 }
 
-/* === Kartu Ringkasan Admin Ringkas (2x2) di Layar HP === */
-@media (max-width: 767.98px) {
-    /* Grid 4 kartu ringkasan: jadikan 2 kolom agar lebih padat & nyaman di HP */
-    main .grid.grid-cols-1.md\:grid-cols-2,
-    main .grid.grid-cols-1.sm\:grid-cols-2,
-    main .grid.grid-cols-1.lg\:grid-cols-4,
-    main .grid.grid-cols-1.xl\:grid-cols-4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 0.75rem !important;
-    }
-
-    /* Perkecil padding, jarak, judul, ikon, dan angka di dalam kartu ringkasan */
-    main .grid.grid-cols-1.lg\:grid-cols-4 > div,
-    main .grid.grid-cols-1.xl\:grid-cols-4 > div,
-    main .grid.grid-cols-1.sm\:grid-cols-2 > div {
-        padding: 0.875rem !important;
-        border-radius: 0.875rem !important;
-        min-height: auto !important;
-    }
-
-    main .grid.grid-cols-1.lg\:grid-cols-4 > div p,
-    main .grid.grid-cols-1.xl\:grid-cols-4 > div p,
-    main .grid.grid-cols-1.sm\:grid-cols-2 > div p,
-    main .grid.grid-cols-1.lg\:grid-cols-4 > div span,
-    main .grid.grid-cols-1.xl\:grid-cols-4 > div span {
-        font-size: 0.75rem !important;
-        line-height: 1.25 !important;
-    }
-
-    main .grid.grid-cols-1.lg\:grid-cols-4 > div .text-3xl,
-    main .grid.grid-cols-1.lg\:grid-cols-4 > div .text-4xl,
-    main .grid.grid-cols-1.xl\:grid-cols-4 > div .text-3xl,
-    main .grid.grid-cols-1.xl\:grid-cols-4 > div .text-4xl,
-    main .grid.grid-cols-1.sm\:grid-cols-2 > div .text-3xl,
-    main .grid.grid-cols-1.sm\:grid-cols-2 > div .text-4xl,
-    main .grid.grid-cols-1.lg\:grid-cols-4 > div h3,
-    main .grid.grid-cols-1.xl\:grid-cols-4 > div h3 {
-        font-size: 1.5rem !important;
-        line-height: 1.2 !important;
-        margin-top: 0.5rem !important;
-        margin-bottom: 0 !important;
-    }
-}
-
 /* === Penyeragaman Ukuran Tombol Sidebar Client & Admin === */
 aside nav a,
 aside nav button,
@@ -344,4 +300,57 @@ aside nav div div a i {
     width: 0.95rem !important;
     height: 0.95rem !important;
     font-size: 0.875rem !important;
+}
+
+/* === Kartu Ringkasan Admin Ringkas (2x2) Khusus Grid 4 Kolom di HP === */
+@media (max-width: 767.98px) {
+    /* Hanya berlaku untuk grid 4 kartu ringkasan (Dashboard Admin) */
+    main .grid.lg\:grid-cols-4,
+    main .grid.xl\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+    }
+
+    main .grid.lg\:grid-cols-4 > div,
+    main .grid.xl\:grid-cols-4 > div {
+        padding: 0.875rem !important;
+        border-radius: 0.875rem !important;
+        min-height: auto !important;
+    }
+
+    main .grid.lg\:grid-cols-4 > div p,
+    main .grid.xl\:grid-cols-4 > div p,
+    main .grid.lg\:grid-cols-4 > div span,
+    main .grid.xl\:grid-cols-4 > div span {
+        font-size: 0.75rem !important;
+        line-height: 1.25 !important;
+    }
+
+    main .grid.lg\:grid-cols-4 > div .text-3xl,
+    main .grid.lg\:grid-cols-4 > div .text-4xl,
+    main .grid.xl\:grid-cols-4 > div .text-3xl,
+    main .grid.xl\:grid-cols-4 > div .text-4xl,
+    main .grid.lg\:grid-cols-4 > div h3,
+    main .grid.xl\:grid-cols-4 > div h3 {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+        margin-top: 0.5rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Pastikan kartu halaman publik (Layanan, Portofolio, Pelatihan, Ensiklopedia, Visi Misi) 1 kolom penuh */
+    main .grid.grid-cols-1.md\:grid-cols-2,
+    main .grid.grid-cols-1.md\:grid-cols-3,
+    main .grid.grid-cols-1.lg\:grid-cols-3,
+    main .grid.grid-cols-1.sm\:grid-cols-2 {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 1.25rem !important;
+    }
+
+    /* Cegah pemotongan huruf per karakter pada tombol & judul kartu */
+    main a,
+    main button {
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+    }
 }
