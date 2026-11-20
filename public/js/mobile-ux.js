@@ -233,3 +233,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 150);
     });
 });
+
+/* === Redirect Tombol Back ke Halaman Publik Setelah Logout === */
+(function () {
+    const path = window.location.pathname.replace(/\/+$/, '');
+    const isLoginPage = path === '/admin/login' || path === '/login';
+
+    if (isLoginPage && window.history && window.history.pushState) {
+        // Sisipkan state agar klik Back di HP/Laptop langsung ke halaman publik (/)
+        window.history.pushState({ fromLoginGuard: true }, '', window.location.href);
+        window.addEventListener('popstate', () => {
+            window.location.replace('/');
+        });
+    }
+
+    // Jika browser memulihkan halaman dari bfcache saat klik Back, paksa reload
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+})();

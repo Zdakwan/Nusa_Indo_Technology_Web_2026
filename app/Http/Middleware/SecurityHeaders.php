@@ -24,6 +24,13 @@ class SecurityHeaders
 
         $response->headers->remove('X-Powered-By');
 
+                // Cegah bfcache/cache browser pada area admin & autentikasi
+        if ($request->is('admin', 'admin/*', 'login', 'logout')) {
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
+        }
+
         return $response;
     }
 }
