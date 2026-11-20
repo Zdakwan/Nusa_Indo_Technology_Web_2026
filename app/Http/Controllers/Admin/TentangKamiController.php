@@ -39,24 +39,29 @@ class TentangKamiController extends Controller
             'foto_kolaborasi_serah_terima.mimes' => 'Format foto serah terima harus berupa: png, jpg, jpeg, gif, atau bmp.',
         ]);
 
-        $tentang = TentangKami::first() ?? new TentangKami();
-        $data = $request->except(['_token', '_method', 'foto_kolaborasi_tim', 'foto_kolaborasi_serah_terima']);
+        try {
+            $tentang = TentangKami::first() ?? new TentangKami();
+            $data = $request->except(['_token', '_method', 'foto_kolaborasi_tim', 'foto_kolaborasi_serah_terima']);
 
-        if ($request->hasFile('foto_kolaborasi_tim')) {
-            $this->deleteLegacyFile($tentang->foto_kolaborasi_tim);
-            $this->ensureLongTextColumn(TentangKami::class, 'foto_kolaborasi_tim');
-            $data['foto_kolaborasi_tim'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_tim'));
+            if ($request->hasFile('foto_kolaborasi_tim')) {
+                $this->ensureLongTextColumn(TentangKami::class, 'foto_kolaborasi_tim');
+                $this->deleteLegacyFile($tentang->foto_kolaborasi_tim);
+                $data['foto_kolaborasi_tim'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_tim'));
+            }
+
+            if ($request->hasFile('foto_kolaborasi_serah_terima')) {
+                $this->ensureLongTextColumn(TentangKami::class, 'foto_kolaborasi_serah_terima');
+                $this->deleteLegacyFile($tentang->foto_kolaborasi_serah_terima);
+                $data['foto_kolaborasi_serah_terima'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_serah_terima'));
+            }
+
+            TentangKami::updateOrCreate(['id' => 1], $data);
+
+            return redirect()->back()->with('success', 'Informasi Tentang Kami berhasil diperbarui!');
+        } catch (\Throwable $e) {
+            Log::error('[TentangKami@updateProfil] ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['foto_kolaborasi_tim' => 'Gagal menyimpan: ' . $e->getMessage()]);
         }
-
-        if ($request->hasFile('foto_kolaborasi_serah_terima')) {
-            $this->deleteLegacyFile($tentang->foto_kolaborasi_serah_terima);
-            $this->ensureLongTextColumn(TentangKami::class, 'foto_kolaborasi_serah_terima');
-            $data['foto_kolaborasi_serah_terima'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_serah_terima'));
-        }
-
-        TentangKami::updateOrCreate(['id' => 1], $data);
-
-        return redirect()->back()->with('success', 'Informasi Tentang Kami berhasil diperbarui!');
     }
 
     public function storeTim(Request $request)
@@ -70,14 +75,19 @@ class TentangKamiController extends Controller
             'foto.mimes' => 'Format foto harus berupa: png, jpg, jpeg, gif, atau bmp.',
         ]);
 
-        if ($request->hasFile('foto')) {
-            $this->ensureLongTextColumn(AnggotaTim::class, 'foto');
-            $data['foto'] = $this->encodeImageToBase64($request->file('foto'));
+        try {
+            if ($request->hasFile('foto')) {
+                $this->ensureLongTextColumn(AnggotaTim::class, 'foto');
+                $data['foto'] = $this->encodeImageToBase64($request->file('foto'));
+            }
+
+            AnggotaTim::create($data);
+
+            return redirect()->back()->with('success', 'Anggota tim berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            Log::error('[TentangKami@storeTim] ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['foto' => 'Gagal menyimpan anggota: ' . $e->getMessage()]);
         }
-
-        AnggotaTim::create($data);
-
-        return redirect()->back()->with('success', 'Anggota tim berhasil ditambahkan.');
     }
 
     public function updateTim(Request $request, $id)
@@ -92,15 +102,20 @@ class TentangKamiController extends Controller
             'foto.mimes' => 'Format foto harus berupa: png, jpg, jpeg, gif, atau bmp.',
         ]);
 
-        if ($request->hasFile('foto')) {
-            $this->deleteLegacyFile($tim->foto);
-            $this->ensureLongTextColumn(AnggotaTim::class, 'foto');
-            $data['foto'] = $this->encodeImageToBase64($request->file('foto'));
+        try {
+            if ($request->hasFile('foto')) {
+                $this->ensureLongTextColumn(AnggotaTim::class, 'foto');
+                $this->deleteLegacyFile($tim->foto);
+                $data['foto'] = $this->encodeImageToBase64($request->file('foto'));
+            }
+
+            $tim->update($data);
+
+            return redirect()->back()->with('success', 'Data anggota tim diperbarui.');
+        } catch (\Throwable $e) {
+            Log::error('[TentangKami@updateTim] ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['foto' => 'Gagal memperbarui anggota: ' . $e->getMessage()]);
         }
-
-        $tim->update($data);
-
-        return redirect()->back()->with('success', 'Data anggota tim diperbarui.');
     }
 
     public function destroyTim($id)
@@ -112,12 +127,25 @@ class TentangKamiController extends Controller
         return redirect()->back()->with('success', 'Anggota tim dihapus.');
     }
 
+    private function ensureLongTextColumn(string $modelClass, string $column): void
+    {
+        $table = (new $modelClass())->getTable();
+        $col = DB::selectOne(
+            'SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
+            [$table, $column]
+        );
+
+        if ($col && strtolower((string) $col->DATA_TYPE) !== 'longtext') {
+            DB::statement("ALTER TABLE `{$table}` MODIFY `{$column}` LONGTEXT NULL");
+        }
+    }
+
     private function encodeImageToBase64(UploadedFile $file): string
     {
         $mime = $file->getMimeType() ?: 'image/jpeg';
         $raw  = file_get_contents($file->getRealPath());
 
-        // Kompres otomatis via GD jika tersedia agar ukuran database tetap ringan
+        // Kompres otomatis via GD jika tersedia agar ringan disimpan di database
         if (function_exists('imagecreatefromstring') && in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
             $img = @imagecreatefromstring($raw);
             if ($img !== false) {
@@ -137,7 +165,7 @@ class TentangKamiController extends Controller
                 }
 
                 ob_start();
-                imagejpeg($img, null, 80);
+                imagejpeg($img, null, 75);
                 $compressed = ob_get_clean();
                 imagedestroy($img);
 
@@ -162,23 +190,6 @@ class TentangKamiController extends Controller
             }
         } catch (\Throwable $e) {
             // Abaikan error filesystem read-only di Vercel
-        }
-    }
-
-    private function ensureLongTextColumn(string $modelClass, string $column): void
-    {
-        try {
-            $table = (new $modelClass())->getTable();
-            $col = DB::selectOne(
-                'SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
-                [$table, $column]
-            );
-
-            if ($col && strtolower((string) $col->DATA_TYPE) !== 'longtext') {
-                DB::statement("ALTER TABLE `{$table}` MODIFY `{$column}` LONGTEXT NULL");
-            }
-        } catch (\Throwable $e) {
-            Log::warning("[TentangKami] Gagal auto-alter kolom {$column}: " . $e->getMessage());
         }
     }
 }
