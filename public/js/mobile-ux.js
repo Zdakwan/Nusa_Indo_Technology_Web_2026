@@ -287,3 +287,186 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.visibilityState === 'visible') refreshCsrfToken();
     });
 })();
+
+/* === Perbaikan Notifikasi Admin & Pop-up Konfirmasi Logout (Admin & Client) === */
+document.addEventListener('DOMContentLoaded', () => {
+    const NOTIF_STORAGE_KEY = 'nit_admin_notif_read_signature';
+
+    // 1. Cari elemen badge lonceng & dropdown notifikasi
+    const findNotifElements = () => {
+        const bellBtn = document.querySelector('button:has(svg), a:has(svg), [id*="notif"], [class*="notif"]');
+        const badges = Array.from(document.querySelectorAll('header span, nav span')).filter((el) => {
+            const txt = (el.textContent || '').trim();
+            return /^\d+$/.test(txt) && el.closest('button, a, div');
+        });
+        return { bellBtn, badges };
+    };
+
+    const getNotifSignature = () => {
+        const itemText = Array.from(document.querySelectorAll('div, p, li'))
+            .map((el) => (el.textContent || '').trim())
+            .find((t) => /Ada\s+\d+\s+permintaan/i.test(t));
+        return itemText || 'default-notif';
+    };
+
+    // Sembunyikan badge jika notifikasi dengan signature yang sama sudah ditandai dibaca
+    const applyReadState = () => {
+        const saved = localStorage.getItem(NOTIF_STORAGE_KEY);
+        if (saved && saved === getNotifSignature()) {
+            const { badges } = findNotifElements();
+            badges.forEach((b) => { b.style.display = 'none'; });
+        }
+    };
+    applyReadState();
+
+    // Handler klik "Tandai dibaca" & "Lihat Semua"
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button, span');
+        if (!target) return;
+
+        const text = (target.textContent || '').trim().toLowerCase();
+
+        // A. Tombol "Tandai dibaca" / "Tandai telah dibaca"
+        if (text === 'tandai dibaca' || text === 'tandai telah dibaca') {
+            const href = target.getAttribute('href');
+            if (!href || href === '#' || href.startsWith('javascript:')) {
+                e.preventDefault();
+            }
+
+            localStorage.setItem(NOTIF_STORAGE_KEY, getNotifSignature());
+
+            // Sembunyikan semua badge angka di header
+            const { badges } = findNotifElements();
+            badges.forEach((b) => { b.style.display = 'none'; });
+
+            // Beri umpan balik visual pada tombol & item notifikasi
+            target.textContent = 'Sudah dibaca';
+            target.style.opacity = '0.6';
+            target.style.pointerEvents = 'none';
+
+            const dropdown = target.closest('div[class*="shadow"], div[class*="rounded"]');
+            if (dropdown) {
+                dropdown.querySelectorAll('a, div').forEach((item) => {
+                    if (/Konsultasi Baru/i.test(item.textContent || '')) {
+                        item.style.opacity = '0.55';
+                    }
+                });
+            }
+            return;
+        }
+
+        // B. Tombol "Lihat Semua" pada dropdown notifikasi
+        if (text === 'lihat semua') {
+            const href = target.getAttribute('href');
+            if (!href || href === '#' || href.startsWith('javascript:')) {
+                e.preventDefault();
+
+                // Tutup dropdown jika terbuka
+                const dropdown = target.closest('div[class*="shadow"], div[class*="absolute"]');
+                if (dropdown && dropdown.classList.contains('absolute')) {
+                    dropdown.classList.add('hidden');
+                }
+
+                // Jika sedang di dashboard admin, scroll halus ke tabel daftar aktivitas
+                const tableSection = Array.from(document.querySelectorAll('h2, h3, div'))
+                    .find((el) => /Daftar Aktivitas Klien Terbaru/i.test(el.textContent || ''));
+
+                if (tableSection && window.location.pathname.includes('/admin/dashboard')) {
+                    tableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    window.location.href = '/admin/dashboard';
+                }
+            }
+        }
+    });
+
+    // 2. Pop-up Konfirmasi Logout ("Yakin ingin keluar?") untuk Admin & Client
+    let pendingLogoutAction = null;
+
+    const createLogoutModal = () => {
+        if (document.getElementById('nitLogoutConfirmModal')) {
+            return document.getElementById('nitLogoutConfirmModal');
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'nitLogoutConfirmModal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.style.cssText = [
+            'position:fixed', 'inset:0', 'z-index:99999', 'display:none',
+            'align-items:center', 'justify-content:center', 'padding:1rem',
+            'background:rgba(15, 23, 42, 0.55)', 'backdrop-filter:blur(2px)'
+        ].join(';');
+
+        modal.innerHTML = `
+            <div style="background:#ffffff;border-radius:1rem;max-width:380px;width:100%;padding:1.5rem;box-shadow:0 20px 25px -5px rgba(0,0,0,0.2);text-align:center;font-family:inherit;">
+                <div style="width:48px;height:48px;margin:0 auto 0.875rem;border-radius:9999px;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:700;">!</div>
+                <h3 style="margin:0 0 0.375rem;font-size:1.125rem;font-weight:700;color:#1e293b;">Konfirmasi Keluar</h3>
+                <p style="margin:0 0 1.25rem;font-size:0.9rem;color:#64748b;">Yakin ingin keluar?</p>
+                <div style="display:flex;gap:0.75rem;justify-content:center;">
+                    <button type="button" id="nitLogoutCancelBtn" style="flex:1;padding:0.625rem 1rem;border-radius:0.625rem;border:1px solid #cbd5e1;background:#ffffff;color:#334155;font-weight:600;font-size:0.875rem;cursor:pointer;">Batal</button>
+                    <button type="button" id="nitLogoutConfirmBtn" style="flex:1;padding:0.625rem 1rem;border-radius:0.625rem;border:none;background:#dc2626;color:#ffffff;font-weight:600;font-size:0.875rem;cursor:pointer;">Ya, Keluar</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+            pendingLogoutAction = null;
+        };
+
+        modal.querySelector('#nitLogoutCancelBtn').addEventListener('click', closeModal);
+        modal.addEventListener('click', (ev) => {
+            if (ev.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape' && modal.style.display === 'flex') closeModal();
+        });
+
+        modal.querySelector('#nitLogoutConfirmBtn').addEventListener('click', () => {
+            const action = pendingLogoutAction;
+            closeModal();
+            if (typeof action === 'function') action();
+        });
+
+        return modal;
+    };
+
+    const showLogoutModal = (onConfirm) => {
+        const modal = createLogoutModal();
+        pendingLogoutAction = onConfirm;
+        modal.style.display = 'flex';
+    };
+
+    // Tangkap submit form logout (Admin & Client)
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        const actionUrl = (form.getAttribute('action') || '').toLowerCase();
+
+        if (actionUrl.includes('logout') && form.dataset.logoutConfirmed !== 'true') {
+            e.preventDefault();
+            showLogoutModal(() => {
+                form.dataset.logoutConfirmed = 'true';
+                form.submit();
+            });
+        }
+    }, true);
+
+    // Tangkap klik tautan <a href="...logout..."> jika ada yang memakai GET/link
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = (link.getAttribute('href') || '').toLowerCase();
+
+        if (href.includes('logout') && link.dataset.logoutConfirmed !== 'true') {
+            e.preventDefault();
+            showLogoutModal(() => {
+                link.dataset.logoutConfirmed = 'true';
+                window.location.href = link.href;
+            });
+        }
+    }, true);
+});
