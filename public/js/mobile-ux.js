@@ -471,48 +471,110 @@ document.addEventListener('DOMContentLoaded', () => {
     }, true);
 });
 
-/* === Perbaikan Tinggi Panel Biru Carousel & Jarak Tombol Panah di HP === */
+});
+
+/* === Perbaikan Tinggi Panel Biru Carousel Khusus Layar HP (Desktop Tetap 2 Kolom) === */
 document.addEventListener('DOMContentLoaded', () => {
-    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4')).filter((el) =>
-        /Membangun Ekosistem Digital|Politeknik Negeri Jember PSDKU Sidoarjo/i.test(el.textContent || '')
-    );
+    const applyCarouselLayout = () => {
+        const isMobile = window.innerWidth <= 767;
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4')).filter((el) =>
+            /Membangun Ekosistem Digital|Politeknik Negeri Jember PSDKU Sidoarjo/i.test(el.textContent || '')
+        );
 
-    if (!headings.length) return;
+        headings.forEach((heading) => {
+            let bluePanel = heading.parentElement;
+            while (bluePanel && bluePanel !== document.body) {
+                const bg = window.getComputedStyle(bluePanel).backgroundColor;
+                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'rgb(255, 255, 255)') {
+                    break;
+                }
+                bluePanel = bluePanel.parentElement;
+            }
+            if (!bluePanel || bluePanel === document.body) return;
 
-    headings.forEach((heading) => {
-        // Cari container panel biru yang membungkus judul
-        let bluePanel = heading.parentElement;
-        while (bluePanel && bluePanel !== document.body) {
-            const bg = window.getComputedStyle(bluePanel).backgroundColor;
-            if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'rgb(255, 255, 255)') {
+            const slide = bluePanel.parentElement;
+            const blueBg = window.getComputedStyle(bluePanel).backgroundColor;
+
+            if (isMobile) {
+                if (slide) {
+                    slide.style.display = 'flex';
+                    slide.style.flexDirection = 'column';
+                    slide.style.height = 'auto';
+                    slide.style.minHeight = '100%';
+                    slide.style.backgroundColor = blueBg;
+                }
+                bluePanel.style.flex = '1 1 auto';
+                bluePanel.style.display = 'flex';
+                bluePanel.style.flexDirection = 'column';
+                bluePanel.style.justifyContent = 'center';
+                bluePanel.style.paddingLeft = '2.5rem';
+                bluePanel.style.paddingRight = '2.5rem';
+            } else {
+                // Reset total di desktop agar gambar & teks tampil berdampingan normal
+                if (slide) {
+                    slide.style.display = '';
+                    slide.style.flexDirection = '';
+                    slide.style.height = '';
+                    slide.style.minHeight = '';
+                    slide.style.backgroundColor = '';
+                }
+                bluePanel.style.flex = '';
+                bluePanel.style.display = '';
+                bluePanel.style.flexDirection = '';
+                bluePanel.style.justifyContent = '';
+                bluePanel.style.paddingLeft = '';
+                bluePanel.style.paddingRight = '';
+            }
+        });
+    };
+
+    applyCarouselLayout();
+    window.addEventListener('resize', applyCarouselLayout);
+
+    /* === Lengkapi Ikon Kartu Dashboard Client (Permintaan Konsultasi & Riwayat Konsultasi) === */
+    const clientCardsConfig = [
+        {
+            title: 'Permintaan Konsultasi',
+            bg: '#fef3c7',
+            color: '#d97706',
+            svg: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+        },
+        {
+            title: 'Riwayat Konsultasi',
+            bg: '#dbeafe',
+            color: '#2563eb',
+            svg: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+        }
+    ];
+
+    clientCardsConfig.forEach((cfg) => {
+        const labelEl = Array.from(document.querySelectorAll('p, h3, h4, span, div')).find(
+            (el) => el.children.length === 0 && (el.textContent || '').trim() === cfg.title
+        );
+        if (!labelEl) return;
+
+        // Naik ke container kartu terdekat
+        let card = labelEl.parentElement;
+        while (card && card !== document.body) {
+            const cls = card.className || '';
+            if (typeof cls === 'string' && (cls.includes('rounded') || cls.includes('shadow') || cls.includes('bg-white'))) {
                 break;
             }
-            bluePanel = bluePanel.parentElement;
+            card = card.parentElement;
+        }
+        if (!card || card === document.body) return;
+
+        // Jika kartu sudah punya ikon SVG/FontAwesome di dalamnya, lewati
+        if (card.querySelector('.nit-client-card-icon, svg:not([class*="wave"]), i[class*="fa-"]')) return;
+
+        if (window.getComputedStyle(card).position === 'static') {
+            card.style.position = 'relative';
         }
 
-        if (!bluePanel || bluePanel === document.body) return;
-
-        const slide = bluePanel.parentElement;
-        const blueBg = window.getComputedStyle(bluePanel).backgroundColor;
-
-        // Pastikan slide meregang penuh dengan warna latar yang sama agar tidak ada celah putih
-        if (slide) {
-            slide.style.display = 'flex';
-            slide.style.flexDirection = 'column';
-            slide.style.height = 'auto';
-            slide.style.minHeight = '100%';
-            slide.style.backgroundColor = blueBg;
-        }
-
-        bluePanel.style.flex = '1 1 auto';
-        bluePanel.style.display = 'flex';
-        bluePanel.style.flexDirection = 'column';
-        bluePanel.style.justifyContent = 'center';
-
-        // Di layar HP, beri padding kiri-kanan agar tombol panah < > tidak menutupi teks judul
-        if (window.innerWidth <= 767) {
-            bluePanel.style.paddingLeft = '3.25rem';
-            bluePanel.style.paddingRight = '3.25rem';
-        }
+        const iconBox = document.createElement('div');
+        iconBox.className = 'nit-client-card-icon';
+        iconBox.style.cssText = `position:absolute;top:1.25rem;right:1.25rem;width:2.5rem;height:2.5rem;border-radius:0.75rem;background:${cfg.bg};color:${cfg.color};display:flex;align-items:center;justify-content:center;pointer-events:none;`;
+        iconBox.innerHTML = cfg.svg;
+        card.appendChild(iconBox);
     });
 });

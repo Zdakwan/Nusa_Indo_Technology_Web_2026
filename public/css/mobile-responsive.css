@@ -384,3 +384,30 @@ aside nav button span,
     text-overflow: clip !important;
     white-space: nowrap !important;
 }
+
+/* === Pastikan Panah Dropdown Sidebar Sejajar 1 Baris di HP === */
+aside nav button,
+aside nav a,
+.sidebar nav button,
+.sidebar nav a {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+}
+
+aside nav button svg,
+aside nav button i,
+.sidebar nav button svg,
+.sidebar nav button i {
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 767.98px) {
+    aside nav a,
+    aside nav button,
+    .sidebar nav a,
+    .sidebar nav button {
+        font-size: 0.875rem !important;
+    }
+}
