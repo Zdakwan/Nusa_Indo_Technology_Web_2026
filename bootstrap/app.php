@@ -36,6 +36,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response) {
+            if ($response->getStatusCode() === 419) {
+                return back()
+                    ->withInput(request()->except(['password', 'password_confirmation', '_token']))
+                    ->withErrors(['email' => 'Sesi halaman telah diperbarui. Silakan klik login kembali.']);
+            }
+            return $response;
+        });
         $exceptions->shouldRenderJsonWhen(fn (Request $request, \Throwable $e) =>
             $request->is('api/*') || $request->expectsJson()
         );

@@ -254,3 +254,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 })();
+
+/* === Auto-Refresh CSRF Token (Cegah 419 Page Expired di Form) === */
+(function () {
+    const refreshCsrfToken = async () => {
+        const tokenInputs = document.querySelectorAll('input[name="_token"]');
+        if (!tokenInputs.length) return;
+
+        try {
+            const res = await fetch('/csrf-token', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                cache: 'no-store'
+            });
+            if (!res.ok) return;
+
+            const data = await res.json();
+            if (!data.token) return;
+
+            tokenInputs.forEach((input) => { input.value = data.token; });
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            if (meta) meta.setAttribute('content', data.token);
+        } catch (_) {
+            // Abaikan jika sedang offline
+        }
+    };
+
+    // Perbarui token setiap 10 menit dan saat tab kembali aktif
+    setInterval(refreshCsrfToken, 10 * 60 * 1000);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') refreshCsrfToken();
+    });
+})();

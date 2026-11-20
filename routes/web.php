@@ -235,3 +235,9 @@ Route::middleware('auth:client')->group(function () {
         Route::get('/proyek/{id}', [ProyekClientController::class, 'show'])->name('proyek.show');
     });
 });
+
+// Endpoint ringan untuk memperbarui CSRF token agar form login tidak 419 saat lama dibuka
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()])
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+})->middleware('throttle:30,1')->name('csrf.refresh');
