@@ -470,3 +470,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, true);
 });
+
+/* === Perbaikan Tinggi Panel Biru Carousel & Jarak Tombol Panah di HP === */
+document.addEventListener('DOMContentLoaded', () => {
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4')).filter((el) =>
+        /Membangun Ekosistem Digital|Politeknik Negeri Jember PSDKU Sidoarjo/i.test(el.textContent || '')
+    );
+
+    if (!headings.length) return;
+
+    headings.forEach((heading) => {
+        // Cari container panel biru yang membungkus judul
+        let bluePanel = heading.parentElement;
+        while (bluePanel && bluePanel !== document.body) {
+            const bg = window.getComputedStyle(bluePanel).backgroundColor;
+            if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'rgb(255, 255, 255)') {
+                break;
+            }
+            bluePanel = bluePanel.parentElement;
+        }
+
+        if (!bluePanel || bluePanel === document.body) return;
+
+        const slide = bluePanel.parentElement;
+        const blueBg = window.getComputedStyle(bluePanel).backgroundColor;
+
+        // Pastikan slide meregang penuh dengan warna latar yang sama agar tidak ada celah putih
+        if (slide) {
+            slide.style.display = 'flex';
+            slide.style.flexDirection = 'column';
+            slide.style.height = 'auto';
+            slide.style.minHeight = '100%';
+            slide.style.backgroundColor = blueBg;
+        }
+
+        bluePanel.style.flex = '1 1 auto';
+        bluePanel.style.display = 'flex';
+        bluePanel.style.flexDirection = 'column';
+        bluePanel.style.justifyContent = 'center';
+
+        // Di layar HP, beri padding kiri-kanan agar tombol panah < > tidak menutupi teks judul
+        if (window.innerWidth <= 767) {
+            bluePanel.style.paddingLeft = '3.25rem';
+            bluePanel.style.paddingRight = '3.25rem';
+        }
+    });
+});
