@@ -301,3 +301,47 @@ img, svg, video, canvas {
         margin-bottom: 0 !important;
     }
 }
+
+/* === Penyeragaman Ukuran Tombol Sidebar Client & Admin === */
+aside nav a,
+aside nav button,
+.sidebar nav a,
+.sidebar nav button {
+    font-size: 0.875rem !important;      /* 14px - sama dengan sidebar Admin */
+    line-height: 1.25rem !important;
+    padding: 0.625rem 0.875rem !important; /* 10px 14px - tinggi pill aktif seragam */
+    border-radius: 0.625rem !important;
+    gap: 0.75rem !important;
+}
+
+/* Ukuran ikon menu utama di sidebar */
+aside nav a svg,
+aside nav button svg,
+aside nav a i,
+aside nav button i,
+.sidebar nav a svg,
+.sidebar nav button svg,
+.sidebar nav a i,
+.sidebar nav button i {
+    width: 1.125rem !important;          /* 18px */
+    height: 1.125rem !important;
+    font-size: 1rem !important;          /* 16px untuk icon font (FontAwesome/Bootstrap Icons) */
+    flex-shrink: 0;
+}
+
+/* Submenu (seperti Data Diri & Edit Data Diri) tetap proporsional sedikit lebih kecil */
+aside nav ul ul a,
+aside nav div div a,
+.sidebar nav ul ul a {
+    font-size: 0.8125rem !important;     /* 13px */
+    padding: 0.45rem 0.75rem !important;
+}
+
+aside nav ul ul a svg,
+aside nav ul ul a i,
+aside nav div div a svg,
+aside nav div div a i {
+    width: 0.95rem !important;
+    height: 0.95rem !important;
+    font-size: 0.875rem !important;
+}
