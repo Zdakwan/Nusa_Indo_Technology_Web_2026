@@ -10,6 +10,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TentangKamiController extends Controller
 {
@@ -46,21 +47,23 @@ class TentangKamiController extends Controller
             if ($request->hasFile('foto_kolaborasi_tim')) {
                 $this->ensureLongTextColumn(TentangKami::class, 'foto_kolaborasi_tim');
                 $this->deleteLegacyFile($tentang->foto_kolaborasi_tim);
-                $data['foto_kolaborasi_tim'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_tim'));
+                $data['foto_kolaborasi_tim'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_tim'), 800, 75);
             }
 
             if ($request->hasFile('foto_kolaborasi_serah_terima')) {
                 $this->ensureLongTextColumn(TentangKami::class, 'foto_kolaborasi_serah_terima');
                 $this->deleteLegacyFile($tentang->foto_kolaborasi_serah_terima);
-                $data['foto_kolaborasi_serah_terima'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_serah_terima'));
+                $data['foto_kolaborasi_serah_terima'] = $this->encodeImageToBase64($request->file('foto_kolaborasi_serah_terima'), 800, 75);
             }
 
             TentangKami::updateOrCreate(['id' => 1], $data);
 
             return redirect()->back()->with('success', 'Informasi Tentang Kami berhasil diperbarui!');
         } catch (\Throwable $e) {
-            Log::error('[TentangKami@updateProfil] ' . $e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['foto_kolaborasi_tim' => 'Gagal menyimpan: ' . $e->getMessage()]);
+            $msg = $this->shortErrorMessage($e);
+            Log::error('[TentangKami@updateProfil] ' . $msg);
+            return redirect()->back()->withInput($request->except(['foto_kolaborasi_tim', 'foto_kolaborasi_serah_terima']))
+                ->with('error', 'Gagal menyimpan profil: ' . $msg);
         }
     }
 
@@ -78,15 +81,17 @@ class TentangKamiController extends Controller
         try {
             if ($request->hasFile('foto')) {
                 $this->ensureLongTextColumn(AnggotaTim::class, 'foto');
-                $data['foto'] = $this->encodeImageToBase64($request->file('foto'));
+                $data['foto'] = $this->encodeImageToBase64($request->file('foto'), 500, 70);
             }
 
             AnggotaTim::create($data);
 
             return redirect()->back()->with('success', 'Anggota tim berhasil ditambahkan.');
         } catch (\Throwable $e) {
-            Log::error('[TentangKami@storeTim] ' . $e->getMessage());
-            return redirect()->back()->withInput()->with('error', 'Gagal menyimpan anggota: ' . $e->getMessage())->withErrors(['foto' => 'Gagal menyimpan anggota: ' . $e->getMessage()]);
+            $msg = $this->shortErrorMessage($e);
+            Log::error('[TentangKami@storeTim] ' . $msg);
+            return redirect()->back()->withInput($request->except('foto'))
+                ->with('error', 'Gagal menyimpan anggota: ' . $msg);
         }
     }
 
@@ -106,15 +111,17 @@ class TentangKamiController extends Controller
             if ($request->hasFile('foto')) {
                 $this->ensureLongTextColumn(AnggotaTim::class, 'foto');
                 $this->deleteLegacyFile($tim->foto);
-                $data['foto'] = $this->encodeImageToBase64($request->file('foto'));
+                $data['foto'] = $this->encodeImageToBase64($request->file('foto'), 500, 70);
             }
 
             $tim->update($data);
 
             return redirect()->back()->with('success', 'Data anggota tim diperbarui.');
         } catch (\Throwable $e) {
-            Log::error('[TentangKami@updateTim] ' . $e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['foto' => 'Gagal memperbarui anggota: ' . $e->getMessage()]);
+            $msg = $this->shortErrorMessage($e);
+            Log::error('[TentangKami@updateTim] ' . $msg);
+            return redirect()->back()->withInput($request->except('foto'))
+                ->with('error', 'Gagal memperbarui anggota: ' . $msg);
         }
     }
 
@@ -129,29 +136,30 @@ class TentangKamiController extends Controller
 
     private function ensureLongTextColumn(string $modelClass, string $column): void
     {
-        $table = (new $modelClass())->getTable();
-        $col = DB::selectOne(
-            'SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
-            [$table, $column]
-        );
-
-        if ($col && strtolower((string) $col->DATA_TYPE) !== 'longtext') {
+        try {
+            $table = (new $modelClass())->getTable();
             DB::statement("ALTER TABLE `{$table}` MODIFY `{$column}` LONGTEXT NULL");
+        } catch (\Throwable $e) {
+            Log::warning('[TentangKami] Auto-alter skip: ' . $this->shortErrorMessage($e));
         }
     }
 
-    private function encodeImageToBase64(UploadedFile $file): string
+    private function shortErrorMessage(\Throwable $e): string
+    {
+        $msg = preg_replace('/data:image\/[a-zA-Z0-9+.-]+;base64,[A-Za-z0-9+\/=]+/', '[BASE64_IMAGE]', $e->getMessage());
+        return Str::limit((string) $msg, 220);
+    }
+
+    private function encodeImageToBase64(UploadedFile $file, int $maxDim = 500, int $quality = 70): string
     {
         $mime = $file->getMimeType() ?: 'image/jpeg';
         $raw  = file_get_contents($file->getRealPath());
 
-        // Kompres otomatis via GD jika tersedia agar ringan disimpan di database
         if (function_exists('imagecreatefromstring') && in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
             $img = @imagecreatefromstring($raw);
             if ($img !== false) {
                 $width  = imagesx($img);
                 $height = imagesy($img);
-                $maxDim = 800;
 
                 if ($width > $maxDim || $height > $maxDim) {
                     $ratio     = min($maxDim / $width, $maxDim / $height);
@@ -165,7 +173,7 @@ class TentangKamiController extends Controller
                 }
 
                 ob_start();
-                imagejpeg($img, null, 75);
+                imagejpeg($img, null, $quality);
                 $compressed = ob_get_clean();
                 imagedestroy($img);
 
