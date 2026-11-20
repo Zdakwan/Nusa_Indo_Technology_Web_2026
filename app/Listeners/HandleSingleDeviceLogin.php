@@ -2,54 +2,48 @@
 
 namespace App\Listeners;
 
-use App\Services\DeviceSessionService;
 use Illuminate\Auth\Events\Login;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class HandleSingleDeviceLogin
 {
-    public function __construct(
-        private readonly DeviceSessionService $deviceSession
-    ) {}
-
     public function handle(Login $event): void
     {
-        if (! in_array($event->guard, ['client', 'admin'], true)) {
-            return;
-        }
+        try {
+            $user  = $event->user;
+            $guard = $event->guard ?? config('auth.defaults.guard', 'web');
 
-        $request = request();
-
-        if (! $request || ! $request->hasSession()) {
-            return;
-        }
-
-        $existingSession = $this->deviceSession->acquireOrGetExisting($event->user, $request);
-
-        if ($existingSession !== null) {
-            // Cabut autentikasi di perangkat baru tanpa menghapus sesi perangkat lama
-            $guard = Auth::guard($event->guard);
-            if (method_exists($guard, 'logoutCurrentDevice')) {
-                $guard->logoutCurrentDevice();
-            } else {
-                $guard->logout();
+            if (!$user || !$user->getAuthIdentifier()) {
+                return;
             }
 
-            $lockInfo = [
-                'role' => $event->guard === 'admin' ? 'Admin' : 'Klien',
-                'email' => $this->deviceSession->maskEmail($event->user->email ?? null),
-                'device' => $existingSession->device_summary,
-                'ip' => $existingSession->ip_address,
-                'last_active' => $existingSession->last_activity_at->diffForHumans(),
-                'login_url' => route($event->guard === 'admin' ? 'admin.login' : 'login'),
-            ];
+            // Generate token acak unik agar tidak pernah bentrok antar guard di browser yang sama
+            $token = Str::random(64);
+            $now   = now();
+            $ttl   = (int) config('session.lifetime', 120);
 
-            throw new HttpResponseException(
-                redirect()
-                    ->route('auth.device-locked')
-                    ->with('device_lock_info', $lockInfo)
+            DB::table('active_device_sessions')->updateOrInsert(
+                [
+                    'authenticatable_type' => get_class($user),
+                    'authenticatable_id'   => $user->getAuthIdentifier(),
+                ],
+                [
+                    'session_token'    => $token,
+                    'ip_address'       => request()->ip(),
+                    'user_agent'       => Str::limit((string) request()->userAgent(), 500, ''),
+                    'last_activity_at' => $now,
+                    'expires_at'       => $now->copy()->addMinutes($ttl),
+                    'updated_at'       => $now,
+                    'created_at'       => $now,
+                ]
             );
+
+            // Simpan token terpisah per guard agar Admin & Client tidak saling menimpa
+            session()->put("active_device_token_{$guard}", $token);
+        } catch (\Throwable $e) {
+            Log::error('[SingleDeviceLogin] Gagal menyimpan sesi perangkat: ' . $e->getMessage());
         }
     }
 }

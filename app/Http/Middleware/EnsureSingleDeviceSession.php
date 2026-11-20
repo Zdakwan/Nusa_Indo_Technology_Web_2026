@@ -2,36 +2,39 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\DeviceSessionService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureSingleDeviceSession
 {
-    public function __construct(
-        private readonly DeviceSessionService $deviceSessionService
-    ) {}
-
-    public function handle(Request $request, Closure $next, string $guard = 'client'): Response
+    public function handle(Request $request, Closure $next, ?string $guard = null): Response
     {
-        $authGuard = Auth::guard($guard);
+        $activeGuard = $guard ?? ($request->is('admin', 'admin/*') ? 'admin' : config('auth.defaults.guard', 'web'));
 
-        if ($authGuard->check()) {
-            $user = $authGuard->user();
+        if (!Auth::guard($activeGuard)->check()) {
+            return $next($request);
+        }
 
-            if (! $this->deviceSessionService->validateAndRefresh($user, $request)) {
-                $authGuard->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+        $user  = Auth::guard($activeGuard)->user();
+        $token = $request->session()->get("active_device_token_{$activeGuard}");
 
-                $loginRoute = $guard === 'admin' ? 'admin.login' : 'login';
+        $activeSession = DB::table('active_device_sessions')
+            ->where('authenticatable_type', get_class($user))
+            ->where('authenticatable_id', $user->getAuthIdentifier())
+            ->first();
 
-                return redirect()->route($loginRoute)->withErrors([
-                    'email' => 'Sesi Anda telah berakhir. Silakan login kembali.',
-                ]);
-            }
+        if (!$token || !$activeSession || !hash_equals((string) $activeSession->session_token, (string) $token)) {
+            Auth::guard($activeGuard)->logout();
+            $request->session()->forget("active_device_token_{$activeGuard}");
+
+            $loginRoute = $activeGuard === 'admin' ? 'admin.login' : 'login';
+
+            return redirect()->route($loginRoute)->withErrors([
+                'email' => 'Sesi Anda telah berakhir karena login di perangkat lain. Silakan login kembali.',
+            ]);
         }
 
         return $next($request);
