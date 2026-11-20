@@ -17,7 +17,7 @@ class TentangKamiController extends Controller
     public function index()
     {
         $tentang = TentangKami::first() ?? new TentangKami();
-        $tim = AnggotaTim::latest()->get();
+        $tim = AnggotaTim::orderBy('id', 'asc')->get();
 
         return view('admin.tentang-kami.index', compact('tentang', 'tim'));
     }
