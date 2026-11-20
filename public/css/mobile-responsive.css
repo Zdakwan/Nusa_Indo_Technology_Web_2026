@@ -238,7 +238,7 @@ img, svg, video, canvas {
     }
 
     /* Rapatkan padding container utama di HP */
-    main, .container {
+    .container {
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
