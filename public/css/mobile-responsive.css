@@ -498,3 +498,75 @@ aside img,
     display: block;
     object-fit: contain;
 }
+
+/* === Polishing Tampilan Mobile: Stepper, Tabel Konsultasi, Detail Proyek, Notifikasi === */
+@media (max-width: 639.98px) {
+    /* 1. Stepper Status Pendaftaran agar 4 label tidak saling bertumpuk */
+    .nit-stepper-scroll {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.35rem;
+    }
+
+    .nit-stepper-track {
+        min-width: 340px !important;
+    }
+
+    .nit-stepper-label {
+        font-size: 0.65rem !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+    }
+
+    /* 2. Tabel Daftar Konsultasi lebih lega di HP */
+    .nit-compact-table-card {
+        padding: 1rem !important;
+    }
+
+    .nit-compact-table-card table th,
+    .nit-compact-table-card table td {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.82rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* 3. Tombol Export PDF & Kembali ke Proyek Saya rapi 1 baris */
+    .nit-proyek-actions {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+
+    .nit-proyek-actions a,
+    .nit-proyek-actions button {
+        font-size: 0.8125rem !important;
+        padding: 0.55rem 0.85rem !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.4rem !important;
+    }
+
+    /* 4. Kartu Notifikasi: cegah teks terjepit di tengah oleh badge "Sudah dibaca" */
+    .nit-notif-item {
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+        padding: 1rem !important;
+    }
+
+    .nit-notif-body {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+    }
+
+    .nit-notif-badge-wrap {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        margin-top: -0.25rem !important;
+    }
+}

@@ -692,3 +692,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/* === Penanda Otomatis Layout Mobile (Stepper, Tabel Konsultasi, Detail Proyek, Notifikasi) === */
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Stepper Status Pendaftaran Terbaru
+    const statusHeading = Array.from(document.querySelectorAll('h2, h3, h4, p, div')).find(
+        (el) => el.children.length === 0 && (el.textContent || '').trim() === 'Status Pendaftaran Terbaru'
+    );
+    if (statusHeading) {
+        const card = statusHeading.closest('div[class*="rounded"], section') || statusHeading.parentElement;
+        if (card) {
+            const firstLabel = Array.from(card.querySelectorAll('p, span, div')).find(
+                (el) => el.children.length === 0 && (el.textContent || '').trim() === 'Pengajuan'
+            );
+            if (firstLabel) {
+                let track = firstLabel.parentElement;
+                while (track && track !== card) {
+                    const txt = track.textContent || '';
+                    if (txt.includes('Pengajuan') && txt.includes('Diverifikasi') && txt.includes('Selesai')) {
+                        track.classList.add('nit-stepper-track');
+                        if (track.parentElement) {
+                            track.parentElement.classList.add('nit-stepper-scroll');
+                        }
+                        break;
+                    }
+                    track = track.parentElement;
+                }
+            }
+        }
+    }
+
+    // 2. Kartu Tabel Daftar Konsultasi
+    const daftarHeading = Array.from(document.querySelectorAll('h2, h3, h4, p, div')).find(
+        (el) => el.children.length === 0 && (el.textContent || '').trim() === 'Daftar Konsultasi'
+    );
+    if (daftarHeading) {
+        const card = daftarHeading.closest('div[class*="rounded"], section');
+        if (card) card.classList.add('nit-compact-table-card');
+    }
+
+    // 3. Tombol Aksi Detail Proyek (Export PDF & Kembali ke Proyek Saya)
+    const exportBtn = Array.from(document.querySelectorAll('a, button')).find(
+        (el) => /Export\s*PDF/i.test(el.textContent || '')
+    );
+    if (exportBtn && exportBtn.parentElement) {
+        exportBtn.parentElement.classList.add('nit-proyek-actions');
+    }
+
+    // 4. Item Notifikasi agar teks tidak terjepit badge "Sudah dibaca"
+    document.querySelectorAll('span, button, div, a').forEach((badge) => {
+        if (badge.children.length > 1) return;
+        const text = (badge.textContent || '').trim();
+        if (text !== 'Sudah dibaca' && text !== 'Tandai dibaca') return;
+
+        let row = badge.parentElement;
+        while (row && row !== document.body) {
+            const st = window.getComputedStyle(row);
+            if (st.display === 'flex' && row.children.length >= 2 && row.getBoundingClientRect().width > 240) {
+                row.classList.add('nit-notif-item');
+                const directChildren = Array.from(row.children);
+                const badgeContainer = directChildren.find((child) => child === badge || child.contains(badge));
+                if (badgeContainer) {
+                    badgeContainer.classList.add('nit-notif-badge-wrap');
+                }
+                directChildren.forEach((child) => {
+                    if (child !== badgeContainer && !child.classList.contains('nit-notif-badge-wrap')) {
+                        if (child.getBoundingClientRect().width > 60) {
+                            child.classList.add('nit-notif-body');
+                        }
+                    }
+                });
+                break;
+            }
+            row = row.parentElement;
+        }
+    });
+});
