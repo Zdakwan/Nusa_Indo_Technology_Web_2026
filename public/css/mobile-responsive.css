@@ -354,3 +354,14 @@ aside nav div div a i {
         overflow-wrap: normal !important;
     }
 }
+
+/* === Google Maps Otomatis Berwarna di Perangkat Layar Sentuh (HP/Tablet) === */
+@media (hover: none), (pointer: coarse), (max-width: 767.98px) {
+    iframe[src*="google.com/maps"],
+    iframe[src*="maps.google"],
+    div:has(> iframe[src*="google.com/maps"]),
+    div:has(> iframe[src*="maps.google"]) {
+        filter: none !important;
+        -webkit-filter: none !important;
+    }
+}
