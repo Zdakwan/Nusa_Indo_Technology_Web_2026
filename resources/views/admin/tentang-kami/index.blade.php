@@ -167,7 +167,20 @@
     <!-- BAGIAN 2: MANAJEMEN TIM (Tampil di tengah - order-2) -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8 order-2 relative z-10">
         <div class="p-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 class="text-lg font-bold text-[#254261]"><i class="fas fa-users mr-2"></i> Struktur Tim Kami</h2>
+            <h2 class="text-lg font-bold text-[#254261]"><i class="fas fa-users mr-2"></i> @if(session('error') || $errors->any())
+    <div id="nit-tim-error-alert" style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:0.875rem 1rem;border-radius:0.75rem;margin-bottom:1rem;font-size:0.875rem;">
+        <strong>Gagal menyimpan data:</strong>
+        <ul style="margin:0.25rem 0 0 1.25rem;list-style:disc;">
+            @if(session('error'))
+                <li>{{ session('error') }}</li>
+            @endif
+            @foreach($errors->all() as $err)
+                <li>{{ $err }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+Struktur Tim Kami</h2>
             <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#f59e0b] hover:bg-amber-600 text-white text-sm font-bold rounded-lg">
                 <i class="fas fa-plus"></i> Tambah Anggota
             </button>

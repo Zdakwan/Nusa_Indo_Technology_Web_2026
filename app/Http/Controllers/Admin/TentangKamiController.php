@@ -86,7 +86,7 @@ class TentangKamiController extends Controller
             return redirect()->back()->with('success', 'Anggota tim berhasil ditambahkan.');
         } catch (\Throwable $e) {
             Log::error('[TentangKami@storeTim] ' . $e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['foto' => 'Gagal menyimpan anggota: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menyimpan anggota: ' . $e->getMessage())->withErrors(['foto' => 'Gagal menyimpan anggota: ' . $e->getMessage()]);
         }
     }
 
