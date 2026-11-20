@@ -103,7 +103,7 @@
                 @endif
 
                 <p class="mt-3 text-xs text-red-500 font-medium text-center">
-                    *Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.
+                    *Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.
                 </p>
                  @error('gambar')
                     <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
@@ -616,7 +616,7 @@
                 return;
             }
 
-            if (blob.size > 8 * 1024 * 1024) {
+            if (blob.size > (2 * 1024 * 1024)) {
                 alert('Ukuran foto setelah crop melebihi 8 MB. Perkecil atau pilih foto lain.');
                 return;
             }

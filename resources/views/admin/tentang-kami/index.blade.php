@@ -120,7 +120,7 @@
                             </div>
                         @endif
                         <input type="file" name="foto_kolaborasi_tim" class="w-full border rounded-lg bg-white p-1 text-sm">
-                        <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                         @error('foto_kolaborasi_tim')
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
@@ -143,7 +143,7 @@
                             </div>
                         @endif
                         <input type="file" name="foto_kolaborasi_serah_terima" class="w-full border rounded-lg bg-white p-1 text-sm">
-                        <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                         @error('foto_kolaborasi_serah_terima')
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
@@ -229,7 +229,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-1">Foto (Opsional)</label>
                 <input type="file" name="foto" class="w-full border rounded-lg bg-gray-50">
-                <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                 @error('foto')
                     <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                 @enderror
@@ -259,7 +259,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-1">Update Foto</label>
                 <input type="file" name="foto" class="w-full border rounded-lg bg-gray-50">
-                <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                 @error('foto')
                     <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                 @enderror

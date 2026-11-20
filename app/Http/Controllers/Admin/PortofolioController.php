@@ -31,10 +31,10 @@ class PortofolioController extends Controller
             'rating'       => 'required|numeric|min:1|max:5',
             'fitur_utama'  => 'nullable|string',
             'teknologi'    => 'nullable|string|max:255',
-            'gambar'       => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+            'gambar'       => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|max:2048',
         ], [
-            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
-            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
+            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Maksimal 2 MB.',
+            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 2 MB.',
             'gambar.mimes' => 'Format gambar harus berupa: png, jpg, jpeg, gif, atau bmp.',
             'gambar.image' => 'File yang diunggah harus berupa gambar.',
         ]);
@@ -65,10 +65,10 @@ class PortofolioController extends Controller
             'rating'       => 'required|numeric|min:1|max:5',
             'fitur_utama'  => 'nullable|string',
             'teknologi'    => 'nullable|string|max:255',
-            'gambar'       => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+            'gambar'       => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|max:2048',
         ], [
-            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Minimal harus 2 MB.',
-            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 8 MB.',
+            'gambar.min'   => 'Gagal: Ukuran gambar terlalu kecil. Maksimal 2 MB.',
+            'gambar.max'   => 'Gagal: Ukuran gambar terlalu besar. Maksimal 2 MB.',
             'gambar.mimes' => 'Format gambar harus berupa: png, jpg, jpeg, gif, atau bmp.',
             'gambar.image' => 'File yang diunggah harus berupa gambar.',
         ]);

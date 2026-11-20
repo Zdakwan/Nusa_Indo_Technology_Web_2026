@@ -365,3 +365,22 @@ aside nav div div a i {
         -webkit-filter: none !important;
     }
 }
+
+/* === Perbaikan Teks Sidebar Agar Tidak Terpotong (...) === */
+aside nav a,
+aside nav button,
+.sidebar nav a,
+.sidebar nav button {
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+    gap: 0.5rem !important;
+}
+
+aside nav a span,
+aside nav button span,
+.sidebar nav a span,
+.sidebar nav button span {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+}

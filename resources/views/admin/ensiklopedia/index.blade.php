@@ -135,7 +135,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Gambar Thumbnail</label>
                     <input type="file" name="gambar" class="w-full border border-gray-300 p-1.5 rounded-lg bg-gray-50 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                    <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                    <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                     @error('gambar')
                         <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                     @enderror
@@ -186,7 +186,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Update Gambar (Opsional)</label>
                     <input type="file" name="gambar" class="w-full border border-gray-300 p-1.5 rounded-lg bg-gray-50 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                    <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                    <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                     @error('gambar')
                         <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                     @enderror

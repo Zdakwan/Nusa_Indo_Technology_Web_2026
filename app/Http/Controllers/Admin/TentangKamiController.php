@@ -27,14 +27,14 @@ class TentangKamiController extends Controller
             'misi' => 'nullable|string',
             'teks_kolaborasi_tim' => 'nullable|string',
             'teks_kolaborasi_serah_terima' => 'nullable|string',
-            'foto_kolaborasi_tim' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
-            'foto_kolaborasi_serah_terima' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+            'foto_kolaborasi_tim' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|max:2048',
+            'foto_kolaborasi_serah_terima' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|max:2048',
         ], [
-            'foto_kolaborasi_tim.min' => 'Gagal: Ukuran foto tim terlalu kecil. Minimal harus 2 MB.',
-            'foto_kolaborasi_tim.max' => 'Gagal: Ukuran foto tim terlalu besar. Maksimal 8 MB.',
+            'foto_kolaborasi_tim.min' => 'Gagal: Ukuran foto tim terlalu kecil. Maksimal 2 MB.',
+            'foto_kolaborasi_tim.max' => 'Gagal: Ukuran foto tim terlalu besar. Maksimal 2 MB.',
             'foto_kolaborasi_tim.mimes' => 'Format foto tim harus berupa: png, jpg, jpeg, gif, atau bmp.',
-            'foto_kolaborasi_serah_terima.min' => 'Gagal: Ukuran foto serah terima terlalu kecil. Minimal harus 2 MB.',
-            'foto_kolaborasi_serah_terima.max' => 'Gagal: Ukuran foto serah terima terlalu besar. Maksimal 8 MB.',
+            'foto_kolaborasi_serah_terima.min' => 'Gagal: Ukuran foto serah terima terlalu kecil. Maksimal 2 MB.',
+            'foto_kolaborasi_serah_terima.max' => 'Gagal: Ukuran foto serah terima terlalu besar. Maksimal 2 MB.',
             'foto_kolaborasi_serah_terima.mimes' => 'Format foto serah terima harus berupa: png, jpg, jpeg, gif, atau bmp.',
         ]);
 
@@ -65,10 +65,10 @@ class TentangKamiController extends Controller
         $data = $request->validate([
             'nama' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|max:2048',
         ], [
-            'foto.min' => 'Gagal: Ukuran foto anggota terlalu kecil. Minimal harus 2 MB.',
-            'foto.max' => 'Gagal: Ukuran foto anggota terlalu besar. Maksimal 8 MB.',
+            'foto.min' => 'Gagal: Ukuran foto anggota terlalu kecil. Maksimal 2 MB.',
+            'foto.max' => 'Gagal: Ukuran foto anggota terlalu besar. Maksimal 2 MB.',
             'foto.mimes' => 'Format foto harus berupa: png, jpg, jpeg, gif, atau bmp.'
         ]);
 
@@ -86,10 +86,10 @@ class TentangKamiController extends Controller
         $data = $request->validate([
             'nama' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|min:2048|max:8192',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,gif,bmp|max:2048',
         ], [
-            'foto.min' => 'Gagal: Ukuran foto anggota terlalu kecil. Minimal harus 2 MB.',
-            'foto.max' => 'Gagal: Ukuran foto anggota terlalu besar. Maksimal 8 MB.',
+            'foto.min' => 'Gagal: Ukuran foto anggota terlalu kecil. Maksimal 2 MB.',
+            'foto.max' => 'Gagal: Ukuran foto anggota terlalu besar. Maksimal 2 MB.',
             'foto.mimes' => 'Format foto harus berupa: png, jpg, jpeg, gif, atau bmp.'
         ]);
 

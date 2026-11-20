@@ -168,7 +168,7 @@
                 <div class="col-span-2">
                     <label class="block text-sm mb-1">Gambar</label>
                     <input type="file" name="gambar" class="w-full border rounded-lg p-1">
-                    <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                    <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                     @error('gambar')
                         <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                     @enderror
@@ -224,7 +224,7 @@
                 <div class="col-span-2">
                     <label class="block text-sm mb-1">Gambar Baru (Opsional)</label>
                     <input type="file" name="gambar" class="w-full border rounded-lg p-1 text-sm text-gray-500">
-                    <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                    <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                     @error('gambar')
                         <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                     @enderror
