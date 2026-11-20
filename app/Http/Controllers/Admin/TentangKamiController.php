@@ -84,7 +84,18 @@ class TentangKamiController extends Controller
                 $data['foto'] = $this->encodeImageToBase64($request->file('foto'), 500, 70);
             }
 
-            AnggotaTim::create($data);
+            $this->ensureAutoIncrementId(AnggotaTim::class);
+
+            try {
+                AnggotaTim::create($data);
+            } catch (\Throwable $insertErr) {
+                if (str_contains($insertErr->getMessage(), "Field 'id' doesn't have a default value") || str_contains($insertErr->getMessage(), '1364')) {
+                    $data['id'] = ((int) AnggotaTim::max('id')) + 1;
+                    AnggotaTim::create($data);
+                } else {
+                    throw $insertErr;
+                }
+            }
 
             return redirect()->back()->with('success', 'Anggota tim berhasil ditambahkan.');
         } catch (\Throwable $e) {
@@ -198,6 +209,21 @@ class TentangKamiController extends Controller
             }
         } catch (\Throwable $e) {
             // Abaikan error filesystem read-only di Vercel
+        }
+    }
+
+    private function ensureAutoIncrementId(string $modelClass): void
+    {
+        try {
+            $table = (new $modelClass())->getTable();
+            DB::statement("ALTER TABLE `{$table}` MODIFY `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT");
+        } catch (\Throwable $e) {
+            try {
+                $table = (new $modelClass())->getTable();
+                DB::statement("ALTER TABLE `{$table}` ADD PRIMARY KEY (`id`), MODIFY `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT");
+            } catch (\Throwable $e2) {
+                Log::warning('[TentangKami] Auto-increment skip: ' . $this->shortErrorMessage($e2));
+            }
         }
     }
 }
