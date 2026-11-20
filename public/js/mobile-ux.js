@@ -471,7 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, true);
 });
 
-});
 
 /* === Perbaikan Tinggi Panel Biru Carousel Khusus Layar HP (Desktop Tetap 2 Kolom) === */
 document.addEventListener('DOMContentLoaded', () => {
@@ -577,4 +576,119 @@ document.addEventListener('DOMContentLoaded', () => {
         iconBox.innerHTML = cfg.svg;
         card.appendChild(iconBox);
     });
+});
+
+/* === Fallback Klik Tombol Garis 3 (Sidebar) & Foto Profil di Browser HP === */
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Rapikan teks stepper "Pengajuan / Diverifikasi / Dijadwalkan / Selesai" agar tidak bertumpuk di HP
+    const stepWords = ['Pengajuan', 'Diverifikasi', 'Dijadwalkan', 'Selesai'];
+    document.querySelectorAll('p, span, div, h4, h5').forEach((el) => {
+        if (el.children.length === 0 && stepWords.includes((el.textContent || '').trim())) {
+            el.classList.add('nit-stepper-label');
+        }
+    });
+
+    const header = document.querySelector('header');
+    if (!header) return;
+
+    // 2. Fallback tombol garis 3 (hamburger) di pojok kiri header
+    const aside = document.querySelector('aside, .sidebar');
+    const hamburgerBtn = Array.from(header.querySelectorAll('button')).find((btn) => {
+        const rect = btn.getBoundingClientRect();
+        return rect.width > 0 && rect.left < window.innerWidth / 2;
+    });
+
+    if (hamburgerBtn && aside) {
+        const ensureBackdrop = () => {
+            let bd = document.getElementById('nit-mobile-sidebar-backdrop');
+            if (!bd) {
+                bd = document.createElement('div');
+                bd.id = 'nit-mobile-sidebar-backdrop';
+                bd.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);z-index:55;display:none;';
+                bd.addEventListener('click', () => closeSidebarFallback());
+                document.body.appendChild(bd);
+            }
+            return bd;
+        };
+
+        const isSidebarVisible = () => {
+            const st = window.getComputedStyle(aside);
+            const rect = aside.getBoundingClientRect();
+            return st.display !== 'none' && st.visibility !== 'hidden' && rect.right > 20;
+        };
+
+        const closeSidebarFallback = () => {
+            aside.classList.add('-translate-x-full');
+            aside.classList.remove('translate-x-0');
+            if (aside.dataset.nitForcedOpen === '1') {
+                aside.style.transform = '';
+                aside.style.display = '';
+                delete aside.dataset.nitForcedOpen;
+            }
+            const bd = document.getElementById('nit-mobile-sidebar-backdrop');
+            if (bd) bd.style.display = 'none';
+        };
+
+        hamburgerBtn.addEventListener('click', () => {
+            if (window.innerWidth >= 1024) return;
+            const wasVisible = isSidebarVisible();
+
+            // Tunggu 60ms: jika handler bawaan halaman tidak mengubah status sidebar, jalankan fallback
+            setTimeout(() => {
+                if (isSidebarVisible() === wasVisible) {
+                    const bd = ensureBackdrop();
+                    if (!wasVisible) {
+                        aside.dataset.nitForcedOpen = '1';
+                        aside.classList.remove('hidden', '-translate-x-full');
+                        aside.classList.add('translate-x-0');
+                        aside.style.display = 'flex';
+                        aside.style.position = 'fixed';
+                        aside.style.top = '0';
+                        aside.style.left = '0';
+                        aside.style.bottom = '0';
+                        aside.style.transform = 'translateX(0)';
+                        bd.style.display = 'block';
+                    } else {
+                        closeSidebarFallback();
+                    }
+                }
+            }, 60);
+        });
+    }
+
+    // 3. Fallback klik foto profil di pojok kanan header
+    const profileTrigger = header.querySelector('a img, button img')?.closest('a, button')
+        || Array.from(header.querySelectorAll('img')).find((img) => {
+            const rect = img.getBoundingClientRect();
+            return rect.width > 0 && rect.left > window.innerWidth / 2;
+        });
+
+    if (profileTrigger) {
+        profileTrigger.style.cursor = 'pointer';
+        profileTrigger.addEventListener('click', () => {
+            if (profileTrigger.tagName === 'A' && profileTrigger.getAttribute('href') && profileTrigger.getAttribute('href') !== '#') {
+                return;
+            }
+
+            const wrapper = profileTrigger.closest('.relative') || profileTrigger.parentElement;
+            const dropdown = wrapper ? wrapper.querySelector('[x-show], .dropdown-menu, [role="menu"], div.absolute') : null;
+
+            if (dropdown) {
+                const wasHidden = window.getComputedStyle(dropdown).display === 'none' || dropdown.classList.contains('hidden');
+                setTimeout(() => {
+                    const stillHidden = window.getComputedStyle(dropdown).display === 'none' || dropdown.classList.contains('hidden');
+                    if (stillHidden === wasHidden) {
+                        dropdown.classList.toggle('hidden', !wasHidden);
+                        dropdown.style.display = wasHidden ? 'block' : 'none';
+                    }
+                }, 60);
+            } else {
+                // Jika tidak ada dropdown di halaman ini, arahkan ke halaman profil dari link sidebar
+                const profileLink = document.querySelector('aside a[href*="profil"], aside a[href*="profile"], aside a[href*="pengaturan"]');
+                if (profileLink && profileLink.href) {
+                    window.location.href = profileLink.href;
+                }
+            }
+        });
+    }
 });

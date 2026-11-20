@@ -411,3 +411,40 @@ aside nav button i,
         font-size: 0.875rem !important;
     }
 }
+
+/* === Pastikan Header, Tombol Garis 3, dan Foto Profil Selalu Bisa Diklik di HP === */
+@media (max-width: 1023.98px) {
+    header,
+    .topbar,
+    nav.navbar {
+        position: relative;
+        z-index: 45 !important;
+        pointer-events: auto !important;
+    }
+
+    header button,
+    header a,
+    header img {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        touch-action: manipulation;
+    }
+
+    /* Pastikan sidebar drawer berada di atas header saat terbuka */
+    aside,
+    .sidebar {
+        z-index: 60 !important;
+    }
+}
+
+/* === Rapikan Teks Stepper Status Pendaftaran Agar Tidak Bertumpuk di Layar HP === */
+@media (max-width: 639.98px) {
+    .nit-stepper-label {
+        font-size: 0.68rem !important;
+        line-height: 1.2 !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+        word-break: break-word !important;
+        text-align: center !important;
+    }
+}
