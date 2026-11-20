@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminRole;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\EnsureSingleDeviceSession;
 use App\Http\Middleware\VerifyMobileApiKey;
 use Illuminate\Foundation\Application;
@@ -18,6 +19,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
+        $middleware->append(SecurityHeaders::class);
 
         $middleware->alias([
             'admin.role'     => AdminRole::class,
