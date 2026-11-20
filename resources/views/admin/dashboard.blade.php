@@ -73,6 +73,8 @@
 </div>
 
 {{-- Tombol Tambah Aktivitas (Memanggil JS openModalTambah) --}}
+    @include('admin.partials.dashboard-charts')
+
 <div class="flex justify-end mb-4 gap-2">
 
     <!-- Tombol Toggle Mode Pilih Hapus -->
@@ -97,8 +99,6 @@
 <form id="bulkDeleteForm" action="{{ route('admin.dashboard.aktivitas.bulkDestroy') }}" method="POST">
     @csrf
     @method('DELETE')
-
-    @include('admin.partials.dashboard-charts')
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
     <h2 class="text-base font-extrabold text-gray-900 mb-4">Daftar Aktivitas Klien Terbaru & Permintaan Konsultasi</h2>
 
