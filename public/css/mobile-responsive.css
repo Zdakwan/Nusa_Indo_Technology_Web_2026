@@ -204,3 +204,56 @@ iframe[src*="maps.google"] {
         text-align: center;
     }
 }
+
+/* === Global Responsive & Dynamic Polish (Publik, Klien, Admin) === */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Pembungkus tabel responsif otomatis */
+.table-responsive-auto {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0.75rem;
+}
+
+.table-responsive-auto table {
+    min-width: 640px;
+    width: 100%;
+}
+
+/* Pastikan media & grafik tidak pernah meluber keluar container */
+img, svg, video, canvas {
+    max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    /* Form & tombol lebih nyaman disentuh di layar HP */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        font-size: 16px !important; /* Cegah auto-zoom paksa di browser iOS/Android */
+    }
+
+    /* Rapatkan padding container utama di HP */
+    main, .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Modal & dialog selalu pas di layar HP */
+    [role="dialog"], .modal-content {
+        width: calc(100vw - 2rem) !important;
+        max-height: 90dvh;
+        overflow-y: auto;
+    }
+
+    /* Grup tombol aksi otomatis turun baris jika sempit */
+    .flex.items-center.justify-end,
+    .flex.justify-between {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}

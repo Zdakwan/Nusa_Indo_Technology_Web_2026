@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -12,6 +13,15 @@ class AdminDashboardChartComposer
 {
     public function compose(View $view): void
     {
+        $data = Cache::remember('admin_dashboard_charts_v2', now()->addMinutes(3), function () {
+            return $this->buildChartData();
+        });
+
+        $view->with($data);
+    }
+
+    private function buildChartData(): array
+    {
         $chartLabels = [];
         $chartTrendData = [];
         $chartStatusData = [
@@ -20,7 +30,6 @@ class AdminDashboardChartComposer
             'selesai'  => 0,
         ];
 
-        // Siapkan kerangka 6 bulan terakhir agar bulan kosong tetap bernilai 0
         $months = collect();
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
@@ -57,30 +66,43 @@ class AdminDashboardChartComposer
                         'selesai'  => (int) (($statusRows['selesai'] ?? 0) + ($statusRows['completed'] ?? 0) + ($statusRows['done'] ?? 0)),
                     ];
                 }
-            } else {
-                foreach ($months as $item) {
-                    $chartLabels[] = $item['label'];
-                    $chartTrendData[] = 0;
-                }
+
+                return compact('chartLabels', 'chartTrendData', 'chartStatusData');
             }
         } catch (\Throwable $e) {
             Log::error('[AdminDashboardChart] Gagal memuat data grafik: ' . $e->getMessage());
-            foreach ($months as $item) {
-                $chartLabels[] = $item['label'];
-                $chartTrendData[] = 0;
-            }
         }
 
-        $view->with(compact('chartLabels', 'chartTrendData', 'chartStatusData'));
+        foreach ($months as $item) {
+            $chartLabels[] = $item['label'];
+            $chartTrendData[] = 0;
+        }
+
+        return compact('chartLabels', 'chartTrendData', 'chartStatusData');
     }
 
     private function resolveConsultationTable(): ?string
     {
-        $candidates = ['konsultasis', 'consultations', 'permintaan_konsultasis', 'proyeks', 'projects'];
+        // Prioritaskan nama tabel umum terlebih dahulu
+        $candidates = [
+            'konsultasis', 'konsultasi', 'consultations',
+            'permintaan_konsultasis', 'permintaan_konsultasi',
+            'aktivitas_kliens', 'aktivitas_klien', 'proyeks', 'projects',
+        ];
 
         foreach ($candidates as $table) {
             if (Schema::hasTable($table) && Schema::hasColumn($table, 'created_at')) {
                 return $table;
+            }
+        }
+
+        // Fallback dinamis: cari tabel pertama yang punya kolom status & created_at
+        $allTables = array_map('current', DB::select('SHOW TABLES'));
+        foreach ($allTables as $table) {
+            if (preg_match('/(konsul|consult|aktivit|proyek|project|permintaan)/i', $table)) {
+                if (Schema::hasColumn($table, 'created_at') && Schema::hasColumn($table, 'status')) {
+                    return $table;
+                }
             }
         }
 

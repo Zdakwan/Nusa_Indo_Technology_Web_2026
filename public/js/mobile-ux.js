@@ -194,3 +194,42 @@
         }
     });
 })();
+
+/* === Dynamic Responsive UX Enhancements === */
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Bungkus semua <table> yang belum memiliki container overflow-x-auto
+    document.querySelectorAll('table').forEach((table) => {
+        const parent = table.parentElement;
+        if (!parent) return;
+        const style = window.getComputedStyle(parent);
+        if (style.overflowX === 'auto' || style.overflowX === 'scroll' || parent.classList.contains('table-responsive-auto')) {
+            return;
+        }
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-responsive-auto';
+        parent.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+    });
+
+    // 2. Auto-dismiss alert sukses setelah 4.5 detik agar UI tetap bersih
+    document.querySelectorAll('[role="alert"], .bg-green-50, .bg-emerald-50').forEach((alertEl) => {
+        if (alertEl.dataset.persist === 'true') return;
+        setTimeout(() => {
+            alertEl.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            alertEl.style.opacity = '0';
+            alertEl.style.transform = 'translateY(-6px)';
+            setTimeout(() => alertEl.remove(), 400);
+        }, 4500);
+    });
+
+    // 3. Resize grafik Chart.js secara dinamis saat ukuran layar / orientasi berubah
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (typeof Chart !== 'undefined' && Chart.instances) {
+                Object.values(Chart.instances).forEach((chart) => chart.resize());
+            }
+        }, 150);
+    });
+});
