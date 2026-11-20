@@ -116,7 +116,7 @@
                         <label class="block text-sm font-medium mb-2">Foto Tim Mahasiswa Polije PSDKU Sidoarjo</label>
                         @if(isset($tentang->foto_kolaborasi_tim) && $tentang->foto_kolaborasi_tim)
                             <div class="mb-3">
-                                <img src="{{ asset('storage/' . $tentang->foto_kolaborasi_tim) }}" alt="Foto Tim" class="h-32 object-cover rounded-lg border">
+                                <img src="{{ (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) }}" alt="Foto Tim" class="h-32 object-cover rounded-lg border">
                             </div>
                         @endif
                         <input type="file" name="foto_kolaborasi_tim" class="w-full border rounded-lg bg-white p-1 text-sm">
@@ -139,7 +139,7 @@
                         <label class="block text-sm font-medium mb-2">Foto Serah Terima Sistem</label>
                         @if(isset($tentang->foto_kolaborasi_serah_terima) && $tentang->foto_kolaborasi_serah_terima)
                             <div class="mb-3">
-                                <img src="{{ asset('storage/' . $tentang->foto_kolaborasi_serah_terima) }}" alt="Foto Serah Terima" class="h-32 object-cover rounded-lg border">
+                                <img src="{{ (str_starts_with($tentang->foto_kolaborasi_serah_terima, 'data:') ? $tentang->foto_kolaborasi_serah_terima : asset('storage/' . $tentang->foto_kolaborasi_serah_terima)) }}" alt="Foto Serah Terima" class="h-32 object-cover rounded-lg border">
                             </div>
                         @endif
                         <input type="file" name="foto_kolaborasi_serah_terima" class="w-full border rounded-lg bg-white p-1 text-sm">
