@@ -570,3 +570,31 @@ aside img,
         margin-top: -0.25rem !important;
     }
 }
+
+/* === Logo NIT di Sebelah Tombol Garis 3 pada Header Mobile === */
+.nit-mobile-header-brand {
+    display: none;
+    align-items: center;
+    margin-left: 0.75rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.nit-mobile-header-logo {
+    height: 28px;
+    width: auto;
+    max-width: 165px;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 1023.98px) {
+    .nit-mobile-header-brand {
+        display: inline-flex !important;
+    }
+
+    .nit-mobile-header-left {
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+}

@@ -768,3 +768,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/* === Tampilkan Logo NIT di Sebelah Tombol Garis 3 pada Header Mobile === */
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('header');
+    if (!header || header.querySelector('.nit-mobile-header-brand')) return;
+
+    // Ambil logo NIT dari sidebar agar path src selalu akurat
+    const sidebarLogoImg = document.querySelector('aside img, .sidebar img');
+    if (!sidebarLogoImg || !sidebarLogoImg.getAttribute('src')) return;
+
+    // Cari tombol garis 3 (hamburger) di sisi kiri header
+    const hamburgerBtn = Array.from(header.querySelectorAll('button')).find((btn) => {
+        const rect = btn.getBoundingClientRect();
+        return rect.width > 0 && rect.left < window.innerWidth / 2;
+    });
+    if (!hamburgerBtn) return;
+
+    // Bungkus tombol garis 3 + logo agar tetap menempel rapi di sisi kiri header
+    const leftGroup = document.createElement('div');
+    leftGroup.className = 'nit-mobile-header-left';
+
+    const brandLink = document.createElement('a');
+    brandLink.className = 'nit-mobile-header-brand';
+    const dashboardLink = document.querySelector('aside a[href*="dashboard"], .sidebar a[href*="dashboard"]');
+    brandLink.href = dashboardLink ? dashboardLink.getAttribute('href') : '/';
+    brandLink.setAttribute('aria-label', 'Nusa Indo Technology');
+
+    const logoImg = document.createElement('img');
+    logoImg.src = sidebarLogoImg.getAttribute('src');
+    logoImg.alt = sidebarLogoImg.getAttribute('alt') || 'Nusa Indo Technology';
+    logoImg.className = 'nit-mobile-header-logo';
+
+    brandLink.appendChild(logoImg);
+
+    const parent = hamburgerBtn.parentNode;
+    if (parent) {
+        parent.insertBefore(leftGroup, hamburgerBtn);
+        leftGroup.appendChild(hamburgerBtn);
+        leftGroup.appendChild(brandLink);
+    }
+});
