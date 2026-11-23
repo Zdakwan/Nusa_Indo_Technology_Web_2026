@@ -48,11 +48,19 @@ class ProyekClientController extends Controller
                     ->findOrFail($id);
 
         // 2. Load template PDF
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.proyek.single_pdf', compact('proyek'))
+        try {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.proyek.single_pdf', compact('proyek'))
                 ->setPaper('a4', 'portrait')
                 ->setOption('isRemoteEnabled', true);
 
         // 3. Tampilkan PDF di tab baru (Preview / Stream)
         return $pdf->stream('Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf', ['Attachment' => false]);
+        } catch (\Throwable $e) {
+            return response(
+                '<pre style="padding:16px;font-family:monospace;white-space:pre-wrap;">PDF Error: '
+                . e($e->getMessage()) . "\nFile: " . e($e->getFile()) . ':' . $e->getLine() . '</pre>',
+                500
+            );
+        }
     }
 }
