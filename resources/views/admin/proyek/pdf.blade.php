@@ -93,7 +93,7 @@
 
         <div class="tagline">IT Management Consultant & System Development</div>
         <div class="address">Jl. Rungkut Asri Timur XV H No.2, Surabaya, Jawa Timur 60293</div>
-        <div class="address">Email: nusaindotech@gmail.com | Telepon: +62 878-5246-1990</div>
+        <div class="address">Email: nusaindotech@gmail.com | Telepon: +62 819-4463-0996 (Hardanto)</div>
     </div>
 
     <hr class="garis-kop">

@@ -9,9 +9,9 @@
                     Solusi IT terintegrasi untuk masa depan bisnis Anda. Menyediakan layanan konsultasi, arsitektur sistem, tata kelola, dan pengembangan teknologi profesional.
                 </p>
                 <div class="space-y-2.5 text-sm">
-                    <a href="tel:+6287852461990" class="inline-flex items-center gap-3 text-white hover:text-[#f5b73e] transition-colors">
+                    <a href="tel:+62 819-4463-0996 (Hardanto)" class="inline-flex items-center gap-3 text-white hover:text-[#f5b73e] transition-colors">
                         <i class="fa-solid fa-phone text-[#f5b73e] shrink-0"></i>
-                        <span>+62 878-5246-1990</span>
+                        <span>+62 819-4463-0996 (Hardanto)</span>
                     </a>
                     <br>
                     <a href="mailto:nusaindotech@gmail.com" class="inline-flex items-center gap-3 text-white hover:text-[#f5b73e] transition-colors break-all">
