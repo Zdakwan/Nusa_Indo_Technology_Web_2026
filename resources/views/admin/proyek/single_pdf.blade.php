@@ -54,9 +54,9 @@
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit-pdf.jpg?v=3') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit-pdf.jpg?v=3') }}?v=2">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit-pdf.jpg?v=3') }}?v=2">
 </head>
 <body>
     <div class="top-bar"></div>
@@ -65,7 +65,7 @@
     <!-- KOP SURAT -->
     <div class="kop-surat">
         @php
-            $imagePath = public_path('images/LogoNusa.png');
+            $imagePath = public_path('images/LogoNusa-pdf.jpg');
             $logoData = '';
             if(file_exists($imagePath)){
                 $logoData = 'data:image/png;base64,' . base64_encode(file_get_contents($imagePath));
