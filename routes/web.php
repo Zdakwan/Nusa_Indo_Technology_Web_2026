@@ -190,7 +190,7 @@ Route::middleware('guest:client')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])
         ->middleware('throttle:client-auth')
-        ->name('register.process');
+        ->name('register.process')->middleware('throttle:register');
 });
 
 Route::get('/lupa-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
