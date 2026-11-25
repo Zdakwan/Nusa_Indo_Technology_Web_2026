@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Exports\KonsultasiExport;
 use App\Models\Konsultasi;
 use App\Models\Client;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
 {
@@ -184,4 +186,33 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')
             ->with('success', 'Aktivitas berhasil dihapus!');
     }
+<<<<<<< Updated upstream
+=======
+
+    public function bulkDestroyAktivitas(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:konsultasi,id',
+        ]);
+
+        $count = count($request->ids);
+        DB::table('konsultasi')->whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', $count . ' aktivitas berhasil dihapus!');
+    }
+
+    /**
+     * Mengekspor ringkasan grafik dan detail lengkap permintaan konsultasi ke Excel (.xlsx).
+     */
+    public function exportExcel()
+    {
+        // Nama file dinamis menyertakan tanggal hari ini, contoh: laporan-permintaan-konsultasi-2026-11-25.xlsx
+        $fileName = 'laporan-permintaan-konsultasi-' . now()->format('Y-m-d') . '.xlsx';
+
+        // Excel::download() akan memproses KonsultasiExport (2 sheet) lalu langsung mengirim file ke browser
+        return Excel::download(new KonsultasiExport(), $fileName);
+    }
+>>>>>>> Stashed changes
 }
