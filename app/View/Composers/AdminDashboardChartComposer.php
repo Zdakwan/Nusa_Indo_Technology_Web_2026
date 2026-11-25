@@ -18,7 +18,7 @@ class AdminDashboardChartComposer
 
     public function getChartData(): array
     {
-        return Cache::remember('admin_dashboard_charts_v5', now()->addMinutes(2), function () {
+        return Cache::remember('admin_dashboard_charts_v6', now()->addMinutes(2), function () {
             return $this->buildChartData();
         });
     }
@@ -35,7 +35,7 @@ class AdminDashboardChartComposer
             return 'menunggu';
         }
 
-        if (in_array($s, ['diproses', 'proses', 'in_progress', 'in progress', 'processing', 'dikerjakan'], true)) {
+        if (in_array($s, ['diproses', 'proses', 'in_progress', 'in progress', 'processing', 'dikerjakan', 'approved', 'disetujui', 'diterima', 'scheduled', 'terjadwal'], true)) {
             return 'diproses';
         }
 
