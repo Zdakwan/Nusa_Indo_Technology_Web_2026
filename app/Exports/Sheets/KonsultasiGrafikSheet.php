@@ -2,35 +2,33 @@
 
 namespace App\Exports\Sheets;
 
-use App\Models\Konsultasi;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\Export;
+use App\View\Composers\AdminDashboardChartComposer;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCharts;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\Legend;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-/**
- * Sheet 1: Ringkasan Grafik Permintaan Konsultasi.
- *
- * Interface yang digunakan:
- * - Export         : Penanda wajib objek export di Laravel Excel v4.
- * - FromArray      : Sumber data sheet berasal dari array PHP (cocok untuk laporan ringkasan/rekap).
- * - WithTitle      : Mengatur nama tab sheet di Excel.
- * - ShouldAutoSize : Lebar kolom otomatis menyesuaikan isi teks terpanjang.
- * - WithStyles     : Memberikan styling (warna header, bold, border, merge cell) via PhpSpreadsheet.
- */
-class KonsultasiGrafikSheet implements Export, FromArray, WithTitle, ShouldAutoSize, WithStyles
+class KonsultasiGrafikSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, WithCharts
 {
-    private int $trendHeaderRow = 6;
-    private int $trendEndRow = 13;
-    private int $statusHeaderRow = 16;
-    private int $statusEndRow = 21;
+    private array $chartData;
+
+    public function __construct(array $chartData = [])
+    {
+        $this->chartData = !empty($chartData)
+            ? $chartData
+            : (new AdminDashboardChartComposer())->getChartData();
+    }
 
     public function title(): string
     {
@@ -39,117 +37,192 @@ class KonsultasiGrafikSheet implements Export, FromArray, WithTitle, ShouldAutoS
 
     public function array(): array
     {
-        $now = Carbon::now();
-        $startPeriod = $now->copy()->subMonths(5)->startOfMonth();
+        $status      = $this->chartData['chartStatusData'] ?? ['menunggu' => 0, 'diproses' => 0, 'selesai' => 0];
+        $menungguAll = (int) ($status['menunggu'] ?? 0);
+        $diprosesAll = (int) ($status['diproses'] ?? 0);
+        $selesaiAll  = (int) ($status['selesai'] ?? 0);
+        $grandTotal  = $menungguAll + $diprosesAll + $selesaiAll;
 
-        $monthlyRows = DB::table('konsultasi')
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS total")
-            ->where('created_at', '>=', $startPeriod)
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
-            ->pluck('total', 'ym');
-
-        $rows = [
-            ['LAPORAN RINGKASAN GRAFIK PERMINTAAN KONSULTASI', '', ''],
-            ['Tanggal Export', $now->translatedFormat('d F Y H:i'), ''],
-            ['Periode Tren Grafik', $startPeriod->translatedFormat('M Y') . ' - ' . $now->translatedFormat('M Y') . ' (6 Bulan Terakhir)', ''],
-            ['', '', ''],
-            ['TREN PERMINTAAN KONSULTASI (6 BULAN TERAKHIR)', '', ''],
-            ['No', 'Bulan', 'Jumlah Permintaan'],
-        ];
-
-        $this->trendHeaderRow = 6;
-        $totalSixMonths = 0;
-
-        for ($i = 5, $no = 1; $i >= 0; $i--, $no++) {
-            $date = $now->copy()->subMonths($i);
-            $ym = $date->format('Y-m');
-            $count = (int) ($monthlyRows[$ym] ?? 0);
-            $totalSixMonths += $count;
-
-            $rows[] = [$no, $date->translatedFormat('M Y'), $count];
-        }
-
-        $rows[] = ['', 'Total 6 Bulan Terakhir', $totalSixMonths];
-        $this->trendEndRow = count($rows);
-
-        $rows[] = ['', '', ''];
-        $rows[] = ['DISTRIBUSI STATUS PERMINTAAN (SELURUH DATA)', '', ''];
-        $rows[] = ['Status', 'Jumlah', 'Persentase (%)'];
-        $this->statusHeaderRow = count($rows);
-
-        $statusRows = Konsultasi::query()
-            ->selectRaw('LOWER(TRIM(status)) AS status_key, COUNT(*) AS total')
-            ->groupBy(DB::raw('LOWER(TRIM(status))'))
-            ->pluck('total', 'status_key');
-
-        $menunggu = (int) (($statusRows['menunggu'] ?? 0) + ($statusRows['pending'] ?? 0));
-        $diproses = (int) (($statusRows['diproses'] ?? 0) + ($statusRows['proses'] ?? 0) + ($statusRows['in_progress'] ?? 0) + ($statusRows['approved'] ?? 0));
-        $selesai  = (int) (($statusRows['selesai'] ?? 0) + ($statusRows['completed'] ?? 0) + ($statusRows['done'] ?? 0));
-        $ditolak  = (int) (($statusRows['ditolak'] ?? 0) + ($statusRows['rejected'] ?? 0));
-        $totalAll = $menunggu + $diproses + $selesai + $ditolak;
-
-        $pct = fn (int $val): string => $totalAll > 0
-            ? number_format(($val / $totalAll) * 100, 1) . '%'
+        $pct = fn (int $val): string => $grandTotal > 0
+            ? number_format(($val / $grandTotal) * 100, 1) . '%'
             : '0.0%';
 
-        $rows[] = ['Menunggu', $menunggu, $pct($menunggu)];
-        $rows[] = ['Diproses / Disetujui', $diproses, $pct($diproses)];
-        $rows[] = ['Selesai', $selesai, $pct($selesai)];
-        $rows[] = ['Ditolak', $ditolak, $pct($ditolak)];
-        $rows[] = ['Total Keseluruhan', $totalAll, $totalAll > 0 ? '100.0%' : '0.0%'];
+        $rows = [
+            ['LAPORAN RINGKASAN & GRAFIK PERMINTAAN KONSULTASI'],
+            ['Dicetak pada: ' . now()->format('d M Y H:i') . ' WIB'],
+            [''],
+            ['DISTRIBUSI STATUS KESELURUHAN', 'Jumlah', 'Persentase'],
+            ['Menunggu', $menungguAll, $pct($menungguAll)],
+            ['Diproses', $diprosesAll, $pct($diprosesAll)],
+            ['Selesai', $selesaiAll, $pct($selesaiAll)],
+            ['Total Keseluruhan', $grandTotal, $grandTotal > 0 ? '100.0%' : '0.0%'],
+            [''],
+            ['PERBANDINGAN STATUS & TREN BULANAN (6 BULAN TERAKHIR)'],
+            ['Bulan', 'Menunggu', 'Diproses', 'Selesai', 'Total Pengajuan'],
+        ];
 
-        $this->statusEndRow = count($rows);
+        $labels      = $this->chartData['chartLabels'] ?? [];
+        $barMenunggu = $this->chartData['chartBarMenunggu'] ?? [];
+        $barDiproses = $this->chartData['chartBarDiproses'] ?? [];
+        $barSelesai  = $this->chartData['chartBarSelesai'] ?? [];
+        $trendData   = $this->chartData['chartTrendData'] ?? [];
+
+        $sumMenunggu = 0;
+        $sumDiproses = 0;
+        $sumSelesai  = 0;
+        $sumTrend    = 0;
+
+        foreach ($labels as $idx => $label) {
+            $m = (int) ($barMenunggu[$idx] ?? 0);
+            $d = (int) ($barDiproses[$idx] ?? 0);
+            $s = (int) ($barSelesai[$idx] ?? 0);
+            $t = (int) ($trendData[$idx] ?? ($m + $d + $s));
+
+            $sumMenunggu += $m;
+            $sumDiproses += $d;
+            $sumSelesai  += $s;
+            $sumTrend    += $t;
+
+            $rows[] = [$label, $m, $d, $s, $t];
+        }
+
+        $rows[] = ['Total 6 Bulan', $sumMenunggu, $sumDiproses, $sumSelesai, $sumTrend];
 
         return $rows;
     }
 
-    public function styles(Worksheet $sheet): ?array
+    public function styles(Worksheet $sheet): array
     {
-        $sheet->mergeCells('A1:C1');
-        $sheet->mergeCells('A5:C5');
-        $sheet->mergeCells('A' . ($this->statusHeaderRow - 1) . ':C' . ($this->statusHeaderRow - 1));
+        $rowCount = max(1, count($this->chartData['chartLabels'] ?? []));
+        $endRow   = 11 + $rowCount;
+        $totalRow = $endRow + 1;
 
+        $sheet->mergeCells('A1:E1');
+        $sheet->mergeCells('A2:E2');
+        $sheet->mergeCells('A10:E10');
+
+        // Border untuk Tabel Status (A4:C8) dan Tabel Bulanan (A11:E{$totalRow})
         $borderStyle = [
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['rgb' => 'CBD5E1'],
+                    'color'       => ['rgb' => 'CBD5E1'],
                 ],
             ],
         ];
-
-        $sheet->getStyle("A{$this->trendHeaderRow}:C{$this->trendEndRow}")->applyFromArray($borderStyle);
-        $sheet->getStyle("A{$this->statusHeaderRow}:C{$this->statusEndRow}")->applyFromArray($borderStyle);
+        $sheet->getStyle('A4:C8')->applyFromArray($borderStyle);
+        $sheet->getStyle("A11:E{$totalRow}")->applyFromArray($borderStyle);
+        $sheet->getStyle('B5:B8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('C5:C8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("B12:E{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $headerStyle = [
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '23364F'],
-            ],
+            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1B314C']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ];
 
-        $sheet->getStyle("A{$this->trendHeaderRow}:C{$this->trendHeaderRow}")->applyFromArray($headerStyle);
-        $sheet->getStyle("A{$this->statusHeaderRow}:C{$this->statusHeaderRow}")->applyFromArray($headerStyle);
-
-        $totalRowStyle = [
-            'font' => ['bold' => true],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'F1F5F9'],
-            ],
-        ];
-
-        $sheet->getStyle("A{$this->trendEndRow}:C{$this->trendEndRow}")->applyFromArray($totalRowStyle);
-        $sheet->getStyle("A{$this->statusEndRow}:C{$this->statusEndRow}")->applyFromArray($totalRowStyle);
-
         return [
-            1 => ['font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1E293B']]],
-            2 => ['font' => ['size' => 10, 'color' => ['rgb' => '475569']]],
-            3 => ['font' => ['size' => 10, 'color' => ['rgb' => '475569']]],
-            5 => ['font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => '23364F']]],
-            ($this->statusHeaderRow - 1) => ['font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => '23364F']]],
+            1 => ['font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1B314C']]],
+            2 => ['font' => ['italic' => true, 'size' => 10, 'color' => ['rgb' => '64748B']]],
+            4 => $headerStyle,
+            8 => ['font' => ['bold' => true], 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']]],
+            10 => ['font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => '1B314C']]],
+            11 => $headerStyle,
+            $totalRow => ['font' => ['bold' => true], 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']]],
         ];
+    }
+
+    public function charts(): array
+    {
+        $sheetName = "'" . $this->title() . "'";
+        $rowCount  = max(1, count($this->chartData['chartLabels'] ?? []));
+        $endRow    = 11 + $rowCount;
+
+        // 1. Diagram Batang (Bar/Column Chart): Perbandingan Status per Bulan
+        $barLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$B\$11", null, 1),
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$C\$11", null, 1),
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$D\$11", null, 1),
+        ];
+        $barCategories = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$A\$12:\$A\${$endRow}", null, $rowCount),
+        ];
+        $barValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, "{$sheetName}!\$B\$12:\$B\${$endRow}", null, $rowCount),
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, "{$sheetName}!\$C\$12:\$C\${$endRow}", null, $rowCount),
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, "{$sheetName}!\$D\$12:\$D\${$endRow}", null, $rowCount),
+        ];
+
+        $barSeries = new DataSeries(
+            DataSeries::TYPE_BARCHART,
+            DataSeries::GROUPING_CLUSTERED,
+            range(0, count($barValues) - 1),
+            $barLabels,
+            $barCategories,
+            $barValues,
+            DataSeries::DIRECTION_COL
+        );
+        $barChart = new Chart(
+            'bar_chart_status',
+            new Title('Perbandingan Status Konsultasi per Bulan'),
+            new Legend(Legend::POSITION_TOP, null, false),
+            new PlotArea(null, [$barSeries])
+        );
+        $barChart->setTopLeftPosition('G4');
+        $barChart->setBottomRightPosition('N18');
+
+        // 2. Grafik Garis (Line Chart): Tren Permintaan Konsultasi
+        $lineLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$E\$11", null, 1),
+        ];
+        $lineValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, "{$sheetName}!\$E\$12:\$E\${$endRow}", null, $rowCount),
+        ];
+        $lineSeries = new DataSeries(
+            DataSeries::TYPE_LINECHART,
+            DataSeries::GROUPING_STANDARD,
+            [0],
+            $lineLabels,
+            $barCategories,
+            $lineValues
+        );
+        $lineChart = new Chart(
+            'line_chart_trend',
+            new Title('Tren Permintaan Konsultasi (6 Bulan Terakhir)'),
+            new Legend(Legend::POSITION_BOTTOM, null, false),
+            new PlotArea(null, [$lineSeries])
+        );
+        $lineChart->setTopLeftPosition('G20');
+        $lineChart->setBottomRightPosition('N34');
+
+        // 3. Grafik Lingkaran (Pie Chart): Distribusi Status Keseluruhan
+        $pieLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$B\$4", null, 1),
+        ];
+        $pieCategories = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, "{$sheetName}!\$A\$5:\$A\$7", null, 3),
+        ];
+        $pieValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, "{$sheetName}!\$B\$5:\$B\$7", null, 3),
+        ];
+        $pieSeries = new DataSeries(
+            DataSeries::TYPE_PIECHART,
+            null,
+            [0],
+            $pieLabels,
+            $pieCategories,
+            $pieValues
+        );
+        $pieChart = new Chart(
+            'pie_chart_status',
+            new Title('Distribusi Status Keseluruhan'),
+            new Legend(Legend::POSITION_BOTTOM, null, false),
+            new PlotArea(null, [$pieSeries])
+        );
+        $pieChart->setTopLeftPosition('G36');
+        $pieChart->setBottomRightPosition('N50');
+
+        return [$barChart, $lineChart, $pieChart];
     }
 }
