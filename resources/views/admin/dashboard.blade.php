@@ -73,7 +73,6 @@
 </div>
 
 {{-- Tombol Tambah Aktivitas (Memanggil JS openModalTambah) --}}
-<<<<<<< HEAD
     @include('admin.partials.dashboard-charts')
 
 <div class="flex justify-end mb-4 gap-2">
@@ -90,9 +89,6 @@
         <i class="fa-solid fa-trash-alt"></i> Hapus Terpilih
     </button>
 
-=======
-<div class="flex justify-end mb-4">
->>>>>>> mey
     <button type="button" onclick="openModalTambah()" class="bg-[#1b314c] hover:bg-[#122236] text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm transition inline-flex items-center gap-2">
         <span>Tambah Aktivitas</span>
         <i class="fas fa-plus"></i>
@@ -100,12 +96,9 @@
 </div>
 
 {{-- Tabel Daftar Aktivitas Klien --}}
-<<<<<<< HEAD
 <form id="bulkDeleteForm" action="{{ route('admin.dashboard.aktivitas.bulkDestroy') }}" method="POST">
     @csrf
     @method('DELETE')
-=======
->>>>>>> mey
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
     <h2 class="text-base font-extrabold text-gray-900 mb-4">Daftar Aktivitas Klien Terbaru & Permintaan Konsultasi</h2>
 
@@ -113,14 +106,10 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-[#fdf2f0] text-gray-900 text-xs font-bold">
-<<<<<<< HEAD
                     <th class="py-3 pl-4 rounded-l-lg w-10 bulk-action-cell hidden">
                         <input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-gray-300 cursor-pointer">
                     </th>
                     <th class="py-3 pl-4 rounded-l-lg w-10 bulk-spacer-cell"></th>
-=======
-                    <th class="py-3 pl-4 rounded-l-lg w-10"></th>
->>>>>>> mey
                     <th class="py-3 px-4">Nama Klien/Perusahaan</th>
                     <th class="py-3 px-4">Permintaan/Proyek</th>
                     <th class="py-3 px-4">Tanggal Pengajuan</th>
@@ -146,16 +135,10 @@
                         };
                     @endphp
                     <tr class="hover:bg-gray-50 transition">
-<<<<<<< HEAD
                         <td class="py-3.5 pl-4 bulk-action-cell hidden">
                             <input type="checkbox" name="ids[]" value="{{ $k->id }}" class="rowCheckbox w-4 h-4 rounded border-gray-300 cursor-pointer">
                         </td>
                         <td class="py-3.5 pl-4 bulk-spacer-cell"></td>
-=======
-                        <td class="py-3.5 pl-4">
-                            <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                        </td>
->>>>>>> mey
                         <td class="py-3.5 px-4 font-medium">{{ $namaKlien }}</td>
                         <td class="py-3.5 px-4">{{ \Illuminate\Support\Str::limit($proyek, 40) }}</td>
                         <td class="py-3.5 px-4">{{ $tglFormat }}</td>
@@ -181,44 +164,27 @@
                                 </button>
 
                                 {{-- Tombol Hapus (Tempat Sampah) --}}
-<<<<<<< HEAD
                                 <button type="button" onclick="deleteSingleAktivitas({{ $k->id }})" title="Hapus" class="text-red-600 hover:text-red-800 cursor-pointer">
                                     <i class="fas fa-trash"></i>
                                 </button>
-=======
-                                <form action="{{ route('admin.dashboard.aktivitas.destroy', $k->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus aktivitas ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Hapus" class="text-red-600 hover:text-red-800 cursor-pointer">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
->>>>>>> mey
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-<<<<<<< HEAD
                         <td colspan="7" class="py-8 text-center text-gray-400">Belum ada aktivitas klien.</td>
-=======
-                        <td colspan="6" class="py-8 text-center text-gray-400">Belum ada aktivitas klien.</td>
->>>>>>> mey
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
-<<<<<<< HEAD
 </form>
 
 <!-- Form Hapus Satuan (Hidden) -->
 <form id="singleDeleteAktivitasForm" method="POST" class="hidden">
     @csrf @method('DELETE')
 </form>
-=======
->>>>>>> mey
 
 {{-- MODAL TAMBAH AKTIVITAS (Disembunyikan default dengan class 'hidden') --}}
 <div id="modalTambah" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
@@ -354,7 +320,6 @@
         // Menyembunyikan modal
         document.getElementById(modalId).classList.add('hidden');
     }
-<<<<<<< HEAD
 
     // === BULK DELETE & SINGLE DELETE ===
     function deleteSingleAktivitas(id) {
@@ -419,7 +384,5 @@
             });
         });
     });
-=======
->>>>>>> mey
 </script>
 @endsection

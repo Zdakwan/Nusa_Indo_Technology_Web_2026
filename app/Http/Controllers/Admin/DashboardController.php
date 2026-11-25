@@ -8,15 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-<<<<<<< HEAD
-use App\Models\Konsultasi;
-use App\Models\Client;
-=======
 use App\Exports\KonsultasiExport;
 use App\Models\Konsultasi;
 use App\Models\Client;
 use Maatwebsite\Excel\Facades\Excel;
->>>>>>> mey
 
 class DashboardController extends Controller
 {
@@ -191,11 +186,6 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')
             ->with('success', 'Aktivitas berhasil dihapus!');
     }
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> mey
 
     public function bulkDestroyAktivitas(Request $request)
     {
@@ -210,8 +200,6 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')
             ->with('success', $count . ' aktivitas berhasil dihapus!');
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Mengekspor ringkasan grafik dan detail lengkap permintaan konsultasi ke Excel (.xlsx).
@@ -224,6 +212,4 @@ class DashboardController extends Controller
         // Excel::download() akan memproses KonsultasiExport (2 sheet) lalu langsung mengirim file ke browser
         return Excel::download(new KonsultasiExport(), $fileName);
     }
->>>>>>> Stashed changes
->>>>>>> mey
 }

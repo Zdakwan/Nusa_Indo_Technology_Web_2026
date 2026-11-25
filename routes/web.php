@@ -95,6 +95,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // ---- AKSES SEMUA ADMIN (Super Admin, Konten, Layanan) ----
             Route::middleware('admin.role:super_admin,admin_konten,admin_layanan')->group(function () {
                 Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+                Route::get('/dashboard/export-excel', [AdminDashboardController::class, 'exportExcel'])->name('dashboard.export.excel');
 
                 // Rute Tambah, Edit, dan Hapus Aktivitas Dashboard
                 Route::post('/dashboard/aktivitas', [AdminDashboardController::class, 'storeAktivitas'])->name('dashboard.aktivitas.store');

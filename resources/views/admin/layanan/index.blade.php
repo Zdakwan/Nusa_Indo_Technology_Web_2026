@@ -14,7 +14,6 @@
             <i class="fa-solid fa-list-check"></i> Pilih Hapus
         </button>
 
-<<<<<<< HEAD
         <!-- Tombol Hapus Terpilih (Sembunyi secara default) -->
         <button type="submit" form="bulkDeleteForm" id="btnBulkDelete" disabled class="hidden inline-flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all" onclick="return confirm('Apakah Anda yakin ingin menghapus data layanan yang dipilih?')">
             <i class="fa-solid fa-trash-alt"></i> Hapus Terpilih
@@ -24,9 +23,6 @@
             <i class="fa-solid fa-plus"></i> Tambah Layanan
         </button>
     </div>
-=======
-  <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#254261] hover:bg-[#1a2f45] text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
->>>>>>> mey
 </div>
 
 @if(session('success'))
@@ -34,13 +30,7 @@
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-check-circle"></i> <span class="font-medium">{{ session('success') }}</span>
         </div>
-<<<<<<< HEAD
         <button type="button" class="hover:text-green-900" onclick="this.parentElement.style.display='none'"><i class="fa-solid fa-times"></i></button>
-=======
-     <button type="button" class="text-green-700 hover:text-green-900" onclick="this.parentElement.style.display='none'">
-            <i class="fas fa-times"></i>
-        </button>
->>>>>>> mey
     </div>
 @endif
 
@@ -89,7 +79,6 @@
                             <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto text-lg">
                                 <i class="{{ $item->icon ?? 'fa-solid fa-gears' }}"></i>
                             </div>
-<<<<<<< HEAD
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-800 font-bold">{{ $item->nama_layanan }}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">
@@ -106,33 +95,6 @@
                                 data-deskripsi="{{ $item->deskripsi }}"
                                 class="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
                                 <i class="fa-solid fa-edit text-lg"></i>
-=======
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-800 font-bold">{{ $item->nama_layanan }}</td>
-
-                    <td class="px-6 py-4">
-                        <span class="inline-block px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase bg-[#254261]/10 text-[#254261] rounded">
-                            {{ $item->kategori ?? 'Umum' }}
-                        </span>
-                    </td>
-
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ Str::limit($item->deskripsi, 80) }}</td>
-                    <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
-                            <button 
-                        data-id="{{ $item->id }}"
-                        data-nama="{{ $item->nama_layanan }}"
-                        data-kategori="{{ $item->kategori ?? 'Umum' }}"
-                        data-deskripsi="{{ $item->deskripsi }}"
-                        onclick="openEditModal(this.dataset.id, this.dataset.nama, this.dataset.kategori, this.dataset.deskripsi)" 
-                        class="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
-                        <i class="fas fa-edit text-lg"></i>
-                    </button>
-                        <form action="{{ route('admin.layanan.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus layanan ini?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 transition-colors" title="Hapus">
-                                <i class="fas fa-trash-alt text-lg"></i>
->>>>>>> mey
                             </button>
                             <button type="button" onclick="deleteSingle('{{ $item->id }}')" class="text-red-500 hover:text-red-700 transition-colors" title="Hapus">
                                 <i class="fa-solid fa-trash-alt text-lg"></i>
@@ -166,54 +128,11 @@
 @endphp
 
 <!-- Modal Tambah -->
-<<<<<<< HEAD
 <div id="tambahModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-lg">
         <div class="flex justify-between p-4 border-b">
             <h3 class="text-xl font-semibold">Tambah Layanan</h3>
             <button type="button" onclick="closeModal('tambahModal')"><i class="fa-solid fa-times text-gray-500 hover:text-gray-800"></i></button>
-=======
-<div id="tambahModal" tabindex="-1" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm overflow-y-auto w-full h-full flex items-center justify-center">
-    <div class="relative p-4 w-full max-w-xl">
-        <div class="relative bg-white rounded-xl shadow-lg">
-            <div class="flex items-center justify-between p-4 border-b">
-                <h3 class="text-xl font-semibold text-gray-900">Tambah Layanan</h3>
-                <button type="button" onclick="closeModal('tambahModal')" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 flex justify-center items-center"><i class="fas fa-times"></i></button>
-            </div>
-            <form action="{{ route('admin.layanan.store') }}" method="POST" enctype="multipart/form-data" class="p-4">
-                @csrf
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Nama Layanan</label>
-                        <input type="text" name="nama_layanan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#254261] focus:border-[#254261] block w-full p-2.5" required>
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Kategori</label>
-                        <select name="kategori" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#254261] focus:border-[#254261] block w-full p-2.5" required>
-                            <option value="Umum">Umum</option>
-                            <option value="Tata Kelola">Tata Kelola</option>
-                            <option value="Development">Development</option>
-                            <option value="Infrastruktur">Infrastruktur</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-900">Deskripsi</label>
-                    <textarea name="deskripsi" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-[#254261] focus:border-[#254261]" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-900">Icon / Gambar</label>
-                    <!-- Tambah atribut accept di sini -->
-                    <input type="file" name="icon" accept=".jpg,.jpeg,.png,.gif" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-[#254261] file:text-white hover:file:bg-[#1a2f45]">
-                </div>
-                <div class="flex justify-end gap-3 mt-6 border-t pt-4">
-                    <button type="button" onclick="closeModal('tambahModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-[#254261] rounded-lg hover:bg-[#1a2f45]">Simpan</button>
-                </div>
-            </form>
->>>>>>> mey
         </div>
         <form action="{{ route('admin.layanan.store') }}" method="POST" class="p-4">
             @csrf
@@ -266,54 +185,11 @@
 </div>
 
 <!-- Modal Edit -->
-<<<<<<< HEAD
 <div id="editModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-lg">
         <div class="flex justify-between p-4 border-b">
             <h3 class="text-xl font-semibold">Edit Layanan</h3>
             <button type="button" onclick="closeModal('editModal')"><i class="fa-solid fa-times text-gray-500 hover:text-gray-800"></i></button>
-=======
-<div id="editModal" tabindex="-1" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm overflow-y-auto w-full h-full flex items-center justify-center">
-    <div class="relative p-4 w-full max-w-xl">
-        <div class="relative bg-white rounded-xl shadow-lg">
-            <div class="flex items-center justify-between p-4 border-b">
-                <h3 class="text-xl font-semibold text-gray-900">Edit Layanan</h3>
-                <button type="button" onclick="closeModal('editModal')" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 flex justify-center items-center"><i class="fas fa-times"></i></button>
-            </div>
-            <form id="editForm" method="POST" enctype="multipart/form-data" class="p-4">
-                @csrf @method('PUT')
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Nama Layanan</label>
-                        <input type="text" name="nama_layanan" id="edit_nama" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Kategori</label>
-                        <select name="kategori" id="edit_kategori" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
-                            <option value="Umum">Umum</option>
-                            <option value="Tata Kelola">Tata Kelola</option>
-                            <option value="Development">Development</option>
-                            <option value="Infrastruktur">Infrastruktur</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-900">Deskripsi</label>
-                    <textarea name="deskripsi" id="edit_deskripsi" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-900">Icon / Gambar Baru (Opsional)</label>
-                    <!-- Tambah atribut accept di sini -->
-                    <input type="file" name="icon" accept=".jpg,.jpeg,.png,.gif" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-[#254261] file:text-white">
-                </div>
-                <div class="flex justify-end gap-3 mt-6 border-t pt-4">
-                    <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-sm text-white bg-[#254261] rounded-lg hover:bg-[#1a2f45]">Update</button>
-                </div>
-            </form>
->>>>>>> mey
         </div>
         <form id="editForm" method="POST" class="p-4">
             @csrf @method('PUT')
@@ -370,7 +246,6 @@
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-<<<<<<< HEAD
     function selectIcon(modalPrefix, iconClass) {
         document.getElementById(modalPrefix + '_icon_input').value = iconClass;
         document.getElementById(modalPrefix + '_icon_preview').innerHTML = '<i class="' + iconClass + '"></i>';
@@ -385,13 +260,6 @@
         selectIcon('edit', iconClass);
 
         document.getElementById('editForm').action = '/admin/layanan/' + btn.getAttribute('data-id');
-=======
-    function openEditModal(id, nama, kategori, deskripsi) {
-        document.getElementById('edit_nama').value = nama;
-        document.getElementById('edit_kategori').value = kategori;
-        document.getElementById('edit_deskripsi').value = deskripsi;
-        document.getElementById('editForm').action = '/admin/layanan/' + id;
->>>>>>> mey
         openModal('editModal');
     }
 
@@ -470,9 +338,4 @@
         openModal('tambahModal');
     @endif
 </script>
-<<<<<<< HEAD
 @endsection
-=======
-@endpush
-@endsection
->>>>>>> mey
