@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoginLog;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\DB;
+=======
+use Illuminate\Http\Request;
+>>>>>>> mey
 
 class LoginLogController extends Controller
 {
     public function index()
     {
+<<<<<<< HEAD
         $logs = LoginLog::latest()->get();
 
         // Kumpulkan email unik untuk batch query agar tidak terjadi N+1 query
@@ -56,3 +61,10 @@ class LoginLogController extends Controller
         return view('admin.pengguna.riwayat-login', compact('logs'));
     }
 }
+=======
+        // Mengambil riwayat terbaru
+        $logs = LoginLog::latest()->get();
+        return view('admin.pengguna.riwayat-login', compact('logs'));
+    }
+}
+>>>>>>> mey

@@ -43,7 +43,11 @@
     @stack('scripts')
 
     <!-- Script Notifikasi tetap di sini (Paling Bawah) -->
+<<<<<<< HEAD
 
     <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
+=======
+    
+>>>>>>> mey
 </body>
 </html>

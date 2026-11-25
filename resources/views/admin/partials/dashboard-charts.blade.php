@@ -6,9 +6,22 @@
                 <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Tren Permintaan Konsultasi</h2>
                 <p class="text-xs text-gray-500">Jumlah pengajuan klien dalam 6 bulan terakhir</p>
             </div>
+<<<<<<< HEAD
             <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-[#23364f]">
                 6 Bulan Terakhir
             </span>
+=======
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-[#23364f]">
+                    6 Bulan Terakhir
+                </span>
+                <a href="{{ route('admin.dashboard.export.excel') }}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Export Excel</span>
+                </a>
+            </div>
+>>>>>>> mey
         </div>
         <div class="relative h-64 sm:h-72 w-full">
             <canvas id="consultationTrendChart"></canvas>

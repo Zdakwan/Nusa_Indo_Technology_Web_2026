@@ -98,9 +98,23 @@
                 </a>
                 @endif
             </div>
+<<<<<<< HEAD
 
             <a href="{{ route('admin.riwayat-login.index') }}" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ $riwayatAktif ? 'bg-white text-[#254261] font-bold shadow-sm' : 'text-gray-200 hover:bg-[#334f6c]' }}">
                 <i class="fas fa-history w-5 shrink-0 text-center {{ $riwayatAktif ? 'text-[#254261]' : 'text-gray-200' }}"></i> <span class="truncate">Riwayat Log In</span>
+=======
+        
+        @endif
+
+        <a href="{{ route('admin.riwayat-login.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-[#284260] hover:text-white transition gap-3">
+    <i class="fas fa-history"></i> Riwayat Log In
+</a>
+
+        <!-- Pengaturan (Hanya Super Admin) -->
+        @if($adminRole == 'super_admin')
+            <a href="{{ route('admin.pengaturan.index') }}" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ $pengaturanAktif ? 'bg-white text-[#254261] font-bold shadow-sm' : 'text-gray-200 hover:bg-[#334f6c]' }}">
+                <i class="fas fa-gear w-5 shrink-0 text-center {{ $pengaturanAktif ? 'text-[#254261]' : 'text-gray-200' }}"></i> <span class="truncate">Pengaturan</span>
+>>>>>>> mey
             </a>
         @endif
 
