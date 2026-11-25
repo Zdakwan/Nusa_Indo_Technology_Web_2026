@@ -22,6 +22,10 @@
     </style>
 
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
 </head>
 <body class="flex h-screen overflow-hidden text-gray-900">
 
@@ -40,5 +44,6 @@
 
     <!-- Script Notifikasi tetap di sini (Paling Bawah) -->
 
+    <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
 </body>
 </html>

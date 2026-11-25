@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -39,6 +39,10 @@
         a, button { -webkit-tap-highlight-color: transparent; }
     </style>
     @yield('styles')
+    <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased flex flex-col min-h-[100dvh] overflow-x-hidden font-sans">
 
@@ -54,5 +58,6 @@
     @include('partials.footer')
 
     @stack('scripts')
+    <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
 </body>
 </html>

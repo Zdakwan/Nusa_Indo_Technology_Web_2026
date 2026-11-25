@@ -1,0 +1,600 @@
+/* =========================================================
+   Global Mobile Responsiveness & Touch UX - Nusa Indo Tech
+   ========================================================= */
+
+html,
+body {
+    /* Pakai clip agar position: sticky pada navbar tetap berjalan */
+    overflow-x: clip;
+    max-width: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Cegah URL/email/judul panjang merusak lebar layar HP */
+p, h1, h2, h3, h4, h5, h6, td, th, li, a {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+img, svg, video, canvas {
+    max-width: 100%;
+}
+
+/* Wrapper tabel horizontal scroll */
+.responsive-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0.75rem;
+}
+
+.responsive-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Wrapper responsif iframe (Google Maps, YouTube, PDF) */
+.responsive-embed-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0.75rem;
+}
+
+.responsive-embed-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+}
+
+/* Indikator geser tabel khusus mobile */
+.table-scroll-hint {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    /* Cegah auto-zoom browser HP saat mengetik di input form */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    .container,
+    main,
+    section,
+    article {
+        max-width: 100%;
+    }
+
+    /* Jaga sel tabel tetap rapi dan tidak patah per huruf */
+    .responsive-table-wrap th,
+    .responsive-table-wrap td {
+        white-space: nowrap;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .table-scroll-hint.is-overflowing {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+
+    /* Pastikan modal/popup selalu muat di viewport HP */
+    [role="dialog"],
+    .modal-content {
+        max-width: calc(100vw - 1.5rem) !important;
+        max-height: calc(100dvh - 2rem);
+        overflow-y: auto;
+    }
+
+    /* Pagination Laravel rapi dan tidak meluber di layar kecil */
+    nav[role="navigation"] {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Backdrop otomatis untuk sidebar drawer di HP */
+    .nusa-mobile-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 35;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+
+    .nusa-mobile-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    aside.nusa-auto-drawer {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 40 !important;
+        display: flex !important;
+        width: min(18rem, 82vw) !important;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 20px 35px rgba(15, 23, 42, 0.35);
+    }
+
+    aside.nusa-auto-drawer.is-open {
+        transform: translateX(0);
+    }
+}
+
+/* Tombol Scroll-to-Top dinamis */
+#nusaScrollTopBtn {
+    position: fixed;
+    right: 1rem;
+    bottom: 4.5rem;
+    z-index: 45;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    background-color: #23364f;
+    color: #f5b73e;
+    border: 1px solid rgba(245, 183, 62, 0.35);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#nusaScrollTopBtn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+#nusaScrollTopBtn:active {
+    transform: scale(0.94);
+}
+
+/* === Perbaikan Peta Google Maps & Halaman Login Mobile === */
+iframe[src*="google.com/maps"],
+iframe[src*="maps.google"] {
+    width: 100% !important;
+    min-height: 320px;
+    display: block;
+}
+
+@media (max-width: 767.98px) {
+    /* Cegah teks copyright terpotong di halaman Login Klien & Admin */
+    body:has(form[action*="login"]),
+    body:has(form[action*="login"]) > div:first-of-type {
+        min-height: 100dvh !important;
+        height: auto !important;
+    }
+
+    body:has(form[action*="login"]) {
+        overflow-y: auto !important;
+        padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+
+    /* Beri jarak aman untuk teks copyright absolut di bawah layar HP */
+    body:has(form[action*="login"]) .absolute.bottom-0,
+    body:has(form[action*="login"]) [class*="bottom-"] {
+        position: static !important;
+        margin-top: 2rem;
+        padding-bottom: 1.5rem;
+        text-align: center;
+    }
+}
+
+/* === Global Responsive & Dynamic Polish (Publik, Klien, Admin) === */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Pembungkus tabel responsif otomatis */
+.table-responsive-auto {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0.75rem;
+}
+
+.table-responsive-auto table {
+    min-width: 640px;
+    width: 100%;
+}
+
+/* Pastikan media & grafik tidak pernah meluber keluar container */
+img, svg, video, canvas {
+    max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    /* Form & tombol lebih nyaman disentuh di layar HP */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        font-size: 16px !important; /* Cegah auto-zoom paksa di browser iOS/Android */
+    }
+
+    /* Rapatkan padding container utama di HP */
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Modal & dialog selalu pas di layar HP */
+    [role="dialog"], .modal-content {
+        width: calc(100vw - 2rem) !important;
+        max-height: 90dvh;
+        overflow-y: auto;
+    }
+
+    /* Grup tombol aksi otomatis turun baris jika sempit */
+    .flex.items-center.justify-end,
+    .flex.justify-between {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}
+
+/* === Penyeragaman Ukuran Tombol Sidebar Client & Admin === */
+aside nav a,
+aside nav button,
+.sidebar nav a,
+.sidebar nav button {
+    font-size: 0.875rem !important;      /* 14px - sama dengan sidebar Admin */
+    line-height: 1.25rem !important;
+    padding: 0.625rem 0.875rem !important; /* 10px 14px - tinggi pill aktif seragam */
+    border-radius: 0.625rem !important;
+    gap: 0.75rem !important;
+}
+
+/* Ukuran ikon menu utama di sidebar */
+aside nav a svg,
+aside nav button svg,
+aside nav a i,
+aside nav button i,
+.sidebar nav a svg,
+.sidebar nav button svg,
+.sidebar nav a i,
+.sidebar nav button i {
+    width: 1.125rem !important;          /* 18px */
+    height: 1.125rem !important;
+    font-size: 1rem !important;          /* 16px untuk icon font (FontAwesome/Bootstrap Icons) */
+    flex-shrink: 0;
+}
+
+/* Submenu (seperti Data Diri & Edit Data Diri) tetap proporsional sedikit lebih kecil */
+aside nav ul ul a,
+aside nav div div a,
+.sidebar nav ul ul a {
+    font-size: 0.8125rem !important;     /* 13px */
+    padding: 0.45rem 0.75rem !important;
+}
+
+aside nav ul ul a svg,
+aside nav ul ul a i,
+aside nav div div a svg,
+aside nav div div a i {
+    width: 0.95rem !important;
+    height: 0.95rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* === Kartu Ringkasan Admin Ringkas (2x2) Khusus Grid 4 Kolom di HP === */
+@media (max-width: 767.98px) {
+    /* Hanya berlaku untuk grid 4 kartu ringkasan (Dashboard Admin) */
+    main .grid.lg\:grid-cols-4,
+    main .grid.xl\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+    }
+
+    main .grid.lg\:grid-cols-4 > div,
+    main .grid.xl\:grid-cols-4 > div {
+        padding: 0.875rem !important;
+        border-radius: 0.875rem !important;
+        min-height: auto !important;
+    }
+
+    main .grid.lg\:grid-cols-4 > div p,
+    main .grid.xl\:grid-cols-4 > div p,
+    main .grid.lg\:grid-cols-4 > div span,
+    main .grid.xl\:grid-cols-4 > div span {
+        font-size: 0.75rem !important;
+        line-height: 1.25 !important;
+    }
+
+    main .grid.lg\:grid-cols-4 > div .text-3xl,
+    main .grid.lg\:grid-cols-4 > div .text-4xl,
+    main .grid.xl\:grid-cols-4 > div .text-3xl,
+    main .grid.xl\:grid-cols-4 > div .text-4xl,
+    main .grid.lg\:grid-cols-4 > div h3,
+    main .grid.xl\:grid-cols-4 > div h3 {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+        margin-top: 0.5rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Pastikan kartu halaman publik (Layanan, Portofolio, Pelatihan, Ensiklopedia, Visi Misi) 1 kolom penuh */
+    main .grid.grid-cols-1.md\:grid-cols-2,
+    main .grid.grid-cols-1.md\:grid-cols-3,
+    main .grid.grid-cols-1.lg\:grid-cols-3,
+    main .grid.grid-cols-1.sm\:grid-cols-2 {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 1.25rem !important;
+    }
+
+    /* Cegah pemotongan huruf per karakter pada tombol & judul kartu */
+    main a,
+    main button {
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+    }
+}
+
+/* === Google Maps Otomatis Berwarna di Perangkat Layar Sentuh (HP/Tablet) === */
+@media (hover: none), (pointer: coarse), (max-width: 767.98px) {
+    iframe[src*="google.com/maps"],
+    iframe[src*="maps.google"],
+    div:has(> iframe[src*="google.com/maps"]),
+    div:has(> iframe[src*="maps.google"]) {
+        filter: none !important;
+        -webkit-filter: none !important;
+    }
+}
+
+/* === Perbaikan Teks Sidebar Agar Tidak Terpotong (...) === */
+aside nav a,
+aside nav button,
+.sidebar nav a,
+.sidebar nav button {
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+    gap: 0.5rem !important;
+}
+
+aside nav a span,
+aside nav button span,
+.sidebar nav a span,
+.sidebar nav button span {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+}
+
+/* === Pastikan Panah Dropdown Sidebar Sejajar 1 Baris di HP === */
+aside nav button,
+aside nav a,
+.sidebar nav button,
+.sidebar nav a {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+}
+
+aside nav button svg,
+aside nav button i,
+.sidebar nav button svg,
+.sidebar nav button i {
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 767.98px) {
+    aside nav a,
+    aside nav button,
+    .sidebar nav a,
+    .sidebar nav button {
+        font-size: 0.875rem !important;
+    }
+}
+
+/* === Pastikan Header, Tombol Garis 3, dan Foto Profil Selalu Bisa Diklik di HP === */
+@media (max-width: 1023.98px) {
+    header,
+    .topbar,
+    nav.navbar {
+        position: relative;
+        z-index: 45 !important;
+        pointer-events: auto !important;
+    }
+
+    header button,
+    header a,
+    header img {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        touch-action: manipulation;
+    }
+
+    /* Pastikan sidebar drawer berada di atas header saat terbuka */
+    aside,
+    .sidebar {
+        z-index: 60 !important;
+    }
+}
+
+/* === Rapikan Teks Stepper Status Pendaftaran Agar Tidak Bertumpuk di Layar HP === */
+@media (max-width: 639.98px) {
+    .nit-stepper-label {
+        font-size: 0.68rem !important;
+        line-height: 1.2 !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+        word-break: break-word !important;
+        text-align: center !important;
+    }
+}
+
+/* === Sejajarkan Ikon & Teks Menu Sidebar (Client & Admin) === */
+aside nav a,
+aside nav button,
+.sidebar nav a,
+.sidebar nav button {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1.25 !important;
+}
+
+aside nav a > div,
+aside nav button > div,
+aside nav a > span,
+aside nav button > span,
+.sidebar nav a > div,
+.sidebar nav button > div,
+.sidebar nav a > span,
+.sidebar nav button > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1.25 !important;
+}
+
+aside nav a svg,
+aside nav a i,
+aside nav button svg,
+aside nav button i,
+.sidebar nav a svg,
+.sidebar nav a i,
+.sidebar nav button svg,
+.sidebar nav button i {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    line-height: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+}
+
+/* Pastikan logo header sidebar tetap proporsional di tengah */
+aside img,
+.sidebar img {
+    display: block;
+    object-fit: contain;
+}
+
+/* === Polishing Tampilan Mobile: Stepper, Tabel Konsultasi, Detail Proyek, Notifikasi === */
+@media (max-width: 639.98px) {
+    /* 1. Stepper Status Pendaftaran agar 4 label tidak saling bertumpuk */
+    .nit-stepper-scroll {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.35rem;
+    }
+
+    .nit-stepper-track {
+        min-width: 340px !important;
+    }
+
+    .nit-stepper-label {
+        font-size: 0.65rem !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+    }
+
+    /* 2. Tabel Daftar Konsultasi lebih lega di HP */
+    .nit-compact-table-card {
+        padding: 1rem !important;
+    }
+
+    .nit-compact-table-card table th,
+    .nit-compact-table-card table td {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.82rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* 3. Tombol Export PDF & Kembali ke Proyek Saya rapi 1 baris */
+    .nit-proyek-actions {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+
+    .nit-proyek-actions a,
+    .nit-proyek-actions button {
+        font-size: 0.8125rem !important;
+        padding: 0.55rem 0.85rem !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.4rem !important;
+    }
+
+    /* 4. Kartu Notifikasi: cegah teks terjepit di tengah oleh badge "Sudah dibaca" */
+    .nit-notif-item {
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+        padding: 1rem !important;
+    }
+
+    .nit-notif-body {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+    }
+
+    .nit-notif-badge-wrap {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        margin-top: -0.25rem !important;
+    }
+}
+
+/* === Logo NIT di Sebelah Tombol Garis 3 pada Header Mobile === */
+.nit-mobile-header-brand {
+    display: none;
+    align-items: center;
+    margin-left: 0.75rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.nit-mobile-header-logo {
+    height: 28px;
+    width: auto;
+    max-width: 165px;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 1023.98px) {
+    .nit-mobile-header-brand {
+        display: inline-flex !important;
+    }
+
+    .nit-mobile-header-left {
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+}

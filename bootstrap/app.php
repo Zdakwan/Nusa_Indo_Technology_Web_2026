@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\AdminRole;
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\EnsureSingleDeviceSession;
 use App\Http\Middleware\VerifyMobileApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,10 +19,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
+        $middleware->append(SecurityHeaders::class);
 
         $middleware->alias([
             'admin.role'     => AdminRole::class,
             'mobile.api.key' => VerifyMobileApiKey::class,
+            'single.device'  => EnsureSingleDeviceSession::class,
         ]);
 
         $middleware->redirectGuestsTo(fn (Request $request) =>
@@ -32,10 +36,19 @@ $app = Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response) {
+            if ($response->getStatusCode() === 419) {
+                return back()
+                    ->withInput(request()->except(['password', 'password_confirmation', '_token']))
+                    ->withErrors(['email' => 'Sesi halaman telah diperbarui. Silakan klik login kembali.']);
+            }
+            return $response;
+        });
         $exceptions->shouldRenderJsonWhen(fn (Request $request, \Throwable $e) =>
             $request->is('api/*') || $request->expectsJson()
         );
-    })->create();
+    })
+    ->create();
 
 $app->useStoragePath($_ENV['APP_STORAGE'] ?? base_path('storage'));
 

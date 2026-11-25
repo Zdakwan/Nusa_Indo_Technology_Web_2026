@@ -73,6 +73,8 @@
 </div>
 
 {{-- Tombol Tambah Aktivitas (Memanggil JS openModalTambah) --}}
+    @include('admin.partials.dashboard-charts')
+
 <div class="flex justify-end mb-4 gap-2">
 
     <!-- Tombol Toggle Mode Pilih Hapus -->

@@ -116,11 +116,11 @@
                         <label class="block text-sm font-medium mb-2">Foto Tim Mahasiswa Polije PSDKU Sidoarjo</label>
                         @if(isset($tentang->foto_kolaborasi_tim) && $tentang->foto_kolaborasi_tim)
                             <div class="mb-3">
-                                <img src="{{ asset('storage/' . $tentang->foto_kolaborasi_tim) }}" alt="Foto Tim" class="h-32 object-cover rounded-lg border">
+                                <img src="{{ (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) }}" alt="Foto Tim" class="h-32 object-cover rounded-lg border">
                             </div>
                         @endif
                         <input type="file" name="foto_kolaborasi_tim" class="w-full border rounded-lg bg-white p-1 text-sm">
-                        <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                         @error('foto_kolaborasi_tim')
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
@@ -139,11 +139,11 @@
                         <label class="block text-sm font-medium mb-2">Foto Serah Terima Sistem</label>
                         @if(isset($tentang->foto_kolaborasi_serah_terima) && $tentang->foto_kolaborasi_serah_terima)
                             <div class="mb-3">
-                                <img src="{{ asset('storage/' . $tentang->foto_kolaborasi_serah_terima) }}" alt="Foto Serah Terima" class="h-32 object-cover rounded-lg border">
+                                <img src="{{ (str_starts_with($tentang->foto_kolaborasi_serah_terima, 'data:') ? $tentang->foto_kolaborasi_serah_terima : asset('storage/' . $tentang->foto_kolaborasi_serah_terima)) }}" alt="Foto Serah Terima" class="h-32 object-cover rounded-lg border">
                             </div>
                         @endif
                         <input type="file" name="foto_kolaborasi_serah_terima" class="w-full border rounded-lg bg-white p-1 text-sm">
-                        <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                         @error('foto_kolaborasi_serah_terima')
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
@@ -167,7 +167,20 @@
     <!-- BAGIAN 2: MANAJEMEN TIM (Tampil di tengah - order-2) -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8 order-2 relative z-10">
         <div class="p-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 class="text-lg font-bold text-[#254261]"><i class="fas fa-users mr-2"></i> Struktur Tim Kami</h2>
+            <h2 class="text-lg font-bold text-[#254261]"><i class="fas fa-users mr-2"></i> @if(session('error') || $errors->any())
+    <div id="nit-tim-error-alert" style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:0.875rem 1rem;border-radius:0.75rem;margin-bottom:1rem;font-size:0.875rem;">
+        <strong>Gagal menyimpan data:</strong>
+        <ul style="margin:0.25rem 0 0 1.25rem;list-style:disc;">
+            @if(session('error'))
+                <li>{{ session('error') }}</li>
+            @endif
+            @foreach($errors->all() as $err)
+                <li>{{ $err }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+Struktur Tim Kami</h2>
             <button type="button" onclick="openModal('tambahModal')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#f59e0b] hover:bg-amber-600 text-white text-sm font-bold rounded-lg">
                 <i class="fas fa-plus"></i> Tambah Anggota
             </button>
@@ -229,7 +242,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-1">Foto (Opsional)</label>
                 <input type="file" name="foto" class="w-full border rounded-lg bg-gray-50">
-                <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                 @error('foto')
                     <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                 @enderror
@@ -259,7 +272,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-1">Update Foto</label>
                 <input type="file" name="foto" class="w-full border rounded-lg bg-gray-50">
-                <p class="mt-1 text-xs text-red-500 font-medium">*Wajib berukuran antara 2 MB hingga 8 MB. Format: JPG, PNG, GIF, BMP.</p>
+                <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                 @error('foto')
                     <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                 @enderror

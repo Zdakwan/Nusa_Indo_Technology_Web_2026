@@ -1,4 +1,4 @@
-﻿@extends('layouts.public')
+@extends('layouts.public')
 
 @section('title', 'Tentang Kami - Nusa Indo Tech')
 
@@ -86,7 +86,7 @@
                     <div class="text-center group">
                         <div class="w-40 h-40 md:w-48 md:h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-gray-50 shadow-lg relative bg-nusaNavy/5">
                             @if($anggota->foto)
-                                <img src="{{ asset('storage/' . $anggota->foto) }}" alt="{{ $anggota->nama }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <img src="{{ (str_starts_with($anggota->foto, 'data:') ? $anggota->foto : asset('storage/' . $anggota->foto)) }}" alt="{{ $anggota->nama }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-300 text-5xl">
                                     <i class="fas fa-user-tie"></i>
@@ -126,7 +126,7 @@
                     <!-- SLIDE 1: Tim Kolaborasi -->
                     <div class="w-full flex-shrink-0 flex flex-col md:flex-row">
                         <div class="md:w-1/2 h-72 md:h-auto bg-gray-200 relative group">
-                            <img src="{{ $tentang->foto_kolaborasi_tim ? asset('storage/' . $tentang->foto_kolaborasi_tim) : asset('images/default-kolaborasi.jpg') }}" alt="Tim Mahasiswa Polije PSDKU Sidoarjo" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <img src="{{ $tentang->foto_kolaborasi_tim ? (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) : asset('images/default-kolaborasi.jpg') }}" alt="Tim Mahasiswa Polije PSDKU Sidoarjo" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         </div>
                         <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#254261] text-white">
                             <div class="text-[#f7bd55] mb-2 font-bold uppercase tracking-wider text-xs flex items-center gap-2">
@@ -142,7 +142,7 @@
                     <!-- SLIDE 2: Serah Terima -->
                     <div class="w-full flex-shrink-0 flex flex-col md:flex-row">
                         <div class="md:w-1/2 h-72 md:h-auto bg-gray-200 relative group">
-                            <img src="{{ $tentang->foto_kolaborasi_serah_terima ? asset('storage/' . $tentang->foto_kolaborasi_serah_terima) : asset('images/default-serah-terima.jpg') }}" alt="Serah Terima Sistem" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <img src="{{ $tentang->foto_kolaborasi_serah_terima ? (str_starts_with($tentang->foto_kolaborasi_serah_terima, 'data:') ? $tentang->foto_kolaborasi_serah_terima : asset('storage/' . $tentang->foto_kolaborasi_serah_terima)) : asset('images/default-serah-terima.jpg') }}" alt="Serah Terima Sistem" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         </div>
                         <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#254261] text-white">
                             <div class="text-[#f7bd55] mb-2 font-bold uppercase tracking-wider text-xs flex items-center gap-2">
