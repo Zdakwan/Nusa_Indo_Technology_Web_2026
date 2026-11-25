@@ -1,7 +1,7 @@
-{{-- Grafik Analitik Dashboard Admin --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 my-6">
-    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    {{-- Grafik Garis: Tren Permintaan Konsultasi --}}
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
                 <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Tren Permintaan Konsultasi</h2>
                 <p class="text-xs text-gray-500">Jumlah pengajuan klien dalam 6 bulan terakhir</p>
@@ -22,109 +22,197 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 flex flex-col justify-between">
+    {{-- Grafik Donat: Distribusi Status --}}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
         <div class="mb-4">
             <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Distribusi Status</h2>
             <p class="text-xs text-gray-500">Proporsi status seluruh permintaan</p>
         </div>
-        <div class="relative h-56 sm:h-64 w-full flex items-center justify-center">
+        <div class="relative h-56 w-full flex items-center justify-center">
             <canvas id="consultationStatusChart"></canvas>
             <div id="statusChartEmpty" class="hidden text-center text-sm text-gray-400">
-                Belum ada data konsultasi
+                Belum ada data status permintaan.
             </div>
         </div>
     </div>
 </div>
 
+{{-- Diagram Batang: Perbandingan Status Konsultasi per Bulan --}}
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+            <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Perbandingan Status Konsultasi per Bulan</h2>
+            <p class="text-xs text-gray-500">Diagram batang rincian status Menunggu, Diproses, dan Selesai dalam 6 bulan terakhir</p>
+        </div>
+        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-[#23364f]">
+            Diagram Batang
+        </span>
+    </div>
+    <div class="relative h-72 sm:h-80 w-full">
+        <canvas id="consultationStatusBarChart"></canvas>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof Chart === 'undefined') return;
-
-    const trendLabels = @json($chartLabels ?? []);
-    const trendData   = @json($chartTrendData ?? []);
-    const statusData  = @json($chartStatusData ?? ['menunggu' => 0, 'diproses' => 0, 'selesai' => 0]);
-
-    const trendCanvas = document.getElementById('consultationTrendChart');
-    if (trendCanvas) {
-        const ctx = trendCanvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-        gradient.addColorStop(0, 'rgba(35, 54, 79, 0.25)');
-        gradient.addColorStop(1, 'rgba(35, 54, 79, 0.01)');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: trendLabels,
-                datasets: [{
-                    label: 'Permintaan Konsultasi',
-                    data: trendData,
-                    borderColor: '#23364f',
-                    backgroundColor: gradient,
-                    borderWidth: 2.5,
-                    pointBackgroundColor: '#f5b73e',
-                    pointBorderColor: '#23364f',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: true,
-                    tension: 0.35
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 8 }
-                },
-                scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0, color: '#64748b' }, grid: { color: '#f1f5f9' } },
-                    x: { ticks: { color: '#64748b' }, grid: { display: false } }
-                }
-            }
-        });
-    }
-
-    const statusCanvas = document.getElementById('consultationStatusChart');
-    const emptyState   = document.getElementById('statusChartEmpty');
-    const statusValues = [
-        Number(statusData.menunggu || 0),
-        Number(statusData.diproses || 0),
-        Number(statusData.selesai || 0)
-    ];
-
-    if (statusCanvas) {
-        if (statusValues.reduce((a, b) => a + b, 0) === 0) {
-            statusCanvas.classList.add('hidden');
-            emptyState?.classList.remove('hidden');
+document.addEventListener('DOMContentLoaded', function () {
+    const initDashboardCharts = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initDashboardCharts, 100);
             return;
         }
 
-        new Chart(statusCanvas.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Menunggu', 'Diproses', 'Selesai'],
-                datasets: [{
-                    data: statusValues,
-                    backgroundColor: ['#f5b73e', '#3b82f6', '#10b981'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff',
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '68%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { usePointStyle: true, padding: 16, color: '#334155', font: { size: 12, weight: '600' } }
+        const trendLabels = @json($chartLabels ?? []);
+        const trendData   = @json($chartTrendData ?? []);
+        const statusData  = @json($chartStatusData ?? ['menunggu' => 0, 'diproses' => 0, 'selesai' => 0]);
+        const barMenunggu = @json($chartBarMenunggu ?? []);
+        const barDiproses = @json($chartBarDiproses ?? []);
+        const barSelesai  = @json($chartBarSelesai ?? []);
+
+        // 1. Line Chart: Tren Permintaan Konsultasi
+        const trendCanvas = document.getElementById('consultationTrendChart');
+        if (trendCanvas) {
+            const ctx = trendCanvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, 'rgba(35, 54, 79, 0.22)');
+            gradient.addColorStop(1, 'rgba(35, 54, 79, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trendLabels,
+                    datasets: [{
+                        label: 'Jumlah Permintaan',
+                        data: trendData,
+                        borderColor: '#1b314c',
+                        backgroundColor: gradient,
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: '#1b314c',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, color: '#64748b' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { color: '#64748b' },
+                            grid: { display: false }
+                        }
                     }
                 }
+            });
+        }
+
+        // 2. Doughnut Chart: Distribusi Status
+        const statusCanvas = document.getElementById('consultationStatusChart');
+        const emptyState   = document.getElementById('statusChartEmpty');
+        if (statusCanvas) {
+            const values = [
+                Number(statusData.menunggu || 0),
+                Number(statusData.diproses || 0),
+                Number(statusData.selesai || 0)
+            ];
+            const totalStatus = values.reduce((acc, val) => acc + val, 0);
+
+            if (totalStatus === 0 && emptyState) {
+                statusCanvas.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            } else {
+                new Chart(statusCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Menunggu', 'Diproses', 'Selesai'],
+                        datasets: [{
+                            data: values,
+                            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, padding: 16, color: '#334155' }
+                            }
+                        }
+                    }
+                });
             }
-        });
-    }
+        }
+
+        // 3. Bar Chart: Perbandingan Status Konsultasi per Bulan
+        const barCanvas = document.getElementById('consultationStatusBarChart');
+        if (barCanvas) {
+            new Chart(barCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: trendLabels,
+                    datasets: [
+                        {
+                            label: 'Menunggu',
+                            data: barMenunggu,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6,
+                            maxBarThickness: 28
+                        },
+                        {
+                            label: 'Diproses',
+                            data: barDiproses,
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 6,
+                            maxBarThickness: 28
+                        },
+                        {
+                            label: 'Selesai',
+                            data: barSelesai,
+                            backgroundColor: '#10b981',
+                            borderRadius: 6,
+                            maxBarThickness: 28
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { usePointStyle: true, padding: 16, color: '#334155' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, color: '#64748b' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { color: '#64748b' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    initDashboardCharts();
 });
 </script>
