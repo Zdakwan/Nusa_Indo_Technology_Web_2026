@@ -137,7 +137,7 @@
                                    data-preview-id="preview-foto-tim"
                                    data-wrapper-id="preview-wrapper-tim"
                                    data-recrop-id="btn-recrop-tim"
-                                   data-aspect="1.3333"
+                                   data-aspect="NaN"
                                    data-title="Sesuaikan Foto Tim Pengembang">
                             <button type="button" id="btn-recrop-tim" onclick="recropInput('input-foto-tim')" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition">
                                 <i class="fas fa-crop-alt mr-1"></i> Crop Ulang
