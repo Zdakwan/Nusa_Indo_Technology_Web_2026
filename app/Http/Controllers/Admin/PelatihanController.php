@@ -78,11 +78,7 @@ class PelatihanController extends Controller
     public function destroy($id)
     {
         $pelatihan = Pelatihan::findOrFail($id);
-
-        if ($pelatihan->gambar && Storage::disk('public')->exists($pelatihan->gambar)) {
-            Storage::disk('public')->delete($pelatihan->gambar);
-        }
-
+        $this->deleteImageFile($pelatihan->gambar);
         $pelatihan->delete();
 
         return redirect()->route('admin.pelatihan.index')->with('success', 'Pelatihan berhasil dihapus.');
@@ -93,20 +89,36 @@ class PelatihanController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-        $request->validate([
-            'ids'   => 'required|array',
-            'ids.*' => 'exists:pelatihans,id',
+        // Ambil nama tabel langsung dari model agar selalu sinkron dengan skema DB
+        $table = (new Pelatihan())->getTable();
+
+        $validated = $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => "integer|exists:{$table},id",
         ]);
 
-        $pelatihans = Pelatihan::whereIn('id', $request->ids)->get();
+        $pelatihans = Pelatihan::whereIn('id', $validated['ids'])->get();
 
         foreach ($pelatihans as $pelatihan) {
-            if ($pelatihan->gambar && Storage::disk('public')->exists($pelatihan->gambar)) {
-                Storage::disk('public')->delete($pelatihan->gambar);
-            }
+            $this->deleteImageFile($pelatihan->gambar);
             $pelatihan->delete();
         }
 
-        return redirect()->back()->with('success', count($request->ids) . ' pelatihan berhasil dihapus beserta file gambarnya.');
+        return redirect()->back()->with('success', $pelatihans->count() . ' pelatihan berhasil dihapus beserta file gambarnya.');
+    }
+
+    private function deleteImageFile(?string $path): void
+    {
+        if (!$path || str_starts_with($path, 'data:') || str_starts_with($path, 'http')) {
+            return;
+        }
+
+        try {
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        } catch (\Throwable $e) {
+            // Abaikan error filesystem agar proses hapus data DB tetap berjalan
+        }
     }
 }
