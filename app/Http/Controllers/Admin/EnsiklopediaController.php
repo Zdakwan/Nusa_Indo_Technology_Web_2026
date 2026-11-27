@@ -104,7 +104,7 @@ class EnsiklopediaController extends Controller
     {
         $request->validate([
             'ids'   => 'required|array',
-            'ids.*' => 'exists:ensiklopedias,id', // pastikan nama tabel benar
+            'ids.*' => 'integer|exists:' . (new Ensiklopedia())->getTable() . ',id', // pastikan nama tabel benar
         ]);
 
         $artikels = Ensiklopedia::whereIn('id', $request->ids)->get();

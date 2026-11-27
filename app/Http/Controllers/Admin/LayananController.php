@@ -69,7 +69,7 @@ class LayananController extends Controller
         // Validasi input array
         $request->validate([
             'ids'   => 'required|array',
-            'ids.*' => 'exists:layanans,id',
+            'ids.*' => 'integer|exists:' . (new Layanan())->getTable() . ',id',
         ]);
 
         // Cari dan hapus semua data yang dipilih

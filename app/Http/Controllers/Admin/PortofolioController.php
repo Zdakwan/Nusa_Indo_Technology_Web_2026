@@ -107,7 +107,7 @@ class PortofolioController extends Controller
     {
         $request->validate([
             'ids'   => 'required|array',
-            'ids.*' => 'exists:portofolios,id',
+            'ids.*' => 'integer|exists:' . (new Portofolio())->getTable() . ',id',
         ]);
 
         $portofolios = Portofolio::whereIn('id', $request->ids)->get();

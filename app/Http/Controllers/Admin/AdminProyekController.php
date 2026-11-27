@@ -15,25 +15,25 @@
 |             - Perbarui progres proyek + notifikasi client (updateProgress)
 |             - Hapus proyek (destroy)
 |             - Hapus banyak sekaligus (bulkDelete)
-|             - Export PDF satu proyek → preview di browser (exportSinglePdf)
+|             - Export PDF satu proyek â†’ preview di browser (exportSinglePdf)
 |
 | ROUTE TERKAIT (routes/web.php):
 |   Route::resource('proyek', AdminProyekController::class)
-|   → Otomatis membuat: index, create, store, show, edit, update, destroy
+|   â†’ Otomatis membuat: index, create, store, show, edit, update, destroy
 |
-|   GET  /admin/proyek/{id}/pdf       → exportSinglePdf()
-|   POST /admin/proyek/{id}/progress  → updateProgress()
-|   DELETE /admin/proyek/bulk-delete  → bulkDelete()
+|   GET  /admin/proyek/{id}/pdf       â†’ exportSinglePdf()
+|   POST /admin/proyek/{id}/progress  â†’ updateProgress()
+|   DELETE /admin/proyek/bulk-delete  â†’ bulkDelete()
 |
 | VIEW YANG DIGUNAKAN:
 |   resources/views/admin/proyek/index.blade.php
 |   resources/views/admin/proyek/create.blade.php
 |   resources/views/admin/proyek/show.blade.php
 |   resources/views/admin/proyek/edit.blade.php
-|   resources/views/admin/proyek/pdf_viewer.blade.php ← halaman preview PDF
+|   resources/views/admin/proyek/pdf_viewer.blade.php â† halaman preview PDF
 |
 | TEMPLATE PDF:
-|   resources/views/admin/proyek/single_pdf.blade.php ← isi laporan PDF
+|   resources/views/admin/proyek/single_pdf.blade.php â† isi laporan PDF
 |
 | LIBRARY PDF:
 |   barryvdh/laravel-dompdf (dipanggil via Barryvdh\DomPDF\Facade\Pdf)
@@ -76,8 +76,8 @@ class AdminProyekController extends Controller
      * yang bisa dipilih sebagai dasar pembuatan proyek.
      *
      * Data yang dikirim ke view:
-     *   $konsultasis     → koleksi Konsultasi untuk dropdown
-     *   $daftarKonsultasi → array JSON untuk JavaScript (pilih konsultasi)
+     *   $konsultasis     â†’ koleksi Konsultasi untuk dropdown
+     *   $daftarKonsultasi â†’ array JSON untuk JavaScript (pilih konsultasi)
      */
     public function create()
     {
@@ -230,9 +230,9 @@ class AdminProyekController extends Controller
      *   1. Update kolom progres & status proyek
      *   2. Simpan riwayat perkembangan
      *   3. Cek preferensi notifikasi client
-     *   4. Jika preferensi 'updated_proyek' aktif → buat notifikasi
+     *   4. Jika preferensi 'updated_proyek' aktif â†’ buat notifikasi
      *
-     * Jika progres = 100 → status proyek otomatis berubah menjadi 'selesai'.
+     * Jika progres = 100 â†’ status proyek otomatis berubah menjadi 'selesai'.
      */
     public function updateProgress(Request $request, $id)
     {
@@ -246,7 +246,7 @@ class AdminProyekController extends Controller
 
         DB::transaction(function () use ($proyek, $validated, $adminId) {
 
-            // Update progres; jika 100% → tandai sebagai selesai
+            // Update progres; jika 100% â†’ tandai sebagai selesai
             $proyek->update([
                 'progres' => $validated['progres'],
                 'status'  => $validated['progres'] == 100 ? 'selesai' : 'berjalan',
@@ -312,7 +312,7 @@ class AdminProyekController extends Controller
     {
         $request->validate([
             'ids'   => 'required|array',
-            'ids.*' => 'exists:proyeks,id',
+            'ids.*' => 'integer|exists:' . (new Proyek())->getTable() . ',id',
         ]);
 
         $count = Proyek::whereIn('id', $request->ids)->count();
@@ -327,9 +327,9 @@ class AdminProyekController extends Controller
      *
      * ALUR:
      *   1. Ambil data proyek dari database (dengan relasi client)
-     *   2. Render template PDF → resources/views/admin/proyek/single_pdf.blade.php
+     *   2. Render template PDF â†’ resources/views/admin/proyek/single_pdf.blade.php
      *   3. Encode output PDF ke base64
-     *   4. Kirim base64 ke halaman viewer → pdf_viewer.blade.php
+     *   4. Kirim base64 ke halaman viewer â†’ pdf_viewer.blade.php
      *      (Viewer menampilkan PDF di dalam <iframe>, bukan langsung download)
      *   5. User bisa klik tombol download di toolbar viewer
      *
@@ -338,12 +338,12 @@ class AdminProyekController extends Controller
      *   diunduh otomatis oleh Internet Download Manager (IDM) atau browser.
      *
      * UBAH TAMPILAN PDF:
-     *   → Edit: resources/views/admin/proyek/single_pdf.blade.php
+     *   â†’ Edit: resources/views/admin/proyek/single_pdf.blade.php
      *
      * UBAH UKURAN KERTAS / ORIENTASI:
-     *   → Edit baris: ->setPaper('a4', 'portrait')
-     *   → Pilihan orientasi: 'portrait' atau 'landscape'
-     *   → Pilihan kertas: 'a4', 'a3', 'letter', 'legal'
+     *   â†’ Edit baris: ->setPaper('a4', 'portrait')
+     *   â†’ Pilihan orientasi: 'portrait' atau 'landscape'
+     *   â†’ Pilihan kertas: 'a4', 'a3', 'letter', 'legal'
      */
     public function exportSinglePdf($id)
     {
