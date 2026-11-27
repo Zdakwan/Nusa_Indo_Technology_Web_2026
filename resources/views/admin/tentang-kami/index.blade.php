@@ -2,6 +2,13 @@
 
 @section('title', 'Kelola Tentang Kami')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<style>
+    .cropper-container { max-width: 100%; }
+</style>
+@endpush
+
 @section('content')
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
@@ -114,13 +121,29 @@
                     <h3 class="font-semibold text-gray-700 mb-4 border-b pb-2">Slide 1: Tim Pengembang</h3>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-2">Foto Tim Mahasiswa Polije PSDKU Sidoarjo</label>
-                        @if(isset($tentang->foto_kolaborasi_tim) && $tentang->foto_kolaborasi_tim)
-                            <div class="mb-3">
-                                <img src="{{ (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) }}" alt="Foto Tim" class="h-32 object-cover rounded-lg border">
-                            </div>
-                        @endif
-                        <input type="file" name="foto_kolaborasi_tim" class="w-full border rounded-lg bg-white p-1 text-sm">
-                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
+                        @php $hasFotoTim = isset($tentang->foto_kolaborasi_tim) && $tentang->foto_kolaborasi_tim; @endphp
+                        <div id="preview-wrapper-tim" class="mb-3 {{ $hasFotoTim ? '' : 'hidden' }}">
+                            <img id="preview-foto-tim"
+                                 src="{{ $hasFotoTim ? (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) : '' }}"
+                                 alt="Foto Tim"
+                                 class="h-36 w-full max-w-xs object-cover rounded-lg border border-gray-200 shadow-sm">
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <input type="file"
+                                   id="input-foto-tim"
+                                   name="foto_kolaborasi_tim"
+                                   accept="image/png,image/jpeg,image/jpg,image/gif,image/bmp"
+                                   class="js-crop-input flex-1 min-w-0 border rounded-lg bg-white p-1.5 text-sm"
+                                   data-preview-id="preview-foto-tim"
+                                   data-wrapper-id="preview-wrapper-tim"
+                                   data-recrop-id="btn-recrop-tim"
+                                   data-aspect="1.3333"
+                                   data-title="Sesuaikan Foto Tim Pengembang">
+                            <button type="button" id="btn-recrop-tim" onclick="recropInput('input-foto-tim')" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition">
+                                <i class="fas fa-crop-alt mr-1"></i> Crop Ulang
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP. Foto bisa di-crop/dipaskan setelah dipilih.</p>
                         @error('foto_kolaborasi_tim')
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
@@ -137,13 +160,29 @@
                     <h3 class="font-semibold text-gray-700 mb-4 border-b pb-2">Slide 2: Serah Terima</h3>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-2">Foto Serah Terima Sistem</label>
-                        @if(isset($tentang->foto_kolaborasi_serah_terima) && $tentang->foto_kolaborasi_serah_terima)
-                            <div class="mb-3">
-                                <img src="{{ (str_starts_with($tentang->foto_kolaborasi_serah_terima, 'data:') ? $tentang->foto_kolaborasi_serah_terima : asset('storage/' . $tentang->foto_kolaborasi_serah_terima)) }}" alt="Foto Serah Terima" class="h-32 object-cover rounded-lg border">
-                            </div>
-                        @endif
-                        <input type="file" name="foto_kolaborasi_serah_terima" class="w-full border rounded-lg bg-white p-1 text-sm">
-                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
+                        @php $hasFotoSerahTerima = isset($tentang->foto_kolaborasi_serah_terima) && $tentang->foto_kolaborasi_serah_terima; @endphp
+                        <div id="preview-wrapper-serah-terima" class="mb-3 {{ $hasFotoSerahTerima ? '' : 'hidden' }}">
+                            <img id="preview-foto-serah-terima"
+                                 src="{{ $hasFotoSerahTerima ? (str_starts_with($tentang->foto_kolaborasi_serah_terima, 'data:') ? $tentang->foto_kolaborasi_serah_terima : asset('storage/' . $tentang->foto_kolaborasi_serah_terima)) : '' }}"
+                                 alt="Foto Serah Terima"
+                                 class="h-36 w-full max-w-xs object-cover rounded-lg border border-gray-200 shadow-sm">
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <input type="file"
+                                   id="input-foto-serah-terima"
+                                   name="foto_kolaborasi_serah_terima"
+                                   accept="image/png,image/jpeg,image/jpg,image/gif,image/bmp"
+                                   class="js-crop-input flex-1 min-w-0 border rounded-lg bg-white p-1.5 text-sm"
+                                   data-preview-id="preview-foto-serah-terima"
+                                   data-wrapper-id="preview-wrapper-serah-terima"
+                                   data-recrop-id="btn-recrop-serah-terima"
+                                   data-aspect="1.3333"
+                                   data-title="Sesuaikan Foto Serah Terima Sistem">
+                            <button type="button" id="btn-recrop-serah-terima" onclick="recropInput('input-foto-serah-terima')" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition">
+                                <i class="fas fa-crop-alt mr-1"></i> Crop Ulang
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP. Foto bisa di-crop/dipaskan setelah dipilih.</p>
                         @error('foto_kolaborasi_serah_terima')
                             <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
                         @enderror
@@ -241,7 +280,24 @@ Struktur Tim Kami</h2>
             </div>
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-1">Foto (Opsional)</label>
-                <input type="file" name="foto" class="w-full border rounded-lg bg-gray-50">
+                <div id="preview-wrapper-tambah-tim" class="mb-2 hidden">
+                    <img id="preview-foto-tambah-tim" src="" alt="Preview Foto Anggota" class="h-24 w-24 object-cover rounded-full border border-gray-200 shadow-sm">
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <input type="file"
+                           id="input-foto-tambah-tim"
+                           name="foto"
+                           accept="image/png,image/jpeg,image/jpg,image/gif,image/bmp"
+                           class="js-crop-input flex-1 min-w-0 border rounded-lg bg-gray-50 p-1.5 text-sm"
+                           data-preview-id="preview-foto-tambah-tim"
+                           data-wrapper-id="preview-wrapper-tambah-tim"
+                           data-recrop-id="btn-recrop-tambah-tim"
+                           data-aspect="1"
+                           data-title="Sesuaikan Foto Anggota Tim">
+                    <button type="button" id="btn-recrop-tambah-tim" onclick="recropInput('input-foto-tambah-tim')" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fas fa-crop-alt mr-1"></i> Crop Ulang
+                    </button>
+                </div>
                 <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                 @error('foto')
                     <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
@@ -271,7 +327,24 @@ Struktur Tim Kami</h2>
             </div>
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-1">Update Foto</label>
-                <input type="file" name="foto" class="w-full border rounded-lg bg-gray-50">
+                <div id="preview-wrapper-edit-tim" class="mb-2 hidden">
+                    <img id="preview-foto-edit-tim" src="" alt="Preview Foto Anggota" class="h-24 w-24 object-cover rounded-full border border-gray-200 shadow-sm">
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <input type="file"
+                           id="input-foto-edit-tim"
+                           name="foto"
+                           accept="image/png,image/jpeg,image/jpg,image/gif,image/bmp"
+                           class="js-crop-input flex-1 min-w-0 border rounded-lg bg-gray-50 p-1.5 text-sm"
+                           data-preview-id="preview-foto-edit-tim"
+                           data-wrapper-id="preview-wrapper-edit-tim"
+                           data-recrop-id="btn-recrop-edit-tim"
+                           data-aspect="1"
+                           data-title="Sesuaikan Foto Anggota Tim">
+                    <button type="button" id="btn-recrop-edit-tim" onclick="recropInput('input-foto-edit-tim')" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fas fa-crop-alt mr-1"></i> Crop Ulang
+                    </button>
+                </div>
                 <p class="mt-1 text-xs text-red-500 font-medium">*Ukuran maksimal 2 MB. Format: JPG, PNG, GIF, BMP.</p>
                 @error('foto')
                     <span class="text-red-500 text-xs mt-1 block font-bold">{{ $message }}</span>
@@ -285,6 +358,52 @@ Struktur Tim Kami</h2>
     </div>
 </div>
 
+<!-- MODAL CROP / PASKAN FOTO -->
+<div id="cropImageModal" class="fixed inset-0 z-[60] hidden bg-gray-900/75 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh]">
+        <div class="px-5 py-4 border-b flex items-center justify-between bg-[#254261] text-white">
+            <h3 id="cropModalTitle" class="text-base font-bold flex items-center gap-2">
+                <i class="fas fa-crop-alt"></i> Sesuaikan / Crop Foto
+            </h3>
+            <button type="button" onclick="cancelCropModal()" class="text-white/80 hover:text-white text-lg">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="p-4 bg-gray-900 flex-1 overflow-hidden flex items-center justify-center min-h-[280px] max-h-[58vh]">
+            <img id="cropperTargetImage" src="" alt="Preview Crop" class="max-w-full max-h-[54vh] block">
+        </div>
+
+        <div class="px-5 py-3 bg-gray-50 border-t flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-xs font-semibold text-gray-600 mr-1">Rasio:</span>
+                <button type="button" onclick="setCropAspect(4/3)" class="crop-aspect-btn px-2.5 py-1 text-xs font-medium rounded border bg-white hover:bg-gray-100">4:3 (Slider)</button>
+                <button type="button" onclick="setCropAspect(16/9)" class="crop-aspect-btn px-2.5 py-1 text-xs font-medium rounded border bg-white hover:bg-gray-100">16:9</button>
+                <button type="button" onclick="setCropAspect(1)" class="crop-aspect-btn px-2.5 py-1 text-xs font-medium rounded border bg-white hover:bg-gray-100">1:1 (Tim)</button>
+                <button type="button" onclick="setCropAspect(NaN)" class="crop-aspect-btn px-2.5 py-1 text-xs font-medium rounded border bg-white hover:bg-gray-100">Bebas</button>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <button type="button" onclick="cropperAction('zoom', 0.1)" title="Perbesar" class="px-2.5 py-1.5 text-xs bg-white border rounded hover:bg-gray-100"><i class="fas fa-search-plus"></i></button>
+                <button type="button" onclick="cropperAction('zoom', -0.1)" title="Perkecil" class="px-2.5 py-1.5 text-xs bg-white border rounded hover:bg-gray-100"><i class="fas fa-search-minus"></i></button>
+                <button type="button" onclick="cropperAction('rotate', -90)" title="Putar Kiri" class="px-2.5 py-1.5 text-xs bg-white border rounded hover:bg-gray-100"><i class="fas fa-undo"></i></button>
+                <button type="button" onclick="cropperAction('rotate', 90)" title="Putar Kanan" class="px-2.5 py-1.5 text-xs bg-white border rounded hover:bg-gray-100"><i class="fas fa-redo"></i></button>
+                <button type="button" onclick="cropperAction('reset')" title="Reset" class="px-2.5 py-1.5 text-xs bg-white border rounded hover:bg-gray-100">Reset</button>
+            </div>
+        </div>
+
+        <div class="px-5 py-3 bg-white border-t flex items-center justify-between gap-2">
+            <p class="text-xs text-gray-500">Geser atau zoom gambar untuk mempaskan area yang tampil.</p>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="cancelCropModal()" class="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50">Batal</button>
+                <button type="button" onclick="applyCropImage()" class="px-5 py-2 text-sm bg-[#254261] hover:bg-[#1a2f45] text-white font-bold rounded-lg shadow-sm">
+                    <i class="fas fa-check mr-1"></i> Terapkan Foto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -292,6 +411,14 @@ Struktur Tim Kami</h2>
         document.getElementById('edit_nama').value = btn.getAttribute('data-nama');
         document.getElementById('edit_jabatan').value = btn.getAttribute('data-jabatan');
         document.getElementById('editForm').action = "{{ url('admin/tentang-kami/tim') }}/" + btn.getAttribute('data-id');
+
+        const editInput = document.getElementById('input-foto-edit-tim');
+        const editWrap = document.getElementById('preview-wrapper-edit-tim');
+        const editBtn = document.getElementById('btn-recrop-edit-tim');
+        if (editInput) editInput.value = '';
+        if (editWrap) editWrap.classList.add('hidden');
+        if (editBtn) editBtn.classList.add('hidden');
+
         openModal('editModal');
     }
 
@@ -301,3 +428,138 @@ Struktur Tim Kami</h2>
     @endif
 </script>
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+    let activeCropper = null;
+    let activeFileInput = null;
+    let originalFilesStore = {}; // Simpan file asli per input ID agar bisa "Crop Ulang"
+
+    document.querySelectorAll('.js-crop-input').forEach(function (input) {
+        input.addEventListener('change', function (e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Harap pilih file gambar yang valid (JPG, PNG, GIF, BMP).');
+                input.value = '';
+                return;
+            }
+
+            originalFilesStore[input.id] = file;
+            openCropModalForInput(input, file);
+        });
+    });
+
+    function recropInput(inputId) {
+        const input = document.getElementById(inputId);
+        const file = originalFilesStore[inputId] || (input && input.files && input.files[0]);
+        if (!input || !file) return;
+        openCropModalForInput(input, file);
+    }
+
+    function openCropModalForInput(input, file) {
+        activeFileInput = input;
+        const modal = document.getElementById('cropImageModal');
+        const img = document.getElementById('cropperTargetImage');
+        const titleEl = document.getElementById('cropModalTitle');
+
+        titleEl.innerHTML = '<i class="fas fa-crop-alt"></i> ' + (input.dataset.title || 'Sesuaikan / Crop Foto');
+
+        if (activeCropper) {
+            activeCropper.destroy();
+            activeCropper = null;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            img.src = event.target.result;
+            modal.classList.remove('hidden');
+
+            const aspectAttr = parseFloat(input.dataset.aspect);
+            const initialAspect = isNaN(aspectAttr) ? NaN : aspectAttr;
+
+            activeCropper = new Cropper(img, {
+                aspectRatio: initialAspect,
+                viewMode: 1,
+                autoCropArea: 0.9,
+                responsive: true,
+                background: false,
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function setCropAspect(ratio) {
+        if (activeCropper) {
+            activeCropper.setAspectRatio(ratio);
+        }
+    }
+
+    function cropperAction(action, value) {
+        if (!activeCropper) return;
+        if (action === 'zoom') activeCropper.zoom(value);
+        if (action === 'rotate') activeCropper.rotate(value);
+        if (action === 'reset') activeCropper.reset();
+    }
+
+    function cancelCropModal() {
+        const modal = document.getElementById('cropImageModal');
+        modal.classList.add('hidden');
+        if (activeCropper) {
+            activeCropper.destroy();
+            activeCropper = null;
+        }
+        activeFileInput = null;
+    }
+
+    function applyCropImage() {
+        if (!activeCropper || !activeFileInput) return;
+
+        const canvas = activeCropper.getCroppedCanvas({
+            maxWidth: 1200,
+            maxHeight: 1200,
+            fillColor: '#ffffff',
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+        });
+
+        if (!canvas) return;
+
+        const input = activeFileInput;
+        const originalName = (originalFilesStore[input.id]?.name || 'cropped-image').replace(/\.[^/.]+$/, '');
+
+        canvas.toBlob(function (blob) {
+            if (!blob) return;
+
+            const croppedFile = new File([blob], originalName + '-cropped.jpg', {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+            });
+
+            // Masukkan file hasil crop ke input file agar terkirim saat form disubmit
+            const dt = new DataTransfer();
+            dt.items.add(croppedFile);
+            input.files = dt.files;
+
+            // Update gambar preview di form
+            const previewEl = document.getElementById(input.dataset.previewId);
+            const wrapperEl = document.getElementById(input.dataset.wrapperId);
+            const recropBtn = document.getElementById(input.dataset.recropId);
+
+            if (previewEl) {
+                previewEl.src = canvas.toDataURL('image/jpeg', 0.9);
+            }
+            if (wrapperEl) {
+                wrapperEl.classList.remove('hidden');
+            }
+            if (recropBtn) {
+                recropBtn.classList.remove('hidden');
+            }
+
+            cancelCropModal();
+        }, 'image/jpeg', 0.9);
+    }
+</script>
+@endpush
