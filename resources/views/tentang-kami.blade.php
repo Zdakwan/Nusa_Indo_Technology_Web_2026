@@ -126,7 +126,7 @@
                     <!-- SLIDE 1: Tim Kolaborasi -->
                     <div class="w-full flex-shrink-0 flex flex-col md:flex-row">
                         <div class="md:w-1/2 h-72 md:h-auto bg-gray-200 relative group">
-                            <img src="{{ $tentang->foto_kolaborasi_tim ? (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) : asset('images/default-kolaborasi.jpg') }}" alt="Tim Mahasiswa Polije PSDKU Sidoarjo" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <img src="{{ $tentang->foto_kolaborasi_tim ? (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) : asset('images/default-kolaborasi.jpg') }}" alt="Tim Mahasiswa Polije PSDKU Sidoarjo" class="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" style="object-fit: contain !important; background-color: #ffffff; padding: 16px;">
                         </div>
                         <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#254261] text-white">
                             <div class="text-[#f7bd55] mb-2 font-bold uppercase tracking-wider text-xs flex items-center gap-2">

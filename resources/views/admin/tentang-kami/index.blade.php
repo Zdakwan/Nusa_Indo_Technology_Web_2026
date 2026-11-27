@@ -126,7 +126,7 @@
                             <img id="preview-foto-tim"
                                  src="{{ $hasFotoTim ? (str_starts_with($tentang->foto_kolaborasi_tim, 'data:') ? $tentang->foto_kolaborasi_tim : asset('storage/' . $tentang->foto_kolaborasi_tim)) : '' }}"
                                  alt="Foto Tim"
-                                 class="h-36 w-full max-w-xs object-cover rounded-lg border border-gray-200 shadow-sm">
+                                 class="h-36 w-full max-w-xs object-contain rounded-lg border border-gray-200 shadow-sm" style="object-fit: contain !important; background-color: #ffffff; padding: 8px;">
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <input type="file"
