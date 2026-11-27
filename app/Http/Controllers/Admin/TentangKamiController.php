@@ -149,6 +149,10 @@ class TentangKamiController extends Controller
     {
         try {
             $table = (new $modelClass())->getTable();
+            $colInfo = DB::selectOne("SHOW COLUMNS FROM `{$table}` LIKE ?", [$column]);
+            if ($colInfo && str_contains(strtolower((string) ($colInfo->Type ?? '')), 'longtext')) {
+                return;
+            }
             DB::statement("ALTER TABLE `{$table}` MODIFY `{$column}` LONGTEXT NULL");
         } catch (\Throwable $e) {
             Log::warning('[TentangKami] Auto-alter skip: ' . $this->shortErrorMessage($e));
@@ -165,6 +169,7 @@ class TentangKamiController extends Controller
     {
         $mime = $file->getMimeType() ?: 'image/jpeg';
         $raw  = file_get_contents($file->getRealPath());
+        $isTransparent = in_array($mime, ['image/png', 'image/webp'], true);
 
         if (function_exists('imagecreatefromstring') && in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
             $img = @imagecreatefromstring($raw);
@@ -177,19 +182,36 @@ class TentangKamiController extends Controller
                     $newWidth  = max(1, (int) round($width * $ratio));
                     $newHeight = max(1, (int) round($height * $ratio));
                     $resized   = imagecreatetruecolor($newWidth, $newHeight);
-                    imagefill($resized, 0, 0, imagecolorallocate($resized, 255, 255, 255));
+
+                    if ($isTransparent) {
+                        imagealphablending($resized, false);
+                        imagesavealpha($resized, true);
+                        $transparent = imagecolorallocatealpha($resized, 0, 0, 0, 127);
+                        imagefilledrectangle($resized, 0, 0, $newWidth, $newHeight, $transparent);
+                    } else {
+                        imagefill($resized, 0, 0, imagecolorallocate($resized, 255, 255, 255));
+                    }
+
                     imagecopyresampled($resized, $img, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
                     imagedestroy($img);
                     $img = $resized;
+                } elseif ($isTransparent) {
+                    imagealphablending($img, false);
+                    imagesavealpha($img, true);
                 }
 
                 ob_start();
-                imagejpeg($img, null, $quality);
+                if ($isTransparent) {
+                    imagepng($img, null, 6);
+                } else {
+                    imagejpeg($img, null, $quality);
+                }
                 $compressed = ob_get_clean();
                 imagedestroy($img);
 
                 if ($compressed !== false && strlen($compressed) < strlen($raw)) {
-                    return 'data:image/jpeg;base64,' . base64_encode($compressed);
+                    $outMime = $isTransparent ? 'image/png' : 'image/jpeg';
+                    return 'data:' . $outMime . ';base64,' . base64_encode($compressed);
                 }
             }
         }

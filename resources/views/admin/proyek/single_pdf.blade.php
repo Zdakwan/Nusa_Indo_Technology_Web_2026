@@ -139,17 +139,7 @@
         <div class="signature-box">
             <p>Sidoarjo, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
             <p>Mengetahui,</p>
-                        <div class="signature-space" style="height: auto; margin: 10px 0 8px 0; text-align: center;">
-                @php
-                    $logoPath = public_path('images/LogoNIT.png');
-                    $logoBase64 = file_exists($logoPath)
-                        ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
-                        : null;
-                @endphp
-                @if ($logoBase64)
-                    <img src="{{ $logoBase64 }}" alt="Logo NIT" style="height: 45px; width: auto; display: block; margin: 0 auto 4px auto;">
-                @endif
-            </div>
+                        <div class="signature-space"></div>
             <p class="signature-name">Ony Prabowo S.Kom., M.MT</p>
             <p>Pimpinan Nusa Indo Tech</p>
         </div>

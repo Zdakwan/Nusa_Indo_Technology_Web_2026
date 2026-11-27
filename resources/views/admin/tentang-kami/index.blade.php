@@ -370,7 +370,7 @@ Struktur Tim Kami</h2>
             </button>
         </div>
 
-        <div class="p-4 bg-gray-900 flex-1 overflow-hidden flex items-center justify-center min-h-[280px] max-h-[58vh]">
+        <div class="p-4 flex-1 overflow-hidden flex items-center justify-center min-h-[300px] max-h-[60vh]" style="background-color:#f8fafc;background-image:linear-gradient(45deg,#e2e8f0 25%,transparent 25%),linear-gradient(-45deg,#e2e8f0 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e2e8f0 75%),linear-gradient(-45deg,transparent 75%,#e2e8f0 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;">
             <img id="cropperTargetImage" src="" alt="Preview Crop" class="max-w-full max-h-[54vh] block">
         </div>
 
@@ -480,12 +480,17 @@ Struktur Tim Kami</h2>
             const aspectAttr = parseFloat(input.dataset.aspect);
             const initialAspect = isNaN(aspectAttr) ? NaN : aspectAttr;
 
-            activeCropper = new Cropper(img, {
+                        activeCropper = new Cropper(img, {
                 aspectRatio: initialAspect,
-                viewMode: 1,
-                autoCropArea: 0.9,
+                viewMode: 0,
+                dragMode: 'move',
+                autoCropArea: 0.85,
                 responsive: true,
                 background: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                toggleDragModeOnDblclick: false,
             });
         };
         reader.readAsDataURL(file);
@@ -517,39 +522,46 @@ Struktur Tim Kami</h2>
     function applyCropImage() {
         if (!activeCropper || !activeFileInput) return;
 
-        const canvas = activeCropper.getCroppedCanvas({
-            maxWidth: 1200,
-            maxHeight: 1200,
-            fillColor: '#ffffff',
+        const input = activeFileInput;
+        const origFile = originalFilesStore[input.id] || (input.files && input.files[0]);
+        const origType = origFile ? origFile.type : 'image/jpeg';
+        const isTransparentType = ['image/png', 'image/webp', 'image/gif'].includes(origType);
+        const outMime = isTransparentType ? 'image/png' : 'image/jpeg';
+        const outExt  = isTransparentType ? '.png' : '.jpg';
+
+        const canvasOpts = {
+            maxWidth: 800,
+            maxHeight: 800,
             imageSmoothingEnabled: true,
             imageSmoothingQuality: 'high',
-        });
+        };
+        if (!isTransparentType) {
+            canvasOpts.fillColor = '#ffffff';
+        }
 
+        let canvas = activeCropper.getCroppedCanvas(canvasOpts);
         if (!canvas) return;
 
-        const input = activeFileInput;
-        const originalName = (originalFilesStore[input.id]?.name || 'cropped-image').replace(/\.[^/.]+$/, '');
+        const originalName = (origFile?.name || 'cropped-image').replace(/\.[^/.]+$/, '');
 
-        canvas.toBlob(function (blob) {
+        const finalizeBlob = function (blob, usedCanvas) {
             if (!blob) return;
 
-            const croppedFile = new File([blob], originalName + '-cropped.jpg', {
-                type: 'image/jpeg',
+            const croppedFile = new File([blob], originalName + '-cropped' + outExt, {
+                type: outMime,
                 lastModified: Date.now(),
             });
 
-            // Masukkan file hasil crop ke input file agar terkirim saat form disubmit
             const dt = new DataTransfer();
             dt.items.add(croppedFile);
             input.files = dt.files;
 
-            // Update gambar preview di form
             const previewEl = document.getElementById(input.dataset.previewId);
             const wrapperEl = document.getElementById(input.dataset.wrapperId);
             const recropBtn = document.getElementById(input.dataset.recropId);
 
             if (previewEl) {
-                previewEl.src = canvas.toDataURL('image/jpeg', 0.9);
+                previewEl.src = usedCanvas.toDataURL(outMime, isTransparentType ? undefined : 0.85);
             }
             if (wrapperEl) {
                 wrapperEl.classList.remove('hidden');
@@ -559,7 +571,25 @@ Struktur Tim Kami</h2>
             }
 
             cancelCropModal();
-        }, 'image/jpeg', 0.9);
+        };
+
+        canvas.toBlob(function (blob) {
+            if (blob && blob.size > 850 * 1024 && isTransparentType) {
+                const smallCanvas = activeCropper.getCroppedCanvas({
+                    maxWidth: 520,
+                    maxHeight: 520,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+                if (smallCanvas) {
+                    smallCanvas.toBlob(function (smallBlob) {
+                        finalizeBlob(smallBlob || blob, smallCanvas);
+                    }, 'image/png');
+                    return;
+                }
+            }
+            finalizeBlob(blob, canvas);
+        }, outMime, isTransparentType ? undefined : 0.85);
     }
 </script>
 @endpush

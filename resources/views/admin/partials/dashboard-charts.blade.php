@@ -10,15 +10,15 @@ DI-INCLUDE OLEH:
    resources/views/admin/dashboard.blade.php
 
 DATA YANG DITERIMA DARI CONTROLLER (DashboardController@index):
-   $chartLabels       → array label bulan, contoh: ['Jun', 'Jul', 'Agu', ...]
-   $chartTrendData    → array jumlah permintaan per bulan (untuk grafik garis)
-   $chartStatusData   → array {menunggu, diproses, selesai} untuk grafik donat
-   $chartBarMenunggu  → array jumlah status 'menunggu' per bulan (grafik batang)
-   $chartBarDiproses  → array jumlah status 'diproses' per bulan
-   $chartBarSelesai   → array jumlah status 'selesai' per bulan
+   $chartLabels       â†’ array label bulan, contoh: ['Jun', 'Jul', 'Agu', ...]
+   $chartTrendData    â†’ array jumlah permintaan per bulan (untuk grafik garis)
+   $chartStatusData   â†’ array {menunggu, diproses, selesai} untuk grafik donat
+   $chartBarMenunggu  â†’ array jumlah status 'menunggu' per bulan (grafik batang)
+   $chartBarDiproses  â†’ array jumlah status 'diproses' per bulan
+   $chartBarSelesai   â†’ array jumlah status 'selesai' per bulan
 
 LIBRARY YANG DIGUNAKAN:
-   Chart.js v4.4.3 (CDN) → https://www.chartjs.org/
+   Chart.js v4.4.3 (CDN) â†’ https://www.chartjs.org/
 
 CARA MENGUBAH WARNA CHART:
    - Grafik garis  : cari 'borderColor' di chart 'consultationTrendChart'
@@ -30,7 +30,7 @@ CARA MENGUBAH JUDUL CHART:
    - Ubah teks di dalam tag tersebut
 
 CARA MENGUBAH PERIODE DATA (BUKAN 6 BULAN):
-   - Edit DashboardController@index → ubah query yang mengirim $chartLabels
+   - Edit DashboardController@index â†’ ubah query yang mengirim $chartLabels
 ==========================================================================
 --}}
 
@@ -66,7 +66,7 @@ CARA MENGUBAH PERIODE DATA (BUKAN 6 BULAN):
             </div>
         </div>
 
-        {{-- Canvas untuk grafik garis — diisi oleh Chart.js via id="consultationTrendChart" --}}
+        {{-- Canvas untuk grafik garis â€” diisi oleh Chart.js via id="consultationTrendChart" --}}
         <div class="relative h-64 sm:h-72 w-full">
             <canvas id="consultationTrendChart"></canvas>
         </div>
@@ -80,7 +80,7 @@ CARA MENGUBAH PERIODE DATA (BUKAN 6 BULAN):
             <p class="text-xs text-gray-500">Proporsi status seluruh permintaan</p>
         </div>
 
-        {{-- Canvas grafik donat — id="consultationStatusChart"
+        {{-- Canvas grafik donat â€” id="consultationStatusChart"
              Jika data kosong, tampilkan pesan "statusChartEmpty" --}}
         <div class="relative h-56 w-full flex items-center justify-center">
             <canvas id="consultationStatusChart"></canvas>
@@ -92,7 +92,7 @@ CARA MENGUBAH PERIODE DATA (BUKAN 6 BULAN):
 </div>
 
 {{-- ======================================================================
-     BARIS 2: DIAGRAM BATANG — Perbandingan Status per Bulan (lebar penuh)
+     BARIS 2: DIAGRAM BATANG â€” Perbandingan Status per Bulan (lebar penuh)
      ====================================================================== --}}
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -106,7 +106,7 @@ CARA MENGUBAH PERIODE DATA (BUKAN 6 BULAN):
         </span>
     </div>
 
-    {{-- Canvas grafik batang — id="consultationStatusBarChart" --}}
+    {{-- Canvas grafik batang â€” id="consultationStatusBarChart" --}}
     <div class="relative h-72 sm:h-80 w-full">
         <canvas id="consultationStatusBarChart"></canvas>
     </div>
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // ─── Ambil data dari PHP/Blade ke JavaScript ──────────────────────
+        // â”€â”€â”€ Ambil data dari PHP/Blade ke JavaScript â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Data ini dikirim dari DashboardController@index via compact()
         const trendLabels = @json($chartLabels ?? []);       // Label bulan: ['Jan', 'Feb', ...]
         const trendData   = @json($chartTrendData ?? []);    // Jumlah permintaan per bulan
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const barDiproses = @json($chartBarDiproses ?? []); // Status diproses per bulan
         const barSelesai  = @json($chartBarSelesai ?? []);  // Status selesai per bulan
 
-        // ─── CHART 1: Grafik Garis — Tren Permintaan ─────────────────────
+        // â”€â”€â”€ CHART 1: Grafik Garis â€” Tren Permintaan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Untuk ubah tampilan: edit bagian 'datasets' di bawah
         const trendCanvas = document.getElementById('consultationTrendChart');
         if (trendCanvas) {
@@ -148,8 +148,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Efek gradien di bawah garis
             const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(163, 8, 24, 0.15)');
-            gradient.addColorStop(1, 'rgba(163, 8, 24, 0.02)');
+            gradient.addColorStop(0, 'rgba(35, 54, 79, 0.18)');
+            gradient.addColorStop(1, 'rgba(35, 54, 79, 0.02)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -158,13 +158,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     datasets: [{
                         label: 'Jumlah Permintaan',
                         data: trendData,
-                        borderColor: '#a30818',        // ← UBAH WARNA GARIS DI SINI
-                        backgroundColor: gradient,     // ← Gradien area bawah garis
+                        borderColor: '#23364f',        // â† UBAH WARNA GARIS DI SINI
+                        backgroundColor: gradient,     // â† Gradien area bawah garis
                         borderWidth: 2.5,
                         fill: true,
                         tension: 0.35,                 // Kelengkungan garis (0 = lurus, 1 = sangat melengkung)
-                        pointBackgroundColor: '#ffffff', // ← Warna titik data
-                        pointBorderColor: '#a30818',
+                        pointBackgroundColor: '#ffffff', // â† Warna titik data
+                        pointBorderColor: '#23364f',
                         pointBorderWidth: 2,
                         pointRadius: 4
                     }]
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // ─── CHART 2: Grafik Donat — Distribusi Status ───────────────────
+        // â”€â”€â”€ CHART 2: Grafik Donat â€” Distribusi Status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Untuk ubah warna: edit 'backgroundColor' di bawah
         const statusCanvas = document.getElementById('consultationStatusChart');
         const emptyState   = document.getElementById('statusChartEmpty');
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         labels: ['Menunggu', 'Diproses', 'Selesai'],
                         datasets: [{
                             data: values,
-                            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'], // ← UBAH WARNA DONAT DI SINI
+                            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'], // â† UBAH WARNA DONAT DI SINI
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // ─── CHART 3: Diagram Batang — Perbandingan Status per Bulan ─────
+        // â”€â”€â”€ CHART 3: Diagram Batang â€” Perbandingan Status per Bulan â”€â”€â”€â”€â”€
         // Untuk ubah warna batang: edit 'backgroundColor' di masing-masing dataset
         const barCanvas = document.getElementById('consultationStatusBarChart');
         if (barCanvas) {
@@ -243,21 +243,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         {
                             label: 'Menunggu',
                             data: barMenunggu,
-                            backgroundColor: '#f59e0b', // ← UBAH WARNA BATANG MENUNGGU
+                            backgroundColor: '#f59e0b', // â† UBAH WARNA BATANG MENUNGGU
                             borderRadius: 6,
                             maxBarThickness: 28
                         },
                         {
                             label: 'Diproses',
                             data: barDiproses,
-                            backgroundColor: '#3b82f6', // ← UBAH WARNA BATANG DIPROSES
+                            backgroundColor: '#3b82f6', // â† UBAH WARNA BATANG DIPROSES
                             borderRadius: 6,
                             maxBarThickness: 28
                         },
                         {
                             label: 'Selesai',
                             data: barSelesai,
-                            backgroundColor: '#10b981', // ← UBAH WARNA BATANG SELESAI
+                            backgroundColor: '#10b981', // â† UBAH WARNA BATANG SELESAI
                             borderRadius: 6,
                             maxBarThickness: 28
                         }
