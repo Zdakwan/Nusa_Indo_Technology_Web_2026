@@ -53,10 +53,6 @@
         .badge-berjalan { background-color: #dbeafe; color: #1e40af; border-color: #bfdbfe;}
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit-pdf.jpg?v=3') }}?v=2">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit-pdf.jpg?v=3') }}?v=2">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit-pdf.jpg?v=3') }}?v=2">
 </head>
 <body>
     <div class="top-bar"></div>
@@ -143,7 +139,17 @@
         <div class="signature-box">
             <p>Sidoarjo, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
             <p>Mengetahui,</p>
-            <div class="signature-space"></div>
+                        <div class="signature-space" style="height: auto; margin: 10px 0 8px 0; text-align: center;">
+                @php
+                    $logoPath = public_path('images/LogoNIT.png');
+                    $logoBase64 = file_exists($logoPath)
+                        ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+                        : null;
+                @endphp
+                @if ($logoBase64)
+                    <img src="{{ $logoBase64 }}" alt="Logo NIT" style="height: 45px; width: auto; display: block; margin: 0 auto 4px auto;">
+                @endif
+            </div>
             <p class="signature-name">Ony Prabowo S.Kom., M.MT</p>
             <p>Pimpinan Nusa Indo Tech</p>
         </div>
@@ -160,6 +166,5 @@
             $pdf->page_text($x, $y, $text, $font, $size, array(0.4, 0.4, 0.4));
         }
     </script>
-    <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
 </body>
 </html>

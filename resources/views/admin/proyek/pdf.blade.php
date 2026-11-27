@@ -1,11 +1,50 @@
 <!DOCTYPE html>
+{{--
+==========================================================================
+FILE: resources/views/admin/proyek/pdf.blade.php
+==========================================================================
+FUNGSI : Template HTML yang dirender oleh DomPDF menjadi file PDF.
+         Berisi laporan DAFTAR seluruh proyek (semua proyek dalam satu file).
+
+CATATAN: File ini BUKAN untuk proyek tunggal.
+   - Laporan SEMUA proyek  â†’ pdf.blade.php (file ini)
+   - Laporan SATU proyek   â†’ single_pdf.blade.php
+
+DIPANGGIL DARI:
+   app/Http/Controllers/Admin/AdminProyekController.php
+   (cek method yang menggunakan 'admin.proyek.pdf')
+
+CARA MENGUBAH TAMPILAN:
+   - Judul laporan     â†’ ubah teks <td class="report-title">
+   - Kolom tabel       â†’ tambah/hapus <th> di thead dan <td> di tbody
+   - Warna header tabel â†’ ubah background-color di CSS table.data-table th
+   - Margin kertas     â†’ ubah @page { margin: ... }
+   - Ukuran font global â†’ ubah font-size di body {}
+
+CARA MENGUBAH TANDA TANGAN:
+   - Nama pimpinan â†’ ubah teks di <p class="signature-name">
+   - Jabatan       â†’ ubah <p> di bawah signature-name
+   - Kota/tanggal  â†’ ubah teks di baris pertama signature-box
+
+CARA MENAMBAH LOGO:
+   Logo dimuat dari public/images/LogoNusa.png sebagai base64.
+   DomPDF TIDAK mendukung URL gambar eksternal, harus gunakan base64.
+
+CATATAN TEKNIS DomPDF:
+   - Tidak mendukung Flexbox/Grid CSS
+   - Gunakan <table> untuk layout kolom
+   - Nomor halaman menggunakan blok <script type="text/php"> (DomPDF khusus)
+==========================================================================
+--}}
 <html>
 <head>
     <meta charset="utf-8">
     <title>Laporan Manajemen Proyek</title>
     <style>
-        /* Pengaturan Kertas & Font Default */
+        /* â”€â”€â”€ Pengaturan Kertas & Font Default â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* UBAH MARGIN KERTAS DI SINI */
         @page { margin: 30px 40px; }
+        /* UBAH FONT DAN UKURAN TEKS GLOBAL DI SINI */
         body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px; color: #334155; line-height: 1.4; }
 
         /* Aksesn Pita Warna di Atas Kertas */
@@ -65,10 +104,6 @@
         .signature-name { font-weight: bold; text-decoration: underline; color: #0f172a; font-size: 12px; }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ asset('css/mobile-responsive.css') }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon-nit.png?v=3') }}?v=2">
 </head>
 <body>
 
@@ -174,6 +209,5 @@
             $pdf->page_text($x, $y, $text, $font, $size, array(0.4, 0.4, 0.4));
         }
     </script>
-    <script src="{{ asset('js/mobile-ux.js') }}" defer></script>
 </body>
 </html>

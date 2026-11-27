@@ -1,15 +1,63 @@
+{{--
+==========================================================================
+FILE: resources/views/admin/partials/dashboard-charts.blade.php
+==========================================================================
+FUNGSI : Komponen partial (potongan halaman) yang berisi:
+           1. HTML canvas untuk 3 jenis chart/diagram
+           2. Script Chart.js untuk render semua chart
+
+DI-INCLUDE OLEH:
+   resources/views/admin/dashboard.blade.php
+
+DATA YANG DITERIMA DARI CONTROLLER (DashboardController@index):
+   $chartLabels       → array label bulan, contoh: ['Jun', 'Jul', 'Agu', ...]
+   $chartTrendData    → array jumlah permintaan per bulan (untuk grafik garis)
+   $chartStatusData   → array {menunggu, diproses, selesai} untuk grafik donat
+   $chartBarMenunggu  → array jumlah status 'menunggu' per bulan (grafik batang)
+   $chartBarDiproses  → array jumlah status 'diproses' per bulan
+   $chartBarSelesai   → array jumlah status 'selesai' per bulan
+
+LIBRARY YANG DIGUNAKAN:
+   Chart.js v4.4.3 (CDN) → https://www.chartjs.org/
+
+CARA MENGUBAH WARNA CHART:
+   - Grafik garis  : cari 'borderColor' di chart 'consultationTrendChart'
+   - Grafik donat  : cari 'backgroundColor' di chart 'consultationStatusChart'
+   - Grafik batang : cari 'backgroundColor' di masing-masing dataset bar
+
+CARA MENGUBAH JUDUL CHART:
+   - Cari tag <h2> di bawah komentar masing-masing chart
+   - Ubah teks di dalam tag tersebut
+
+CARA MENGUBAH PERIODE DATA (BUKAN 6 BULAN):
+   - Edit DashboardController@index → ubah query yang mengirim $chartLabels
+==========================================================================
+--}}
+
+{{-- ======================================================================
+     BARIS 1: GRAFIK GARIS + GRAFIK DONAT (2 kolom)
+     ====================================================================== --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-    {{-- Grafik Garis: Tren Permintaan Konsultasi --}}
+
+    {{-- GRAFIK GARIS: Tren Permintaan Konsultasi (lebar 2/3 layar) --}}
     <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
+                {{-- UBAH JUDUL GRAFIK GARIS DI SINI --}}
                 <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Tren Permintaan Konsultasi</h2>
+                {{-- UBAH SUBTITLE DI SINI --}}
                 <p class="text-xs text-gray-500">Jumlah pengajuan klien dalam 6 bulan terakhir</p>
             </div>
             <div class="flex items-center gap-2">
+                {{-- Label badge periode --}}
                 <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-[#23364f]">
                     6 Bulan Terakhir
                 </span>
+
+                {{-- TOMBOL EXPORT EXCEL
+                     Route: admin.dashboard.export.excel
+                     Controller: DashboardController@exportExcel
+                     File Excel: app/Exports/KonsultasiExport.php --}}
                 <a href="{{ route('admin.dashboard.export.excel') }}"
                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition">
                     <i class="fas fa-file-excel"></i>
@@ -17,17 +65,23 @@
                 </a>
             </div>
         </div>
+
+        {{-- Canvas untuk grafik garis — diisi oleh Chart.js via id="consultationTrendChart" --}}
         <div class="relative h-64 sm:h-72 w-full">
             <canvas id="consultationTrendChart"></canvas>
         </div>
     </div>
 
-    {{-- Grafik Donat: Distribusi Status --}}
+    {{-- GRAFIK DONAT: Distribusi Status (lebar 1/3 layar) --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
         <div class="mb-4">
+            {{-- UBAH JUDUL GRAFIK DONAT DI SINI --}}
             <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Distribusi Status</h2>
             <p class="text-xs text-gray-500">Proporsi status seluruh permintaan</p>
         </div>
+
+        {{-- Canvas grafik donat — id="consultationStatusChart"
+             Jika data kosong, tampilkan pesan "statusChartEmpty" --}}
         <div class="relative h-56 w-full flex items-center justify-center">
             <canvas id="consultationStatusChart"></canvas>
             <div id="statusChartEmpty" class="hidden text-center text-sm text-gray-400">
@@ -37,10 +91,13 @@
     </div>
 </div>
 
-{{-- Diagram Batang: Perbandingan Status Konsultasi per Bulan --}}
+{{-- ======================================================================
+     BARIS 2: DIAGRAM BATANG — Perbandingan Status per Bulan (lebar penuh)
+     ====================================================================== --}}
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
+            {{-- UBAH JUDUL GRAFIK BATANG DI SINI --}}
             <h2 class="text-base sm:text-lg font-bold text-[#23364f]">Perbandingan Status Konsultasi per Bulan</h2>
             <p class="text-xs text-gray-500">Diagram batang rincian status Menunggu, Diproses, dan Selesai dalam 6 bulan terakhir</p>
         </div>
@@ -48,34 +105,51 @@
             Diagram Batang
         </span>
     </div>
+
+    {{-- Canvas grafik batang — id="consultationStatusBarChart" --}}
     <div class="relative h-72 sm:h-80 w-full">
         <canvas id="consultationStatusBarChart"></canvas>
     </div>
 </div>
 
+{{-- ======================================================================
+     JAVASCRIPT: Inisialisasi Chart.js
+     Semua chart diinisialisasi setelah halaman (DOMContentLoaded) siap.
+     Jika Chart.js belum dimuat (CDN lambat), tunggu 100ms lalu coba lagi.
+     ====================================================================== --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    /**
+     * Fungsi inisialisasi chart.
+     * Dipanggil ulang setiap 100ms jika Chart.js belum dimuat.
+     */
     const initDashboardCharts = () => {
         if (typeof Chart === 'undefined') {
-            setTimeout(initDashboardCharts, 100);
+            setTimeout(initDashboardCharts, 100); // Tunggu CDN selesai dimuat
             return;
         }
 
-        const trendLabels = @json($chartLabels ?? []);
-        const trendData   = @json($chartTrendData ?? []);
+        // ─── Ambil data dari PHP/Blade ke JavaScript ──────────────────────
+        // Data ini dikirim dari DashboardController@index via compact()
+        const trendLabels = @json($chartLabels ?? []);       // Label bulan: ['Jan', 'Feb', ...]
+        const trendData   = @json($chartTrendData ?? []);    // Jumlah permintaan per bulan
         const statusData  = @json($chartStatusData ?? ['menunggu' => 0, 'diproses' => 0, 'selesai' => 0]);
-        const barMenunggu = @json($chartBarMenunggu ?? []);
-        const barDiproses = @json($chartBarDiproses ?? []);
-        const barSelesai  = @json($chartBarSelesai ?? []);
+        const barMenunggu = @json($chartBarMenunggu ?? []); // Status menunggu per bulan
+        const barDiproses = @json($chartBarDiproses ?? []); // Status diproses per bulan
+        const barSelesai  = @json($chartBarSelesai ?? []);  // Status selesai per bulan
 
-        // 1. Line Chart: Tren Permintaan Konsultasi
+        // ─── CHART 1: Grafik Garis — Tren Permintaan ─────────────────────
+        // Untuk ubah tampilan: edit bagian 'datasets' di bawah
         const trendCanvas = document.getElementById('consultationTrendChart');
         if (trendCanvas) {
             const ctx = trendCanvas.getContext('2d');
+
+            // Efek gradien di bawah garis
             const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(35, 54, 79, 0.22)');
-            gradient.addColorStop(1, 'rgba(35, 54, 79, 0.0)');
+            gradient.addColorStop(0, 'rgba(163, 8, 24, 0.15)');
+            gradient.addColorStop(1, 'rgba(163, 8, 24, 0.02)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -84,13 +158,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     datasets: [{
                         label: 'Jumlah Permintaan',
                         data: trendData,
-                        borderColor: '#1b314c',
-                        backgroundColor: gradient,
+                        borderColor: '#a30818',        // ← UBAH WARNA GARIS DI SINI
+                        backgroundColor: gradient,     // ← Gradien area bawah garis
                         borderWidth: 2.5,
                         fill: true,
-                        tension: 0.35,
-                        pointBackgroundColor: '#f59e0b',
-                        pointBorderColor: '#1b314c',
+                        tension: 0.35,                 // Kelengkungan garis (0 = lurus, 1 = sangat melengkung)
+                        pointBackgroundColor: '#ffffff', // ← Warna titik data
+                        pointBorderColor: '#a30818',
                         pointBorderWidth: 2,
                         pointRadius: 4
                     }]
@@ -98,33 +172,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { legend: { display: false } }, // Sembunyikan legenda
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { precision: 0, color: '#64748b' },
+                            ticks: { precision: 0, color: '#64748b' }, // Hanya angka bulat
                             grid: { color: '#f1f5f9' }
                         },
                         x: {
                             ticks: { color: '#64748b' },
-                            grid: { display: false }
+                            grid: { display: false } // Sembunyikan garis vertikal
                         }
                     }
                 }
             });
         }
 
-        // 2. Doughnut Chart: Distribusi Status
+        // ─── CHART 2: Grafik Donat — Distribusi Status ───────────────────
+        // Untuk ubah warna: edit 'backgroundColor' di bawah
         const statusCanvas = document.getElementById('consultationStatusChart');
         const emptyState   = document.getElementById('statusChartEmpty');
         if (statusCanvas) {
             const values = [
-                Number(statusData.menunggu || 0),
-                Number(statusData.diproses || 0),
-                Number(statusData.selesai || 0)
+                Number(statusData.menunggu || 0), // Kuning
+                Number(statusData.diproses || 0), // Biru
+                Number(statusData.selesai  || 0)  // Hijau
             ];
             const totalStatus = values.reduce((acc, val) => acc + val, 0);
 
+            // Jika tidak ada data, tampilkan pesan kosong
             if (totalStatus === 0 && emptyState) {
                 statusCanvas.classList.add('hidden');
                 emptyState.classList.remove('hidden');
@@ -135,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         labels: ['Menunggu', 'Diproses', 'Selesai'],
                         datasets: [{
                             data: values,
-                            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
+                            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'], // ← UBAH WARNA DONAT DI SINI
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]
@@ -143,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '68%',
+                        cutout: '68%', // Ukuran lubang tengah (makin besar = makin tipis lingkaran)
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -155,32 +231,33 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // 3. Bar Chart: Perbandingan Status Konsultasi per Bulan
+        // ─── CHART 3: Diagram Batang — Perbandingan Status per Bulan ─────
+        // Untuk ubah warna batang: edit 'backgroundColor' di masing-masing dataset
         const barCanvas = document.getElementById('consultationStatusBarChart');
         if (barCanvas) {
             new Chart(barCanvas.getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: trendLabels,
+                    labels: trendLabels, // Pakai label bulan yang sama dengan chart 1
                     datasets: [
                         {
                             label: 'Menunggu',
                             data: barMenunggu,
-                            backgroundColor: '#f59e0b',
+                            backgroundColor: '#f59e0b', // ← UBAH WARNA BATANG MENUNGGU
                             borderRadius: 6,
                             maxBarThickness: 28
                         },
                         {
                             label: 'Diproses',
                             data: barDiproses,
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#3b82f6', // ← UBAH WARNA BATANG DIPROSES
                             borderRadius: 6,
                             maxBarThickness: 28
                         },
                         {
                             label: 'Selesai',
                             data: barSelesai,
-                            backgroundColor: '#10b981',
+                            backgroundColor: '#10b981', // ← UBAH WARNA BATANG SELESAI
                             borderRadius: 6,
                             maxBarThickness: 28
                         }
@@ -189,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
+                    interaction: { mode: 'index', intersect: false }, // Tooltip muncul untuk semua dataset di x yang sama
                     plugins: {
                         legend: {
                             position: 'top',

@@ -1,5 +1,45 @@
 <?php
 
+/*
+|==========================================================================
+| FILE: app/Http/Controllers/Admin/AdminProyekController.php
+|==========================================================================
+| FUNGSI  : Mengelola seluruh CRUD Proyek dari sisi Admin.
+|           Mencakup:
+|             - Lihat daftar proyek (index)
+|             - Form tambah proyek (create)
+|             - Simpan proyek baru dari konsultasi approved (store)
+|             - Lihat detail proyek (show)
+|             - Form edit proyek (edit)
+|             - Perbarui info proyek (update)
+|             - Perbarui progres proyek + notifikasi client (updateProgress)
+|             - Hapus proyek (destroy)
+|             - Hapus banyak sekaligus (bulkDelete)
+|             - Export PDF satu proyek → preview di browser (exportSinglePdf)
+|
+| ROUTE TERKAIT (routes/web.php):
+|   Route::resource('proyek', AdminProyekController::class)
+|   → Otomatis membuat: index, create, store, show, edit, update, destroy
+|
+|   GET  /admin/proyek/{id}/pdf       → exportSinglePdf()
+|   POST /admin/proyek/{id}/progress  → updateProgress()
+|   DELETE /admin/proyek/bulk-delete  → bulkDelete()
+|
+| VIEW YANG DIGUNAKAN:
+|   resources/views/admin/proyek/index.blade.php
+|   resources/views/admin/proyek/create.blade.php
+|   resources/views/admin/proyek/show.blade.php
+|   resources/views/admin/proyek/edit.blade.php
+|   resources/views/admin/proyek/pdf_viewer.blade.php ← halaman preview PDF
+|
+| TEMPLATE PDF:
+|   resources/views/admin/proyek/single_pdf.blade.php ← isi laporan PDF
+|
+| LIBRARY PDF:
+|   barryvdh/laravel-dompdf (dipanggil via Barryvdh\DomPDF\Facade\Pdf)
+|==========================================================================
+*/
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -17,7 +57,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class AdminProyekController extends Controller
 {
     /**
-     * Menampilkan daftar seluruh proyek.
+     * Tampilkan daftar seluruh proyek (halaman index).
+     * Data diurutkan terbaru, ditampilkan 10 per halaman (pagination).
      */
     public function index()
     {
@@ -29,25 +70,33 @@ class AdminProyekController extends Controller
     }
 
     /**
-     * Menampilkan formulir tambah proyek.
-     * Hanya konsultasi approved yang belum memiliki proyek.
+     * Tampilkan form tambah proyek baru.
+     *
+     * Hanya konsultasi dengan status 'approved' yang belum punya proyek
+     * yang bisa dipilih sebagai dasar pembuatan proyek.
+     *
+     * Data yang dikirim ke view:
+     *   $konsultasis     → koleksi Konsultasi untuk dropdown
+     *   $daftarKonsultasi → array JSON untuk JavaScript (pilih konsultasi)
      */
     public function create()
     {
+        // Tampilkan konsultasi approved ATAU completed yang belum jadi proyek
+        // 'completed' = konsultasi selesai tapi belum dibuatkan proyek pengerjaannya
         $konsultasis = Konsultasi::with('client')
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'completed'])
             ->whereDoesntHave('proyek')
             ->latest()
             ->get();
 
-        // Siapkan data konsultasi untuk ditampilkan melalui JavaScript.
+        // Format data untuk dipakai di JavaScript (dropdown pilih konsultasi)
         $daftarKonsultasi = $konsultasis->map(function ($konsultasi) {
             return [
-                'id' => $konsultasi->id,
-                'client' => $konsultasi->client->name ?? '-',
+                'id'         => $konsultasi->id,
+                'client'     => $konsultasi->client->name ?? '-',
                 'perusahaan' => $konsultasi->nama_perusahaan ?? '-',
-                'jenis' => $konsultasi->jenis_konsultasi ?? 'Umum',
-                'tanggal' => $konsultasi->tanggal_konsultasi
+                'jenis'      => $konsultasi->jenis_konsultasi ?? 'Umum',
+                'tanggal'    => $konsultasi->tanggal_konsultasi
                     ? \Carbon\Carbon::parse($konsultasi->tanggal_konsultasi)
                         ->locale('id')
                         ->translatedFormat('d F Y')
@@ -62,31 +111,39 @@ class AdminProyekController extends Controller
     }
 
     /**
-     * Menyimpan proyek berdasarkan konsultasi yang disetujui.
+     * Simpan proyek baru berdasarkan konsultasi yang sudah disetujui.
+     *
+     * Alur (dalam transaksi database):
+     *   1. Ambil & kunci konsultasi yang dipilih
+     *   2. Pastikan konsultasi berstatus 'approved'
+     *   3. Pastikan konsultasi belum punya proyek
+     *   4. Buat proyek baru dengan progres 0
+     *   5. Simpan riwayat awal proyek
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'konsultasi_id' => 'required|exists:konsultasi,id',
-            'nama_proyek' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string|max:5000',
+            'nama_proyek'   => 'required|string|max:255',
+            'deskripsi'     => 'nullable|string|max:5000',
         ]);
 
+        // Gunakan transaksi agar tidak terjadi data ganda jika request dikirim 2x
         DB::transaction(function () use ($validated) {
 
-            // Ambil konsultasi dan kunci selama proses penyimpanan.
+            // Ambil konsultasi dan kunci selama proses penyimpanan (mencegah race condition)
             $konsultasi = Konsultasi::where('id', $validated['konsultasi_id'])
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            // Pastikan konsultasi sudah disetujui.
-            if ($konsultasi->status !== 'approved') {
+            // Validasi: konsultasi harus approved atau completed
+            if (! in_array($konsultasi->status, ['approved', 'completed'])) {
                 throw ValidationException::withMessages([
-                    'konsultasi_id' => 'Konsultasi belum disetujui Admin.',
+                    'konsultasi_id' => 'Konsultasi harus berstatus Disetujui atau Selesai untuk dapat dibuat proyek.',
                 ]);
             }
 
-            // Pastikan konsultasi belum pernah menjadi proyek.
+            // Validasi: satu konsultasi hanya bisa jadi satu proyek
             if (Proyek::where('konsultasi_id', $konsultasi->id)->exists()) {
                 throw ValidationException::withMessages([
                     'konsultasi_id' => 'Konsultasi ini sudah memiliki proyek.',
@@ -95,23 +152,23 @@ class AdminProyekController extends Controller
 
             $adminId = Auth::guard('admin')->id();
 
-            // Buat proyek berdasarkan data konsultasi.
+            // Buat proyek baru dengan progres awal 0
             $proyek = Proyek::create([
                 'konsultasi_id' => $konsultasi->id,
-                'client_id' => $konsultasi->client_id,
-                'admin_id' => $adminId,
-                'nama_proyek' => $validated['nama_proyek'],
-                'deskripsi' => $validated['deskripsi'] ?? null,
-                'progres' => 0,
-                'status' => 'berjalan',
+                'client_id'     => $konsultasi->client_id,
+                'admin_id'      => $adminId,
+                'nama_proyek'   => $validated['nama_proyek'],
+                'deskripsi'     => $validated['deskripsi'] ?? null,
+                'progres'       => 0,
+                'status'        => 'berjalan',
             ]);
 
-            // Simpan riwayat awal proyek.
+            // Simpan riwayat pertama sebagai catatan pembuatan proyek
             RiwayatProyek::create([
                 'proyek_id' => $proyek->id,
-                'admin_id' => $adminId,
-                'progres' => 0,
-                'catatan' => 'Proyek berhasil dibuat berdasarkan konsultasi yang disetujui.',
+                'admin_id'  => $adminId,
+                'progres'   => 0,
+                'catatan'   => 'Proyek berhasil dibuat berdasarkan konsultasi yang disetujui.',
             ]);
         });
 
@@ -121,7 +178,8 @@ class AdminProyekController extends Controller
     }
 
     /**
-     * Menampilkan detail proyek.
+     * Tampilkan halaman detail proyek beserta riwayat perkembangan.
+     * Memuat relasi: client, admin, konsultasi, dan riwayat (dengan admin-nya).
      */
     public function show($id)
     {
@@ -129,14 +187,14 @@ class AdminProyekController extends Controller
             'client',
             'admin',
             'konsultasi',
-            'riwayat.admin',
+            'riwayat.admin', // riwayat beserta siapa admin yang update
         ])->findOrFail($id);
 
         return view('admin.proyek.show', compact('proyek'));
     }
 
     /**
-     * Menampilkan halaman edit progres proyek.
+     * Tampilkan halaman edit informasi dasar proyek (nama & deskripsi).
      */
     public function edit($id)
     {
@@ -147,7 +205,7 @@ class AdminProyekController extends Controller
     }
 
     /**
-     * Memperbarui informasi proyek.
+     * Perbarui nama dan deskripsi proyek.
      */
     public function update(Request $request, $id)
     {
@@ -155,7 +213,7 @@ class AdminProyekController extends Controller
 
         $validated = $request->validate([
             'nama_proyek' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string|max:5000',
+            'deskripsi'   => 'nullable|string|max:5000',
         ]);
 
         $proyek->update($validated);
@@ -166,7 +224,15 @@ class AdminProyekController extends Controller
     }
 
     /**
-     * Memperbarui progres dan membuat notifikasi untuk client.
+     * Perbarui progres proyek dan kirim notifikasi ke client.
+     *
+     * Alur (dalam transaksi database):
+     *   1. Update kolom progres & status proyek
+     *   2. Simpan riwayat perkembangan
+     *   3. Cek preferensi notifikasi client
+     *   4. Jika preferensi 'updated_proyek' aktif → buat notifikasi
+     *
+     * Jika progres = 100 → status proyek otomatis berubah menjadi 'selesai'.
      */
     public function updateProgress(Request $request, $id)
     {
@@ -178,48 +244,44 @@ class AdminProyekController extends Controller
         $adminId = Auth::guard('admin')->id();
         $proyek = Proyek::findOrFail($id);
 
-        DB::transaction(function () use (
-            $proyek,
-            $validated,
-            $adminId
-        ) {
+        DB::transaction(function () use ($proyek, $validated, $adminId) {
+
+            // Update progres; jika 100% → tandai sebagai selesai
             $proyek->update([
                 'progres' => $validated['progres'],
-                'status' => $validated['progres'] == 100
-                    ? 'selesai'
-                    : 'berjalan',
+                'status'  => $validated['progres'] == 100 ? 'selesai' : 'berjalan',
             ]);
 
-            // Simpan riwayat perkembangan.
+            // Simpan riwayat perkembangan proyek
             RiwayatProyek::create([
                 'proyek_id' => $proyek->id,
-                'admin_id' => $adminId,
-                'progres' => $validated['progres'],
-                'catatan' => $validated['catatan'],
+                'admin_id'  => $adminId,
+                'progres'   => $validated['progres'],
+                'catatan'   => $validated['catatan'],
             ]);
 
-            // Ambil preferensi notifikasi client.
+            // Ambil atau buat preferensi notifikasi client (default semua aktif)
             $preferensi = PreferensiNotifikasi::firstOrCreate(
                 ['client_id' => $proyek->client_id],
                 [
-                    'update_konsultasi' => true,
-                    'perubahan_jadwal' => true,
-                    'updated_proyek' => true,
+                    'update_konsultasi'  => true,
+                    'perubahan_jadwal'   => true,
+                    'updated_proyek'     => true,
                     'artikel_ensiklopedia' => true,
                 ]
             );
 
-            // Kirim notifikasi jika preferensi aktif.
+            // Hanya kirim notifikasi jika preferensi 'updated_proyek' diaktifkan client
             if ($preferensi->updated_proyek) {
                 Notifikasi::create([
                     'client_id' => $proyek->client_id,
-                    'judul' => 'Updated Proyek',
-                    'pesan' => 'Progres proyek "' . $proyek->nama_proyek
+                    'judul'     => 'Updated Proyek',
+                    'pesan'     => 'Progres proyek "' . $proyek->nama_proyek
                         . '" telah diperbarui menjadi '
                         . $validated['progres'] . '%. '
                         . 'Catatan perkembangan: '
                         . $validated['catatan'],
-                    'is_read' => false,
+                    'is_read'   => false,
                 ]);
             }
         });
@@ -230,7 +292,7 @@ class AdminProyekController extends Controller
     }
 
     /**
-     * Menghapus proyek.
+     * Hapus satu proyek beserta riwayatnya.
      */
     public function destroy($id)
     {
@@ -240,11 +302,11 @@ class AdminProyekController extends Controller
         return redirect()
             ->route('admin.proyek.index')
             ->with('success', 'Proyek berhasil dihapus.');
-
     }
 
     /**
-     * Menghapus beberapa proyek sekaligus (Bulk Delete).
+     * Hapus banyak proyek sekaligus (bulk delete).
+     * ID proyek dikirim dari form sebagai array.
      */
     public function bulkDelete(Request $request)
     {
@@ -260,21 +322,46 @@ class AdminProyekController extends Controller
             ->with('success', $count . ' proyek berhasil dihapus.');
     }
 
+    /**
+     * Generate PDF laporan proyek dan tampilkan di viewer browser.
+     *
+     * ALUR:
+     *   1. Ambil data proyek dari database (dengan relasi client)
+     *   2. Render template PDF → resources/views/admin/proyek/single_pdf.blade.php
+     *   3. Encode output PDF ke base64
+     *   4. Kirim base64 ke halaman viewer → pdf_viewer.blade.php
+     *      (Viewer menampilkan PDF di dalam <iframe>, bukan langsung download)
+     *   5. User bisa klik tombol download di toolbar viewer
+     *
+     * MENGAPA PAKAI VIEWER?
+     *   Agar browser menampilkan preview terlebih dahulu, tidak langsung
+     *   diunduh otomatis oleh Internet Download Manager (IDM) atau browser.
+     *
+     * UBAH TAMPILAN PDF:
+     *   → Edit: resources/views/admin/proyek/single_pdf.blade.php
+     *
+     * UBAH UKURAN KERTAS / ORIENTASI:
+     *   → Edit baris: ->setPaper('a4', 'portrait')
+     *   → Pilihan orientasi: 'portrait' atau 'landscape'
+     *   → Pilihan kertas: 'a4', 'a3', 'letter', 'legal'
+     */
     public function exportSinglePdf($id)
     {
-        // 1. Ambil data 1 proyek beserta relasi client-nya
+        // 1. Ambil data proyek beserta relasi client
         $proyek = \App\Models\Proyek::with('client')->findOrFail($id);
 
-        // 2. Generate PDF
+        // 2. Generate PDF dari template blade
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.proyek.single_pdf', compact('proyek'))
                 ->setPaper('a4', 'portrait')
-                ->setOption('isRemoteEnabled', true);
+                ->setOption('isRemoteEnabled', true); // izinkan gambar dari URL eksternal
 
-        // 3. Encode ke base64 lalu tampilkan dalam HTML viewer
-        //    agar browser menampilkan preview (bukan langsung download via IDM)
+        // 3. Encode PDF ke base64 agar bisa dikirim ke view sebagai string
         $pdfBase64 = base64_encode($pdf->output());
-        $filename  = 'Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf';
 
+        // 4. Nama file yang akan digunakan saat user klik download
+        $filename = 'Laporan-Rincian-' . str_replace(' ', '-', $proyek->nama_proyek) . '.pdf';
+
+        // 5. Tampilkan halaman viewer (bukan download langsung)
         return view('admin.proyek.pdf_viewer', compact('pdfBase64', 'filename', 'proyek'));
     }
 }

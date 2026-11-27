@@ -1,5 +1,38 @@
 <?php
 
+/*
+|==========================================================================
+| FILE: routes/web.php
+|==========================================================================
+| FUNGSI : Mendefinisikan SEMUA route (URL) untuk halaman web.
+|           Route dibagi 3 kelompok besar:
+|             1. Route Admin  (/admin/...)   → butuh login sebagai admin
+|             2. Route Publik (/, /layanan, dst) → siapa saja bisa akses
+|             3. Route Client (/dashboard, /konsultasi, dst) → butuh login client
+|
+| CARA MENAMBAH ROUTE BARU:
+|   - Tambah controller di bagian use App\Http\Controllers\... di atas
+|   - Tambah baris Route::get/post/put/delete/resource di kelompok yang sesuai
+|
+| CARA MEMBERI AKSES ROLE TERTENTU:
+|   - Gunakan ->middleware('admin.role:super_admin,admin_layanan')
+|   - Role yang ada: super_admin, admin_konten, admin_layanan
+|
+| CARA MENGATUR THROTTLE (BATAS REQUEST):
+|   - Tambah ->middleware('throttle:jumlah,menit')
+|   - Atau definisikan RateLimiter::for('nama', ...) seperti contoh di bawah
+|
+| MIDDLEWARE YANG TERSEDIA (alias dari bootstrap/app.php):
+|   auth:admin       → wajib login sebagai admin
+|   auth:client      → wajib login sebagai client
+|   guest:admin      → hanya untuk yang belum login admin
+|   guest:client     → hanya untuk yang belum login client
+|   admin.role:...   → cek role admin
+|   single.device:.. → paksa 1 perangkat per akun
+|   throttle:...     → batas jumlah request
+|==========================================================================
+*/
+
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
